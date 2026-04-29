@@ -1,0 +1,63 @@
+[
+  {
+    "id": "set_kitchen",
+    "category": "kitchen",
+    "categoryLabel": "🍳 Kitchen",
+    "fromLang": "en",
+    "fromLangLabel": "English",
+    "toLang": "uz_ru",
+    "toLangLabel": "Uzbek / Russian",
+    "words": [
+      { "word": "Pot", "translation": "Qozon / Горшок", "uz": "Qozon", "ru": "Горшок", "emoji": "🍲", "sentences": ["The pot is on the stove.", "A large pot of stew."] },
+      { "word": "Knife", "translation": "Pichoq / Нож", "uz": "Pichoq", "ru": "Нож", "emoji": "🔪", "sentences": ["The knife is very sharp.", "Use a knife to cut the bread."] },
+      { "word": "Cup", "translation": "Finjon / Чашка", "uz": "Finjon", "ru": "Чашка", "emoji": "☕", "sentences": ["A cup of hot tea.", "The cup is full of water."] },
+      { "word": "Plate", "translation": "Likopcha / Тарелка", "uz": "Likopcha", "ru": "Тарелка", "emoji": "🍽️", "sentences": ["Put food on the plate.", "A clean white plate."] },
+      { "word": "Spoon", "translation": "Qoshiq / Ложка", "uz": "Qoshiq", "ru": "Ложка", "emoji": "🥄", "sentences": ["Stir the soup with a spoon.", "Give me a spoon, please."] },
+      { "word": "Fork", "translation": "Vilka / Вилка", "uz": "Vilka", "ru": "Вилка", "emoji": "🍴", "sentences": ["Use a fork to eat salad.", "The fork is on the table."] }
+    ]
+  },
+  {
+    "id": "set_food",
+    "category": "food",
+    "categoryLabel": "🍔 Food",
+    "fromLang": "en",
+    "fromLangLabel": "English",
+    "toLang": "uz_ru",
+    "toLangLabel": "Uzbek / Russian",
+    "words": [
+      { "word": "Bread", "translation": "Non / Хлеб", "uz": "Non", "ru": "Хлеб", "emoji": "🍞", "sentences": ["Fresh bread smells amazing.", "I eat bread every morning."] },
+      { "word": "Rice", "translation": "Guruch / Рис", "uz": "Guruch", "ru": "Рис", "emoji": "🍚", "sentences": ["Rice is a staple food.", "Cook the rice for 20 minutes."] },
+      { "word": "Soup", "translation": "Sho'rva / Суп", "uz": "Sho'rva", "ru": "Суп", "emoji": "🍜", "sentences": ["Warm soup on cold days.", "The chicken soup is delicious."] },
+      { "word": "Meat", "translation": "Go'sht / Мясо", "uz": "Go'sht", "ru": "Мясо", "emoji": "🥩", "sentences": ["Grill the meat well.", "Meat is a good protein source."] }
+    ]
+  },
+  {
+    "id": "set_school",
+    "category": "school",
+    "categoryLabel": "📚 School",
+    "fromLang": "en",
+    "fromLangLabel": "English",
+    "toLang": "uz_ru",
+    "toLangLabel": "Uzbek / Russian",
+    "words": [
+      { "word": "Book", "translation": "Kitob / Книга", "uz": "Kitob", "ru": "Книга", "emoji": "📖", "sentences": ["Read a book every day.", "This book is interesting."] },
+      { "word": "Notebook", "translation": "Daftar / Тетрадь", "uz": "Daftar", "ru": "Тетрадь", "emoji": "📓", "sentences": ["Write in your notebook.", "Buy a new notebook."] },
+      { "word": "Teacher", "translation": "O'qituvchi / Учитель", "uz": "O'qituvchi", "ru": "Учитель", "emoji": "👩‍🏫", "sentences": ["The teacher explains well.", "Our teacher is kind."] },
+      { "word": "Student", "translation": "O'quvchi / Студент", "uz": "O'quvchi", "ru": "Студент", "emoji": "🧑‍🎓", "sentences": ["A hardworking student.", "Every student should study."] }
+    ]
+  },
+  {
+    "id": "set_greetings",
+    "category": "greetings",
+    "categoryLabel": "👋 Greetings",
+    "fromLang": "en",
+    "fromLangLabel": "English",
+    "toLang": "uz_ru",
+    "toLangLabel": "Uzbek / Russian",
+    "words": [
+      { "word": "Hello", "translation": "Salom / Привет", "uz": "Salom", "ru": "Привет", "emoji": "👋", "sentences": ["Hello, how are you?", "Say hello to everyone."] },
+      { "word": "Goodbye", "translation": "Xayr / До свидания", "uz": "Xayr", "ru": "До свидания", "emoji": "👋", "sentences": ["Goodbye, see you tomorrow!", "Wave goodbye."] },
+      { "word": "Thank you", "translation": "Rahmat / Спасибо", "uz": "Rahmat", "ru": "Спасибо", "emoji": "🙏", "sentences": ["Thank you very much!", "Always say thank you."] }
+    ]
+  }
+]
