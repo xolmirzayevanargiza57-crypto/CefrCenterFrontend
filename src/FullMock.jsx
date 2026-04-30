@@ -162,6 +162,7 @@
           {currentStep.key === "speaking" && (
             <div style={{textAlign:"center",padding:60,background:"#18243a",borderRadius:20,border:"1px solid rgba(225,29,72,0.2)"}}>
               <Ic n="mic" s={48} c="#e11d48"/>
+              {/* vaqtinchalik fix */}
               <h2 style={{fontSize:24,fontWeight:800,marginTop:20,color:"#fff"}}>Speaking is being fixed</h2>
               <p style={{color:"#8b9bbf",marginTop:10}}>This section is temporarily unavailable for technical maintenance.</p>
               <button onClick={completeStep} style={{marginTop:24,padding:"10px 20px",borderRadius:10,background:"#1D9E75",color:"#fff",border:"none",fontWeight:700,cursor:"pointer"}}>Skip Section</button>
