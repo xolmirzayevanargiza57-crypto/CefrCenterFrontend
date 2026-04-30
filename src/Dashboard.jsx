@@ -22,6 +22,7 @@ import Community    from "./Community";
 import PremiumModal from "./PremiumModal.jsx";
 import FaceToFace   from "./FaceToFace.jsx";
 import AdminPanel   from "./AdminPanel.jsx";
+import SecurityGuard from "./SecurityGuard.jsx";
 
 import { useProgress, LEVEL_THRESHOLDS, CEFR_META } from "./useProgress";
 import { scoreToCEFR, scoreToWritingBand } from "./scoring";
@@ -392,9 +393,9 @@ export default function Dashboard() {
   const [sideOpen, setSideOpen]   = useState(window.innerWidth > 768);
   const [loading, setLoading]     = useState(true);
   const [timeBonusClaimed, setTimeBonusClaimed] = useState(false);
-  const [showPremiumModal, setShowPremiumModal] = useState(false);
   const [lessons, setLessons]     = useState(null);
   const [unreadNotifs, setUnreadNotifs] = useState(0);
+  const [isVerified, setIsVerified] = useState(false);
   const userAddedRef = useRef(false);
   const timerRef = useRef(null);
   const syncTimerRef = useRef(null);
@@ -519,6 +520,11 @@ export default function Dashboard() {
       </div>
     </div>
   );
+
+  // SECURE SHIELD
+  if (user && !isVerified) {
+    return <SecurityGuard user={user} isAdmin={dbUser?.isAdmin} onVerified={() => setIsVerified(true)} />;
+  }
 
   if (!progress.onboarded) return <US onSelect={setInitialLevel} />;
 
