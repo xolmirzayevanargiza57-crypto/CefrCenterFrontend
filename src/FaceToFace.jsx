@@ -83,7 +83,11 @@ export default function FaceToFace({ progress, openPremiumModal }) {
 
   const setupWebRTC = async (isCaller) => {
     const pc = new RTCPeerConnection({
-      iceServers: [{ urls: "stun:stun.l.google.com:19302" }, { urls: "stun:stun1.l.google.com:19302" }]
+      iceServers: [
+        { urls: "stun:stun.l.google.com:19302" },
+        { urls: "stun:stun1.l.google.com:19302" },
+        { urls: "stun:stun2.l.google.com:19302" }
+      ]
     });
     peerConnectionRef.current = pc;
 
@@ -93,15 +97,16 @@ export default function FaceToFace({ progress, openPremiumModal }) {
       });
     }
 
-    // When remote stream arrives
     pc.ontrack = (event) => {
-      if (remoteVideoRef.current) {
+      console.log("Remote stream received...");
+      if (remoteVideoRef.current && event.streams[0]) {
         remoteVideoRef.current.srcObject = event.streams[0];
+        remoteVideoRef.current.play().catch(e => console.error("Play failed", e));
       }
     };
 
     pc.onicecandidate = (event) => {
-      if (event.candidate) {
+      if (event.candidate && socketRef.current) {
         socketRef.current.emit("ice-candidate", event.candidate);
       }
     };
