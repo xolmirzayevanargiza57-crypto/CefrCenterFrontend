@@ -334,8 +334,9 @@ export default function AdminPanel({ user, onBack }) {
                 <form onSubmit={handleSendNotif} style={{ display: "flex", flexDirection: "column", gap: 20 }}>
                    <input type="text" placeholder="Announcement Title" value={notifForm.title} onChange={e=>setNotifForm({...notifForm, title:e.target.value})} style={{ padding: 16, borderRadius: 16, background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.05)", color: "#fff" }} required />
                    <textarea placeholder="Write your message here..." value={notifForm.message} onChange={e=>setNotifForm({...notifForm, message:e.target.value})} style={{ padding: 16, borderRadius: 16, background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.05)", color: "#fff", minHeight: 120 }} required />
-                   <div style={{ display: "flex", gap: 12 }}>
-                      <input type="text" placeholder="Media URL (Optional Image)" value={notifForm.image} onChange={e=>setNotifForm({...notifForm, image:e.target.value})} style={{ flex: 1, padding: 16, borderRadius: 16, background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.05)", color: "#fff" }} />
+                   <div>
+                      <label style={{ fontSize: 11, fontWeight: 800, color: "#64748b", display: "block", marginBottom: 8 }}>MEDIA URL (IMAGE LINK)</label>
+                      <input type="text" placeholder="https://image-link.com/photo.jpg" value={notifForm.image} onChange={e=>setNotifForm({...notifForm, image:e.target.value})} style={{ width: "100%", padding: 16, borderRadius: 16, background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.05)", color: "#fff" }} />
                    </div>
                    <button type="submit" style={{ padding: 16, borderRadius: 16, background: "#4a9eff", border: "none", color: "#fff", fontWeight: 800, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", gap: 10 }}>
                       <Plus size={18} /> Publish Broadcast
