@@ -1,211 +1,178 @@
 import React, { useState } from "react";
+import { Check, Crown, CreditCard, Image as ImageIcon, X, Send, ShieldCheck, Zap } from "lucide-react";
 import BACKEND_URL from "./config/api";
 
-function Ic({ n, s = 16, c = "currentColor" }) {
-  const st = { width: s, height: s, display: "inline-block", verticalAlign: "middle" };
-  const d = {
-    x: <svg style={st} viewBox="0 0 24 24" fill="none" stroke={c} strokeWidth="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>,
-    check: <svg style={st} viewBox="0 0 24 24" fill="none" stroke={c} strokeWidth="2.5"><polyline points="20 6 9 17 4 12"/></svg>,
-    upload: <svg style={st} viewBox="0 0 24 24" fill="none" stroke={c} strokeWidth="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>,
-    card: <svg style={st} viewBox="0 0 24 24" fill="none" stroke={c} strokeWidth="2"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>,
-  };
-  return d[n] || null;
-}
-
 export default function PremiumModal({ user, onClose, isPremium, premiumExpire }) {
+  const [step, setStep] = useState(1);
+  const [amount, setAmount] = useState(49000);
+  const [receipt, setReceipt] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+  const [success, setSuccess] = useState(false);
+
   const PLANS = [
-    { id: "30_days_basic", price: 55000, name: "Premium Basic", desc: "Access to standard modules for 30 days", days: 30, color: "#4a9eff" },
-    { id: "30_days_pro", price: 49000, name: "Premium Pro", desc: "Best Value! Face-to-Face & More for 30 days", days: 30, color: "#1D9E75", best: true },
-    { id: "90_days", price: 100000, name: "Ultimate Premium", desc: "All features forever! 90 days validity", days: 90, color: "#EF9F27" }
+    { id: 1, name: "Starter", price: 49000, desc: "30 Days Access", icon: Zap, color: "#10b981" },
+    { id: 2, name: "Scholar", price: 99000, desc: "90 Days Access", icon: Crown, color: "#4a9eff" },
+    { id: 3, name: "Infinite", price: 149000, desc: "Unlimited Mastery", icon: ShieldCheck, color: "#fbbf24" }
   ];
 
-  const [step, setStep] = useState("select_plan"); // select_plan | select_method | upload_receipt | success
-  const [plan, setPlan] = useState(PLANS[1]);
-  const [method, setMethod] = useState(null);
-  
-  // Form State
-  const [file, setFile] = useState(null);
-  const [phone, setPhone] = useState("");
-  const [comment, setComment] = useState("");
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [error, setError] = useState("");
-  const [alreadyActive, setAlreadyActive] = useState(isPremium || false);
+  const handleFileUpload = (e) => {
+    const file = e.target.files[0];
+    if (file && file.size > 5 * 1024 * 1024) {
+      setError("File is too large (max 5MB)");
+      return;
+    }
+    setReceipt(file);
+    setError("");
+  };
 
-  const CARD_NUMBER = "8600 XXXX XXXX XXXX";
-  const CARD_NAME = "HOJIAKBAR";
-
-  const handleCheckout = async (e) => {
-    e.preventDefault();
-    if (!file) return setError("Please upload the payment receipt.");
-    if (!phone) return setError("Please enter your phone number.");
-    
-    setIsSubmitting(true);
+  const handleSubmit = async () => {
+    if (!receipt) {
+      setError("Please upload your payment receipt");
+      return;
+    }
+    setLoading(true);
     setError("");
 
     const formData = new FormData();
-    formData.append("userId", user.uid);
     formData.append("email", user.email);
-    formData.append("planId", plan.id);
-    formData.append("paymentMethod", method);
-    formData.append("amount", plan.price);
-    formData.append("phone", phone);
-    formData.append("comment", comment);
-    formData.append("receipt", file);
+    formData.append("amount", amount);
+    formData.append("receipt", receipt);
 
     try {
-      const res = await fetch(`${BACKEND_URL}/api/payments/create`, {
+      const res = await fetch(`${BACKEND_URL}/api/payments/submit`, {
         method: "POST",
         body: formData,
       });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error || "Failed");
-      setStep("success");
+      if (res.ok) {
+        setSuccess(true);
+      } else {
+        const data = await res.json();
+        setError(data.error || "Execution failed. Please contact admin.");
+      }
     } catch (err) {
-      setError(err.message || "An error occurred. Please try again.");
+      setError("Network error. Check your connection.");
     } finally {
-      setIsSubmitting(false);
+      setLoading(false);
     }
   };
 
-  return (
-    <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.5)", backdropFilter: "blur(8px)", zIndex: 10000, display: "flex", alignItems: "center", justifyContent: "center", padding: 20 }}>
-      <div style={{ background: "#131d2e", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 24, width: "100%", maxWidth: 500, overflow: "hidden", position: "relative", boxShadow: "0 24px 64px rgba(0,0,0,0.6)", animation: "fadeUp .3s ease" }}>
-        
-        {/* Header */}
-        <div style={{ padding: "20px 24px", borderBottom: "1px solid rgba(255,255,255,0.05)", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-          <h2 style={{ fontSize: 18, fontWeight: 800, color: "#fff", display: "flex", alignItems: "center", gap: 10 }}>
-             Purchase Premium
-          </h2>
-          <button onClick={onClose} style={{ background: "transparent", border: "none", color: "#8b9bbf", cursor: "pointer" }}><Ic n="x" s={20}/></button>
-        </div>
-
-        <div style={{ padding: 24 }}>
-          {error && <div style={{ background: "rgba(225,29,72,0.1)", border: "1px solid rgba(225,29,72,0.2)", color: "#e11d48", padding: "10px 14px", borderRadius: 10, fontSize: 13, marginBottom: 20, fontWeight: 600 }}>{error}</div>}
-
-          {alreadyActive ? (
-            <div style={{ textAlign: "center", padding: "20px 0" }}>
-              <div style={{ width: 64, height: 64, background: "rgba(239,159,39,0.1)", borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 16px", border: "1px solid rgba(239,159,39,0.3)" }}>
-                <Ic n="check" s={32} c="#EF9F27" />
-              </div>
-              <h2 style={{ fontSize: 20, fontWeight: 800, color: "#fff", marginBottom: 10 }}>Premium already active!</h2>
-              <p style={{ fontSize: 14, color: "#8b9bbf", marginBottom: 24, lineHeight: 1.5 }}>
-                You already have an active Premium subscription.<br/>It expires on: <strong style={{ color: "#fff" }}>{premiumExpire ? new Date(premiumExpire).toLocaleDateString() : "Lifetime"}</strong>.
-              </p>
-              <button onClick={onClose} style={{ width: "100%", padding: "14px", background: "#18243a", border: "1px solid rgba(255,255,255,0.1)", color: "#fff", borderRadius: 12, cursor: "pointer", fontWeight: 700 }}>
-                Done
-              </button>
-            </div>
-          ) : step === "select_plan" ? (
-            <div>
-              <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(130px, 1fr))", gap: 16 }}>
-                {PLANS.map(p => (
-                  <div key={p.id} onClick={() => setPlan(p)} style={{ background: plan.id === p.id ? `${p.color}15` : "rgba(255,255,255,0.03)", border: `2px solid ${plan.id === p.id ? p.color : "rgba(255,255,255,0.05)"}`, borderRadius: 16, padding: "20px 14px", cursor: "pointer", position: "relative", transition: "all .2s" }}>
-                    {p.best && <div style={{ position: "absolute", top: -10, left: "50%", transform: "translateX(-50%)", background: p.color, color: "#fff", fontSize: 10, fontWeight: 900, padding: "4px 10px", borderRadius: 10, whiteSpace: "nowrap" }}>RECOMMENDED</div>}
-                    <h3 style={{ fontSize: 15, fontWeight: 800, color: plan.id === p.id ? p.color : "#fff", textAlign: "center", marginBottom: 6 }}>{p.name}</h3>
-                    <div style={{ fontSize: 18, fontWeight: 900, color: "#fff", textAlign: "center", letterSpacing: 0.5, marginBottom: 8 }}>{p.price.toLocaleString()} UZS</div>
-                    <p style={{ fontSize: 11, color: "#8b9bbf", textAlign: "center", lineHeight: 1.4 }}>{p.desc}</p>
-                  </div>
-                ))}
-              </div>
-              <button 
-                onClick={() => setStep("select_method")}
-                style={{ width: "100%", marginTop: 24, padding: "14px", borderRadius: 12, border: "none", background: plan.color, color: "#fff", fontSize: 15, fontWeight: 800, cursor: "pointer", boxShadow: `0 8px 32px ${plan.color}40`, transition: "all 0.3s" }}>
-                Continue
-              </button>
-            </div>
-          ) : step === "select_method" ? (
-            <div>
-              <p style={{ fontSize: 14, color: "#8b9bbf", marginBottom: 16 }}>Select Payment Method:</p>
-              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
-                {[
-                  { id: "click", label: "Click" },
-                  { id: "payme", label: "Payme" },
-                  { id: "uzum", label: "Uzum Bank" },
-                  { id: "paynet", label: "Paynet" }
-                ].map(m => (
-                  <button key={m.id} onClick={() => { setMethod(m.id); setStep("upload_receipt"); }}
-                    style={{ background: "#18243a", border: "1px solid rgba(255,255,255,0.1)", padding: "20px 10px", borderRadius: 14, color: "#fff", fontSize: 15, fontWeight: 700, cursor: "pointer", transition: "all .2s" }}>
-                    {m.label}
-                  </button>
-                ))}
-              </div>
-              <button onClick={() => setStep("select_plan")} style={{ width: "100%", marginTop: 20, padding: "12px", background: "transparent", border: "1px solid rgba(255,255,255,0.1)", color: "#8b9bbf", borderRadius: 10, cursor: "pointer" }}>Back</button>
-            </div>
-          ) : step === "upload_receipt" ? (
-            <form onSubmit={handleCheckout}>
-              <div style={{ background: "rgba(74,158,255,0.1)", border: "1px solid rgba(74,158,255,0.2)", borderRadius: 12, padding: 16, marginBottom: 20 }}>
-                <p style={{ fontSize: 13, color: "#4a9eff", fontWeight: 700, marginBottom: 12 }}>Transfer the payment to the card below and upload receipt:</p>
-                <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 8, fontSize: 14 }}>
-                  <span style={{ color: "#8b9bbf" }}>Card Number:</span> <span style={{ color: "#fff", fontWeight: 800, letterSpacing: 1 }}><Ic n="card" s={14} c="#a78bfa" /> {CARD_NUMBER}</span>
-                </div>
-                <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 8, fontSize: 14 }}>
-                  <span style={{ color: "#8b9bbf" }}>Cardholder:</span> <span style={{ color: "#fff", fontWeight: 700 }}>{CARD_NAME}</span>
-                </div>
-                <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 8, fontSize: 14 }}>
-                  <span style={{ color: "#8b9bbf" }}>Amount:</span> <span style={{ color: "#fff", fontWeight: 700 }}>{plan.price.toLocaleString()} UZS</span>
-                </div>
-                <div style={{ display: "flex", justifyContent: "space-between", fontSize: 14, background: "rgba(0,0,0,0.2)", padding: "6px 10px", borderRadius: 6, marginTop: 8 }}>
-                  <span style={{ color: "#8b9bbf" }}>Comment:</span> <span style={{ color: "#a78bfa", fontWeight: 700 }}>{plan.name}, userId: {user?.uid?.slice(-6)}</span>
-                </div>
-              </div>
-
-              <div style={{ marginBottom: 16 }}>
-                <label style={{ display: "block", fontSize: 12, fontWeight: 700, color: "#8b9bbf", marginBottom: 6 }}>Payment Receipt (Image or PDF) *</label>
-                <div style={{ 
-                  border: "2px dashed rgba(255,255,255,0.2)", borderRadius: 12, padding: "20px", textAlign: "center", 
-                  background: file ? "rgba(29,158,117,0.1)" : "rgba(255,255,255,0.02)", cursor: "pointer", position: "relative" 
-                }}>
-                  <input type="file" accept="image/*,.pdf" onChange={e => setFile(e.target.files[0])} style={{ position: "absolute", inset: 0, opacity: 0, cursor: "pointer" }} required />
-                  {file ? (
-                    <div style={{ color: "#1D9E75", fontWeight: 700 }}><Ic n="check" s={18} /> {file.name}</div>
-                  ) : (
-                     <div style={{ color: "#a78bfa", fontSize: 13 }}><Ic n="upload" s={20} /><br/>Click to select a file</div>
-                  )}
-                </div>
-              </div>
-
-              <div style={{ display: "flex", gap: 12, marginBottom: 16 }}>
-                <div style={{ flex: 1 }}>
-                  <label style={{ display: "block", fontSize: 12, fontWeight: 700, color: "#8b9bbf", marginBottom: 6 }}>Phone Number *</label>
-                  <input type="text" value={phone} onChange={e => setPhone(e.target.value)} placeholder="+998 90 123 45 67" required style={{ width: "100%", background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", color: "#fff", padding: "10px 14px", borderRadius: 10, fontSize: 14 }} />
-                </div>
-                <div style={{ flex: 1 }}>
-                  <label style={{ display: "block", fontSize: 12, fontWeight: 700, color: "#8b9bbf", marginBottom: 6 }}>Amount (UZS) *</label>
-                  <div style={{ width: "100%", background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.05)", color: "#fff", padding: "10px 14px", borderRadius: 10, fontSize: 14, fontWeight: 700, opacity: 0.7 }}>
-                    {plan.price.toLocaleString()} UZS
-                  </div>
-                </div>
-              </div>
-
-              <div style={{ marginBottom: 20 }}>
-                <label style={{ display: "block", fontSize: 12, fontWeight: 700, color: "#8b9bbf", marginBottom: 6 }}>Additional comment (Optional)</label>
-                <input type="text" value={comment} onChange={e => setComment(e.target.value)} placeholder="Transaction ID or comment..." style={{ width: "100%", background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", color: "#fff", padding: "10px 14px", borderRadius: 10, fontSize: 14 }} />
-              </div>
-
-              <div style={{ display: "flex", gap: 12 }}>
-                <button type="button" onClick={() => setStep("select_method")} style={{ padding: "14px", background: "transparent", border: "1px solid rgba(255,255,255,0.1)", color: "#8b9bbf", borderRadius: 12, cursor: "pointer", fontWeight: 700 }}>Back</button>
-                <button type="submit" disabled={isSubmitting} style={{ flex: 1, padding: "14px", background: "#4a9eff", border: "none", color: "#fff", borderRadius: 12, cursor: "pointer", fontWeight: 800, opacity: isSubmitting ? 0.6 : 1 }}>
-                  {isSubmitting ? "Submitting..." : "Confirm & Submit"}
-                </button>
-              </div>
-            </form>
-          ) : (
-            <div style={{ textAlign: "center", padding: "20px 0" }}>
-              <div style={{ width: 64, height: 64, background: "rgba(29,158,117,0.15)", borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 16px", border: "1px solid rgba(29,158,117,0.3)" }}>
-                <Ic n="check" s={32} c="#1D9E75" />
-              </div>
-              <h2 style={{ fontSize: 20, fontWeight: 800, color: "#fff", marginBottom: 10 }}>Request Submitted!</h2>
-              <p style={{ fontSize: 14, color: "#8b9bbf", marginBottom: 24, lineHeight: 1.5 }}>
-                Your payment will be reviewed by our admins. Once approved, your profile will automatically upgrade to Premium (usually within 5-15 minutes).
-              </p>
-              <button onClick={onClose} style={{ width: "100%", padding: "14px", background: "#18243a", border: "1px solid rgba(255,255,255,0.1)", color: "#fff", borderRadius: 12, cursor: "pointer", fontWeight: 700 }}>
-                Close
-              </button>
-            </div>
-          )}
-
+  if (isPremium) {
+    return (
+      <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.85)", backdropFilter: "blur(20px)", zIndex: 9999, display: "flex", alignItems: "center", justifyContent: "center", padding: 20 }}>
+        <div style={{ width: "100%", maxWidth: 460, background: "#131d2e", borderRadius: 32, padding: 40, textAlign: "center", border: "1px solid rgba(251,191,36,0.3)", boxShadow: "0 25px 50px rgba(0,0,0,0.5)" }}>
+           <div style={{ width: 80, height: 80, borderRadius: "50%", background: "rgba(251,191,36,0.1)", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 24px" }}>
+              <Crown size={40} color="#fbbf24" fill="#fbbf24" />
+           </div>
+           <h2 style={{ fontSize: 28, fontWeight: 900, color: "#fff", marginBottom: 16 }}>Premium Student</h2>
+           <p style={{ color: "#8b9bbf", fontSize: 16, lineHeight: 1.6, marginBottom: 32 }}>
+             You have full access to all features until <span style={{ color: "#fbbf24", fontWeight: 800 }}>{new Date(premiumExpire).toLocaleDateString()}</span>. Continue your mastery!
+           </p>
+           <button onClick={onClose} style={{ width: "100%", padding: 16, borderRadius: 16, background: "#fbbf24", border: "none", color: "#000", fontWeight: 900, fontSize: 16, cursor: "pointer" }}>Dismiss</button>
         </div>
       </div>
+    );
+  }
+
+  return (
+    <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.9)", backdropFilter: "blur(25px)", zIndex: 9999, display: "flex", alignItems: "center", justifyContent: "center", padding: 20 }}>
+      
+      <div style={{ width: "100%", maxWidth: 480, background: "#0b1120", border: "1px solid rgba(255,255,255,0.06)", borderRadius: 32, overflow: "hidden", position: "relative", boxShadow: "0 30px 100px rgba(0,0,0,0.6)" }}>
+        
+        {/* Header */}
+        <div style={{ background: "linear-gradient(135deg,#7c3aed,#a78bfa)", padding: "32px 32px 24px" }}>
+          <button onClick={onClose} style={{ position: "absolute", top: 20, right: 20, background: "rgba(0,0,0,0.2)", border: "none", color: "#fff", borderRadius: "50%", width: 36, height: 36, display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer" }}>
+            <X size={20} />
+          </button>
+          <h2 style={{ color: "#fff", fontSize: 24, fontWeight: 900, marginBottom: 8 }}>Upgrade to Premium</h2>
+          <p style={{ color: "rgba(255,255,255,0.7)", fontSize: 13, fontWeight: 600 }}>Unleash the full potential of CEFR Center</p>
+        </div>
+
+        <div style={{ padding: 32 }}>
+          {success ? (
+            <div style={{ textAlign: "center", padding: "20px 0", animation: "fUp .5s ease" }}>
+               <div style={{ width: 64, height: 64, borderRadius: "50%", background: "rgba(16,185,129,0.1)", border: "2px solid #10b981", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 20px" }}>
+                  <Send size={28} color="#10b981" />
+               </div>
+               <h3 style={{ fontSize: 22, fontWeight: 900, color: "#fff", marginBottom: 12 }}>Receipt Submitted!</h3>
+               <p style={{ color: "#8b9bbf", fontSize: 14, lineHeight: 1.6, marginBottom: 32 }}>We've received your receipt. Our admins will verify your payment within 1-2 hours. Enjoy your learning!</p>
+               <button onClick={onClose} style={{ width: "100%", padding: 16, borderRadius: 16, background: "#10b981", border: "none", color: "#fff", fontWeight: 900, cursor: "pointer" }}>Back to Dashboard</button>
+            </div>
+          ) : (
+            <>
+              {step === 1 ? (
+                <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+                  {PLANS.map(p => (
+                    <div 
+                      key={p.id} 
+                      onClick={() => { setAmount(p.price); setStep(2); }} 
+                      style={{ padding: 24, borderRadius: 20, background: amount === p.price ? "rgba(74,158,255,0.05)" : "rgba(255,255,255,0.02)", border: amount === p.price ? `2px solid ${p.color}` : "1px solid rgba(255,255,255,0.05)", cursor: "pointer", transition: "all 0.2s", display: "flex", alignItems: "center", gap: 20 }}
+                    >
+                      <div style={{ width: 48, height: 48, borderRadius: 12, background: `${p.color}15`, display: "flex", alignItems: "center", justifyContent: "center" }}>
+                        <p.icon size={24} color={p.color} />
+                      </div>
+                      <div style={{ flex: 1 }}>
+                        <div style={{ fontWeight: 800, color: "#fff" }}>{p.name} Plan</div>
+                        <div style={{ fontSize: 12, color: "#64748b" }}>{p.desc}</div>
+                      </div>
+                      <div style={{ textAlign: "right" }}>
+                        <div style={{ fontWeight: 900, fontSize: 15, color: p.color }}>{p.price.toLocaleString()}</div>
+                        <div style={{ fontSize: 9, fontWeight: 800, color: "rgba(255,255,255,0.1)" }}>UZS</div>
+                      </div>
+                    </div>
+                  ))}
+                  <div style={{ marginTop: 24, padding: 16, background: "rgba(16,185,129,0.05)", borderRadius: 16, border: "1px dashed rgba(16,185,129,0.3)", display: "flex", alignItems: "center", gap: 12 }}>
+                     <ShieldCheck size={18} color="#10b981" />
+                     <span style={{ fontSize: 11, fontWeight: 700, color: "#10b981" }}>Money back guarantee within 48 hours</span>
+                  </div>
+                </div>
+              ) : (
+                <div style={{ animation: "fUp .3s ease" }}>
+                  <div style={{ background: "rgba(255,255,255,0.03)", padding: 20, borderRadius: 24, border: "1px solid rgba(255,255,255,0.05)", marginBottom: 24 }}>
+                     <div style={{ fontSize: 11, fontWeight: 800, color: "#64748b", marginBottom: 12, textTransform: "uppercase" }}>Payment Instructions</div>
+                     <div style={{ display: "flex", alignItems: "center", gap: 16, marginBottom: 16 }}>
+                        <div style={{ width: 40, height: 40, borderRadius: 10, background: "#fff", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                           <CreditCard size={20} color="#000" />
+                        </div>
+                        <div style={{ flex: 1 }}>
+                           <div style={{ fontSize: 14, fontWeight: 900, color: "#fff", letterSpacing: 1.5 }}>8600 0000 0000 0000</div>
+                           <div style={{ fontSize: 10, color: "#64748b", fontWeight: 700 }}>CEFR ADMIN: Nargiza Xolmirzayeva</div>
+                        </div>
+                        <button onClick={() => { navigator.clipboard.writeText("8600000000000000"); alert("Copied!"); }} style={{ background: "none", border: "none", color: "#4a9eff", fontSize: 11, fontWeight: 800, cursor: "pointer" }}>COPY</button>
+                     </div>
+                     <div style={{ fontSize: 11, color: "#8b9bbf", lineHeight: 1.5 }}>Please transfer <strong style={{ color: "#fbbf24" }}>{amount.toLocaleString()} UZS</strong>. After payment, upload a clear screenshot of your receipt.</div>
+                  </div>
+
+                  <div style={{ marginBottom: 24 }}>
+                    <label style={{ display: "block", marginBottom: 12 }}>
+                      <div style={{ width: "100%", height: 120, borderRadius: 20, border: "2px dashed rgba(255,255,255,0.1)", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", cursor: "pointer", transition: "all 0.2s", background: receipt ? "rgba(16,185,129,0.05)" : "rgba(255,255,255,0.02)" }}>
+                         <ImageIcon size={32} color={receipt ? "#10b981" : "#64748b"} />
+                         <span style={{ fontSize: 12, fontWeight: 700, color: receipt ? "#10b981" : "#8b9bbf", marginTop: 10 }}>{receipt ? receipt.name : "Attach Payment Receipt"}</span>
+                      </div>
+                      <input type="file" accept="image/*" onChange={handleFileUpload} style={{ display: "none" }} />
+                    </label>
+                  </div>
+
+                  {error && <div style={{ color: "#ef4444", fontSize: 12, fontWeight: 700, marginBottom: 16, textAlign: "center" }}>{error}</div>}
+
+                  <div style={{ display: "flex", gap: 12 }}>
+                    <button onClick={() => setStep(1)} style={{ flex: 1, padding: 16, borderRadius: 16, background: "rgba(255,255,255,0.05)", border: "none", color: "#fff", fontWeight: 800, cursor: "pointer" }}>Back</button>
+                    <button onClick={handleSubmit} disabled={loading} style={{ flex: 2, padding: 16, borderRadius: 16, background: "#4a9eff", border: "none", color: "#fff", fontWeight: 900, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", gap: 10 }}>
+                      {loading ? <RefreshCw className="spin" size={18} /> : <Check size={18} />} {loading ? "Verifying..." : "Confirm Payment"}
+                    </button>
+                  </div>
+                </div>
+              )}
+            </>
+          )}
+        </div>
+      </div>
+      
+      <style>{`
+        @keyframes fUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        .spin { animation: spin 1s linear infinite; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+      `}</style>
     </div>
   );
 }

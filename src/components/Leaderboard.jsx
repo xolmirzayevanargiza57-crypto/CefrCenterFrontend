@@ -1,195 +1,141 @@
 import React, { useState, useEffect } from "react";
-import { Trophy, Medal, Crown, Star, ChevronUp, ChevronDown, User, Zap } from "lucide-react";
-
+import { Trophy, Medal, Crown, Star, User, Zap, ChevronRight, TrendingUp } from "lucide-react";
 import BACKEND_URL from "../config/api.js";
 
 export default function Leaderboard({ currentUser }) {
-  const [period, setPeriod] = useState("all"); // all, month, today
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [userRank, setUserRank] = useState(-1);
 
   useEffect(() => {
     fetchLeaderboard();
-  }, [period]);
+  }, []);
 
   const fetchLeaderboard = async () => {
     setLoading(true);
     try {
-      const resp = await fetch(`${BACKEND_URL}/api/leaderboard?period=${period}&email=${encodeURIComponent(currentUser?.email || "")}`);
+      const resp = await fetch(`${BACKEND_URL}/api/leaderboard?email=${encodeURIComponent(currentUser?.email || "")}`);
       const data = await resp.json();
       setUsers(data.users || []);
       setUserRank(data.userRank);
     } catch (e) {
-      console.error("Leaderboard fetch failed", e);
+      console.error("Leaderboard error", e);
     } finally {
       setLoading(false);
     }
   };
 
-  return (
-    <div className="leaderboard-container" style={{
-      background: "linear-gradient(135deg, #131d2e 0%, #0b1120 100%)",
-      borderRadius: "24px",
-      border: "1px solid rgba(255,255,255,0.06)",
-      padding: "24px",
-      boxShadow: "0 20px 50px rgba(0,0,0,0.3)"
-    }}>
-      <style>{`
-        @keyframes slideIn {
-          from { opacity: 0; transform: translateX(20px); }
-          to { opacity: 1; transform: translateX(0); }
-        }
-        .period-tab {
-          padding: 8px 16px;
-          border-radius: 12px;
-          font-size: 13px;
-          font-weight: 700;
-          cursor: pointer;
-          transition: all 0.2s;
-          border: 1px solid transparent;
-          background: transparent;
-        }
-        .period-tab.active {
-          background: rgba(74, 158, 255, 0.1);
-          color: #4a9eff;
-          border-color: rgba(74, 158, 255, 0.2);
-        }
-        .period-tab:not(.active) {
-          color: #64748b;
-        }
-        .period-tab:hover:not(.active) {
-          background: rgba(255,255,255,0.03);
-          color: #94a3b8;
-        }
-        .rank-card {
-           display: flex;
-           align-items: center;
-           gap: 16px;
-           padding: 12px 16px;
-           border-radius: 16px;
-           background: rgba(255,255,255,0.02);
-           margin-bottom: 8px;
-           transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-        }
-        .rank-card:hover {
-           background: rgba(255,255,255,0.04);
-           transform: scale(1.02);
-           box-shadow: 0 10px 30px rgba(0,0,0,0.2);
-        }
-        .rank-card.me {
-           border: 1px solid rgba(74, 158, 255, 0.3);
-           background: rgba(74, 158, 255, 0.05);
-        }
-        @media (max-width: 480px) {
-          .leaderboard-container { padding: 16px !important; }
-          .rank-card { gap: 10px !important; padding: 10px !important; }
-          .rank-card span { font-size: 10px !important; }
-          .rank-card h4 { font-size: 13px !important; }
-          .period-tab { padding: 6px 10px !important; font-size: 11px !important; }
-        }
-      `}</style>
+  const top3 = users.slice(0, 3);
+  const others = users.slice(3);
 
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 24 }}>
-        <div>
-          <h2 style={{ fontSize: 20, fontWeight: 800, color: "#fff", display: "flex", alignItems: "center", gap: 10 }}>
-            <Trophy size={22} className="text-yellow-400" /> Hall of Fame
-          </h2>
-          <p style={{ fontSize: 12, color: "#64748b" }}>Top learners competing for mastery</p>
+  const PodiumItem = ({ user, rank, delay }) => {
+    const isMe = user?.email === currentUser?.email;
+    const height = rank === 1 ? 140 : (rank === 2 ? 110 : 90);
+    const order = rank === 1 ? 2 : (rank === 2 ? 1 : 3);
+
+    if (!user) return <div style={{ flex: 1 }} />;
+
+    return (
+      <div style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", order, animation: `slideUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards ${delay}s`, opacity: 0 }}>
+        <div style={{ position: "relative", marginBottom: 12 }}>
+          <div style={{ 
+            width: rank === 1 ? 70 : 60, height: rank === 1 ? 70 : 60, 
+            borderRadius: "50%", border: rank === 1 ? "4px solid #fbbf24" : "3px solid rgba(255,255,255,0.1)",
+            padding: 3, overflow: "hidden", position: "relative", zIndex: 2, background: "#131d2e",
+            boxShadow: rank === 1 ? "0 0 30px rgba(251,191,36,0.3)" : "none"
+          }}>
+            {user.photoURL ? <img src={user.photoURL} alt="" style={{ width: "100%", height: "100%", objectFit: "cover", borderRadius: "50%" }} /> : <User size={rank === 1 ? 40 : 30} color="#64748b" />}
+          </div>
+          <div style={{ position: "absolute", top: -15, left: "50%", transform: "translateX(-50%)", zIndex: 3 }}>
+            {rank === 1 && <Crown size={28} color="#fbbf24" fill="#fbbf24" />}
+            {rank === 2 && <Medal size={22} color="#94a3b8" fill="#94a3b8" />}
+            {rank === 3 && <Medal size={22} color="#b45309" fill="#b45309" />}
+          </div>
         </div>
-        <div style={{ display: "flex", gap: 4, background: "rgba(0,0,0,0.2)", padding: 4, borderRadius: 14 }}>
-          <button className={`period-tab ${period === "today" ? "active" : ""}`} onClick={() => setPeriod("today")}>Today</button>
-          <button className={`period-tab ${period === "month" ? "active" : ""}`} onClick={() => setPeriod("month")}>Month</button>
-          <button className={`period-tab ${period === "all" ? "active" : ""}`} onClick={() => setPeriod("all")}>All</button>
+        <div style={{ fontSize: 13, fontWeight: 800, color: isMe ? "#4a9eff" : "#fff", marginBottom: 8, textAlign: "center", maxWidth: 80, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+          {user.username || "User"}
+        </div>
+        <div style={{ 
+          width: "100%", height, background: rank === 1 ? "linear-gradient(180deg, rgba(251,191,36,0.2), transparent)" : "linear-gradient(180deg, rgba(255,255,255,0.05), transparent)", 
+          borderRadius: "16px 16px 0 0", border: "1px solid rgba(255,255,255,0.05)", borderBottom: "none",
+          display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 4
+        }}>
+          <div style={{ fontSize: 16, fontWeight: 900, color: rank === 1 ? "#fbbf24" : "#fff" }}>{user.xp}</div>
+          <div style={{ fontSize: 9, fontWeight: 800, color: "rgba(255,255,255,0.3)" }}>XP</div>
         </div>
       </div>
+    );
+  };
 
-      <div style={{ maxHeight: "400px", overflowY: "auto", paddingRight: "8px" }}>
-        {loading ? (
-          <div style={{ padding: "40px 0", textAlign: "center", color: "#64748b" }}>Loading rankings...</div>
-        ) : (
-          <>
-            {users.map((u, idx) => {
-              const rank = idx + 1;
+  return (
+    <div style={{ background: "#0b1120", borderRadius: 28, border: "1px solid rgba(255,255,255,0.05)", padding: 24, boxShadow: "0 20px 60px rgba(0,0,0,0.4)" }}>
+      <style>{`
+        @keyframes slideUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
+        .others-row::-webkit-scrollbar { width: 4px; }
+        .others-row::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); borderRadius: 10px; }
+      `}</style>
+
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 32 }}>
+        <div>
+           <h2 style={{ fontSize: 24, fontWeight: 900, color: "#fff", display: "flex", alignItems: "center", gap: 12 }}>
+             <Trophy size={26} color="#fbbf24" /> Top Leaders
+           </h2>
+           <p style={{ color: "#64748b", fontSize: 13, marginTop: 4 }}>The elite learners of CEFR Center</p>
+        </div>
+        <TrendingUp color="#10b981" size={20} />
+      </div>
+
+      {loading ? (
+        <div style={{ height: 300, display: "flex", alignItems: "center", justifyContent: "center", color: "#64748b" }}>Loading Leaders...</div>
+      ) : (
+        <>
+          {/* Podium */}
+          <div style={{ display: "flex", alignItems: "flex-end", gap: 12, marginBottom: 40, padding: "0 10px", minHeight: 220 }}>
+             <PodiumItem user={top3[1]} rank={2} delay={0.1} />
+             <PodiumItem user={top3[0]} rank={1} delay={0} />
+             <PodiumItem user={top3[2]} rank={3} delay={0.2} />
+          </div>
+
+          {/* Others List */}
+          <div className="others-row" style={{ maxHeight: 350, overflowY: "auto", paddingRight: 8 }}>
+            {others.map((u, i) => {
+              const rank = i + 4;
               const isMe = u.email === currentUser?.email;
-              const daysActive = u.totalDaysActive || 1;
-              
               return (
-                <div key={u.email} className={`rank-card ${isMe ? "me" : ""}`} style={{
-                  animation: `slideIn 0.4s ease backwards ${idx * 0.05}s`
-                }}>
-                  <div style={{ width: 32, display: "flex", justifyContent: "center", alignItems: "center" }}>
-                    {rank === 1 && <Crown size={22} color="#fbbf24" fill="#fbbf24" style={{ filter: "drop-shadow(0 0 8px rgba(251,191,36,0.4))" }} />}
-                    {rank === 2 && <Medal size={20} color="#94a3b8" fill="#94a3b8" />}
-                    {rank === 3 && <Medal size={20} color="#b45309" fill="#b45309" />}
-                    {rank > 3 && <span style={{ fontSize: 13, fontWeight: 800, color: "rgba(255,255,255,0.2)" }}>#{rank}</span>}
+                <div key={u.email} style={{ display: "flex", alignItems: "center", gap: 16, padding: "12px 16px", borderRadius: 16, background: isMe ? "rgba(74,158,255,0.05)" : "rgba(255,255,255,0.02)", border: isMe ? "1px solid rgba(74,158,255,0.2)" : "1px solid transparent", marginBottom: 8 }}>
+                  <div style={{ width: 40, fontSize: 14, fontWeight: 800, color: "rgba(255,255,255,0.2)" }}>#{rank}</div>
+                  <div style={{ width: 36, height: 36, borderRadius: "50%", background: "#131d2e", border: "1px solid rgba(255,255,255,0.1)", overflow: "hidden" }}>
+                     {u.photoURL ? <img src={u.photoURL} alt="" style={{ width: "100%", height: "100%", objectFit: "cover" }} /> : <User size={18} color="#64748b" style={{ margin: 9 }}/>}
                   </div>
-                  
-                  <div style={{ position: "relative" }}>
-                    <div style={{ 
-                      width: 38, height: 38, borderRadius: "50%", 
-                      background: rank === 1 ? "linear-gradient(135deg, #fbbf24, #d97706)" : (isMe ? "#4a9eff" : "#1e3a5f"), 
-                      display: "flex", alignItems: "center", justifyContent: "center",
-                      fontSize: 14, fontWeight: 900, color: "#fff",
-                      textTransform: "uppercase",
-                      boxShadow: rank === 1 ? "0 4px 12px rgba(217,119,6,0.3)" : "none",
-                      overflow: "hidden",
-                      border: isMe ? "2px solid #4a9eff" : "2px solid rgba(255,255,255,0.05)"
-                    }}>
-                      {u.photoURL ? (
-                        <img src={u.photoURL} alt="" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
-                      ) : (
-                        u.username?.[0] || u.email?.[0] || "?"
-                      )}
-                    </div>
-                    {u.isPremium && (
-                      <div style={{ position: "absolute", bottom: -2, right: -2, background: "#EF9F27", borderRadius: "50%", width: 14, height: 14, display: "flex", alignItems: "center", justifyContent: "center", border: "2px solid #131d2e" }}>
-                        <Star size={8} fill="#fff" color="#fff" />
-                      </div>
-                    )}
-                  </div>
-
                   <div style={{ flex: 1 }}>
-                    <div style={{ fontSize: 14, fontWeight: 700, color: isMe ? "#4a9eff" : "#f0f4ff", display: "flex", alignItems: "center", gap: 6 }}>
-                      {u.username || u.email.split("@")[0]}
-                      {isMe && <span style={{ fontSize: 9, background: "rgba(74,158,255,0.2)", padding: "2px 6px", borderRadius: 4 }}>YOU</span>}
-                    </div>
-                    <div style={{ fontSize: 11, color: "#64748b", display: "flex", gap: 8 }}>
-                      <span>Level {u.level || "A1"}</span>
-                      <span style={{ color: "rgba(255,255,255,0.1)" }}>|</span>
-                      <span>{daysActive}d active</span>
-                    </div>
+                    <div style={{ fontSize: 14, fontWeight: 800, color: isMe ? "#4a9eff" : "#fff" }}>{u.username || "Learner"}</div>
+                    <div style={{ fontSize: 11, color: "#64748b" }}>{u.level || "A1"} Level</div>
                   </div>
-
                   <div style={{ textAlign: "right" }}>
-                    <div style={{ fontSize: 16, fontWeight: 900, color: rank === 1 ? "#fbbf24" : "#fff" }}>{u.xp.toLocaleString()}</div>
-                    <div style={{ fontSize: 9, color: "#64748b", fontWeight: 800, textTransform: "uppercase", letterSpacing: 0.5 }}>XP</div>
+                    <div style={{ fontSize: 15, fontWeight: 900, color: "#fff" }}>{u.xp.toLocaleString()}</div>
+                    <div style={{ fontSize: 9, fontWeight: 800, color: "#64748b" }}>XP</div>
                   </div>
                 </div>
               );
             })}
-            
-            {users.length === 0 && !loading && (
-              <div style={{ padding: "40px 0", textAlign: "center" }}>
-                <p style={{ color: "#64748b", fontSize: 13 }}>No rankings yet for today.</p>
-              </div>
-            )}
-          </>
-        )}
-      </div>
+          </div>
 
-      <div style={{ 
-        marginTop: 20, padding: "16px", borderRadius: "16px", 
-        background: "rgba(74, 158, 255, 0.05)", border: "1px solid rgba(74, 158, 255, 0.1)",
-        display: "flex", alignItems: "center", gap: 12
-      }}>
-        <div style={{ width: 36, height: 36, borderRadius: "12px", background: "rgba(74, 158, 255, 0.1)", display: "flex", alignItems: "center", justifyContent: "center" }}>
-          <Zap size={18} className="text-blue-400" fill="#4a9eff" />
-        </div>
-        <div style={{ flex: 1 }}>
-          <div style={{ fontSize: 12, fontWeight: 700, color: "#f0f4ff" }}>Ready up!</div>
-          <div style={{ fontSize: 10, color: "#64748b" }}>Rank #1 gets 2x daily bonus!</div>
-        </div>
+          {/* Current User Rank Bar */}
+          {userRank > 50 && (
+            <div style={{ marginTop: 24, padding: 16, borderRadius: 16, background: "rgba(74,158,255,0.1)", border: "1px solid rgba(74,158,255,0.3)", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+              <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+                 <div style={{ width: 32, height: 32, borderRadius: "50%", background: "#4a9eff", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 12, fontWeight: 900, color: "#fff" }}>#{userRank}</div>
+                 <div style={{ fontSize: 14, fontWeight: 800, color: "#fff" }}>Your Current Position</div>
+              </div>
+              <ChevronRight size={18} color="#4a9eff" />
+            </div>
+          )}
+        </>
+      )}
+
+      <div style={{ marginTop: 24, textAlign: "center", padding: 16, background: "rgba(255,255,255,0.02)", borderRadius: 16, display: "flex", alignItems: "center", justifyContent: "center", gap: 10 }}>
+        <Zap size={16} color="#fbbf24" fill="#fbbf24" />
+        <span style={{ fontSize: 12, fontWeight: 700, color: "#8b9bbf" }}>Top 1 leader gets <span style={{ color: "#fbbf24" }}>Golden Hall Pass</span>!</span>
       </div>
     </div>
   );
