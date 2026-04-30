@@ -521,9 +521,9 @@ export default function Dashboard() {
     </div>
   );
 
-  // SECURE SHIELD
-  if (user && !isVerified) {
-    return <SecurityGuard user={user} isAdmin={dbUser?.isAdmin} onVerified={() => setIsVerified(true)} />;
+  // SECURE SHIELD - ONLY FOR ADMINS
+  if (user && dbUser?.isAdmin && !isVerified) {
+    return <SecurityGuard user={user} isAdmin={true} onVerified={() => setIsVerified(true)} />;
   }
 
   if (!progress.onboarded) return <US onSelect={setInitialLevel} />;
