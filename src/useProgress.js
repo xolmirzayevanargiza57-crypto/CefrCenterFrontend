@@ -41,6 +41,34 @@ function lvlFor(xp) {
   return l;
 }
 
+function calculateStreak(log) {
+  if (!log || !Array.isArray(log) || log.length === 0) return 0;
+  const sorted = [...log].filter(l => l.xp > 0);
+  if (sorted.length === 0) return 0;
+  
+  let streak = 0;
+  let current = new Date();
+  const todayStr = today();
+  
+  const hasToday = sorted.some(l => l.date === todayStr);
+  if (!hasToday) {
+    current.setDate(current.getDate() - 1);
+  }
+
+  // Iterate backwards day by day to count the continuous streak
+  for (let i = 0; i < 1000; i++) { // Max 1000 days safety limit
+    const checkStr = `${current.getFullYear()}-${String(current.getMonth()+1).padStart(2,"0")}-${String(current.getDate()).padStart(2,"0")}`;
+    const hasDay = sorted.some(l => l.date === checkStr);
+    if (hasDay) {
+      streak++;
+      current.setDate(current.getDate() - 1);
+    } else {
+      break;
+    }
+  }
+  return streak;
+}
+
 export const DEF = {
   xp: 0, level: "A1",
   username: "",
@@ -144,6 +172,7 @@ export function useProgress() {
           dailyGoal: data.dailyGoal || local.dailyGoal || 50,
         };
         merged.level = lvlFor(merged.xp);
+        merged.consecutiveDays = calculateStreak(merged.activityLog);
 
         const mergedS = { ...localS, ...(data.scores || {}) };
 
@@ -219,31 +248,12 @@ export function useProgress() {
     }
 
     if (P.lastLogin !== t) {
-      const prev = P.lastLogin;
-      let cons = P.consecutiveDays || 0;
-      
-      if (prev) {
-        // Precise day difference calculation ignoring time components
-        const d1 = new Date(prev + "T00:00:00");
-        const d2 = new Date(t + "T00:00:00");
-        const diffDays = Math.round((d2 - d1) / (1000 * 60 * 60 * 24));
-        
-        if (diffDays === 1) {
-          cons += 1;
-        } else if (diffDays > 1) {
-          cons = 1; // Streak broken
-        }
-        // If diffDays < 1, it means we're checking on the same day or a past day, do nothing to streak
-      } else {
-        cons = 1; // First ever login
-      }
-
       next.lastLogin = t;
-      next.consecutiveDays = cons;
       next.totalDaysActive = (P.totalDaysActive || 0) + 1;
       next.lastActiveDate = new Date().toLocaleString();
       // Track login as activity even if 0 XP gained
       next.activityLog = logActivity(P.activityLog, t, 0);
+      next.consecutiveDays = calculateStreak(next.activityLog);
       changed = true;
     }
 
@@ -301,6 +311,7 @@ export function useProgress() {
         _scoreTimestamps: { ...prev._scoreTimestamps, [key]: { date: t, xp: amount } },
         activityLog: logActivity(prev.activityLog, t, amount),
       };
+      next.consecutiveDays = calculateStreak(next.activityLog);
       wr(SK, next);
       scheduleSync(next, rd(SCK, {}));
       return next;
