@@ -13,7 +13,7 @@ import Us         from "./US";
 import Dashboard  from "./Dashboard";
 import Login      from "./Login";
 import LevelSelect from "./LevelSelect";
-import Admin       from "./Admin";
+import AdminPanel  from "./AdminPanel";
 
 import { useProgress }    from "./useProgress";
 import { auth }           from "./firebase";
@@ -96,7 +96,7 @@ export default function App() {
       <Routes>
         <Route path="/"            element={<Root />} />
         <Route path="/login"       element={<LoginWrapper />} />
-        <Route path="/admin"       element={<Admin />} />
+        <Route path="/admin"       element={<AdminPanel />} />
         <Route path="/us"          element={<Us />} />
         <Route path="/dashboard"   element={<Dashboard />} />
         <Route path="/dashboard/*" element={<Dashboard />} />
