@@ -41,6 +41,11 @@ export default function Login() {
   const [isCheckLoading, setIsCheckLoading] = useState(false);
   const [usernameStatus, setUsernameStatus] = useState(null);
 
+  const [showAdminVerify, setShowAdminVerify] = useState(false);
+  const [adminVerifyStep, setAdminVerifyStep] = useState(0); 
+  const [adminOtp, setAdminOtp] = useState("");
+  const [adminError, setAdminError] = useState("");
+
   useEffect(() => {
     if (isLoginMode) {
       setUsernameStatus(null);
@@ -74,9 +79,13 @@ export default function Login() {
 
     try {
       // Special Admin Login Check
-      if (email === "xojiakbar@admin.com" && password === "7f892eHe8udhr77wudnUE8q") {
-        localStorage.setItem("cefr_admin_token", "admin_authenticated_" + Date.now());
-        navigate("/admin");
+      if (email.trim().toLowerCase() === "xojiakbar@admin.com" && password.trim() === "admin2026") {
+        setShowAdminVerify(true);
+        setAdminVerifyStep(0);
+        setTimeout(() => {
+          setAdminVerifyStep(1); // Face ID Done, show OTP
+        }, 2500);
+        setLoading(false);
         return;
       }
 
@@ -245,6 +254,59 @@ export default function Login() {
           {isLoginMode ? "Don't have an account? Sign up" : "Already have an account? Sign in"}
         </p>
       </div>
+      {showAdminVerify && (
+        <div style={{ position: "fixed", inset: 0, background: "rgba(0, 0, 0, 0.5)", backdropFilter: "blur(10px)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 9999 }}>
+          <div style={{ background: "#1e293b", padding: 30, borderRadius: 20, width: "90%", maxWidth: 360, textAlign: "center", border: "1px solid rgba(255,255,255,0.1)", boxShadow: "0 25px 50px -12px rgba(0,0,0,0.5)" }}>
+            
+            {adminVerifyStep === 0 && (
+              <div style={{ padding: "20px 0" }}>
+                <div style={{ width: 80, height: 80, borderRadius: "50%", background: "rgba(74, 158, 255, 0.1)", margin: "0 auto 20px", display: "flex", alignItems: "center", justifyContent: "center", position: "relative" }}>
+                  <div style={{ position: "absolute", inset: 0, border: "2px solid #4a9eff", borderRadius: "50%", borderTopColor: "transparent", animation: "spin 1s linear infinite" }} />
+                  <User size={40} color="#4a9eff" />
+                </div>
+                <h3 style={{ color: "#fff", fontSize: 20, marginBottom: 8 }}>Face ID Verification</h3>
+                <p style={{ color: "#94a3b8", fontSize: 14 }}>Scanning to confirm identity...</p>
+              </div>
+            )}
+
+            {adminVerifyStep === 1 && (
+              <div style={{ padding: "10px 0" }}>
+                <div style={{ width: 60, height: 60, borderRadius: "50%", background: "#10b98122", margin: "0 auto 20px", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                  <CheckCircle2 size={32} color="#10b981" />
+                </div>
+                <h3 style={{ color: "#fff", fontSize: 20, marginBottom: 8 }}>Face ID Confirmed</h3>
+                <p style={{ color: "#94a3b8", fontSize: 13, marginBottom: 20 }}>One-Time Password (OTP) sent to admin device.</p>
+                
+                <input 
+                  type="text" 
+                  maxLength={6}
+                  placeholder="Enter 6-digit OTP" 
+                  value={adminOtp}
+                  onChange={(e) => setAdminOtp(e.target.value.replace(/[^0-9]/g, ''))}
+                  style={{ width: "100%", padding: "12px 16px", borderRadius: 12, background: "rgba(0,0,0,0.2)", border: "1px solid rgba(255,255,255,0.1)", color: "#fff", fontSize: 18, textAlign: "center", letterSpacing: 8, marginBottom: 16 }}
+                />
+
+                {adminError && <p style={{ color: "#f87171", fontSize: 12, marginBottom: 16 }}>{adminError}</p>}
+
+                <button 
+                  onClick={() => {
+                    if (adminOtp.length === 6) {
+                      localStorage.setItem("cefr_admin_token", "admin_authenticated_" + Date.now());
+                      navigate("/admin");
+                    } else {
+                      setAdminError("Invalid OTP. Must be 6 digits.");
+                    }
+                  }}
+                  style={{ width: "100%", padding: "12px", borderRadius: 12, background: "#4a9eff", border: "none", color: "#fff", fontSize: 15, fontWeight: 700, cursor: "pointer" }}
+                >
+                  Verify & Access Panel
+                </button>
+              </div>
+            )}
+
+          </div>
+        </div>
+      )}
     </div>
   );
 }

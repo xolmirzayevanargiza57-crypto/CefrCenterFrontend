@@ -40,8 +40,9 @@ export default function AdminPanel({ user, onBack }) {
   const [filterStatus, setFilterStatus] = useState("all");
 
   // AdminPanel can be used both embedded in Dashboard (user prop) or standalone (/admin route)
-  const userEmail = user?.email;
-  const isAdmin   = user?.isAdmin === true;
+  const token = localStorage.getItem("cefr_admin_token");
+  const isAdmin = user?.isAdmin === true || !!token;
+  const userEmail = user?.email || (token ? "xojiakbar@admin.com" : null);
 
   const hdrs = userEmail ? { "x-user-email": userEmail } : {};
 

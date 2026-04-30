@@ -174,24 +174,15 @@ function DashHome({ user, progress, scores, lvlMeta, pct, nxp, cxp, setPage, cle
     <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}>
       {/* PREMIUM LEVEL PROGRESS CARD (Matching Image) */}
       <div style={{
-        background: "linear-gradient(105deg, #1e266d 0%, #3b2a9f 100%)",
+        background: "#18243a",
+        border: "1px solid rgba(167, 139, 250, 0.2)",
         borderRadius: 24,
         padding: "32px",
         marginBottom: 20,
         position: "relative",
-        overflow: "hidden",
-        boxShadow: "0 20px 40px rgba(0,0,0,0.4)"
+        overflow: "hidden"
       }}>
-        {/* Abstract Background Visuals */}
-        <div style={{ position: "absolute", top: -20, right: -20, opacity: 0.1 }}>
-          <motion.svg 
-            animate={{ rotate: 360 }} 
-            transition={{ duration: 40, repeat: Infinity, ease: "linear" }}
-            width="200" height="200" viewBox="0 0 200 200">
-            <circle cx="100" cy="100" r="80" fill="none" stroke="#fff" strokeWidth="1" strokeDasharray="10 5" />
-            <circle cx="100" cy="100" r="100" fill="none" stroke="#fff" strokeWidth="0.5" />
-          </motion.svg>
-        </div>
+        {/* Abstract Background Visuals (Removed to prevent black rendering issues on some devices) */}
 
         <div className="progress-card-content" style={{ display: "flex", alignItems: "center", gap: 40, flexWrap: "wrap", position: "relative", zIndex: 2 }}>
           {/* Circular Gauge */}
@@ -211,7 +202,7 @@ function DashHome({ user, progress, scores, lvlMeta, pct, nxp, cxp, setPage, cle
             </div>
           </div>
 
-          <div style={{ flex: 1, minWidth: 200 }}>
+          <div style={{ flex: 1, minWidth: 150 }}>
             <div style={{ fontSize: 12, fontWeight: 700, color: "rgba(255,255,255,0.5)", textTransform: "uppercase", letterSpacing: 1, marginBottom: 8 }}>Cefr Level</div>
             <div style={{ display: "flex", alignItems: "baseline", gap: 10 }}>
               <h1 className="hero-h1" style={{ fontSize: 56, fontWeight: 900, color: "#fff", lineHeight: 1 }}>{progress.level}</h1>
@@ -224,17 +215,6 @@ function DashHome({ user, progress, scores, lvlMeta, pct, nxp, cxp, setPage, cle
             </div>
           </div>
 
-          {/* Audio Visualizer Decoration */}
-          <div style={{ display: "flex", alignItems: "flex-end", gap: 3, height: 40, opacity: 0.4 }}>
-            {[0.4, 0.7, 1.0, 0.6, 0.9, 0.5, 0.8, 1.0, 0.4, 0.7].map((h, i) => (
-              <motion.div 
-                key={i} 
-                animate={{ height: [`${h * 60}%`, `${h * 100}%`, `${h * 50}%`] }}
-                transition={{ duration: 1.5 + (i * 0.2), repeat: Infinity, repeatType: "reverse", ease: "easeInOut" }}
-                style={{ width: 3, height: `${h * 100}%`, background: "#fff", borderRadius: 2 }} 
-              />
-            ))}
-          </div>
         </div>
 
         {/* Multi-Segment Horizontal Progress */}
@@ -567,8 +547,9 @@ export default function Dashboard() {
 
         @media (max-width: 768px) {
           .dash-grid-top { grid-template-columns: 1fr !important; }
-          .progress-card-content { flex-direction: column !important; gap: 20px !important; align-items: flex-start !important; }
-          .hero-h1 { font-size: 38px !important; }
+          .progress-card-content { flex-direction: row !important; align-items: center !important; gap: 16px !important; flex-wrap: nowrap !important; }
+          .audio-visualizer-decor { display: none !important; }
+          .hero-h1 { font-size: 32px !important; }
           .main-content { padding: 16px 12px !important; }
         }
 
