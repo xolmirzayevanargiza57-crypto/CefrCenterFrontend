@@ -78,13 +78,27 @@ export default function AdminPanel({ user, onBack }) {
         </button>
       </div>
 
-      <div style={{ display: "flex", gap: 12, marginBottom: 24 }}>
-        <button onClick={() => setTab("payments")} style={{ padding: "10px 20px", borderRadius: 10, border: "none", background: tab === "payments" ? "#4a9eff" : "#18243a", color: "#fff", fontWeight: 700, cursor: "pointer" }}>
-          Payment Requests
-        </button>
-        <button onClick={() => setTab("users")} style={{ padding: "10px 20px", borderRadius: 10, border: "none", background: tab === "users" ? "#4a9eff" : "#18243a", color: "#fff", fontWeight: 700, cursor: "pointer" }}>
-          Premium Users
-        </button>
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 24 }}>
+        <div style={{ display: "flex", gap: 12 }}>
+          <button onClick={() => setTab("payments")} style={{ padding: "10px 20px", borderRadius: 10, border: "none", background: tab === "payments" ? "#4a9eff" : "#18243a", color: "#fff", fontWeight: 700, cursor: "pointer" }}>
+            Payment Requests
+          </button>
+          <button onClick={() => setTab("users")} style={{ padding: "10px 20px", borderRadius: 10, border: "none", background: tab === "users" ? "#4a9eff" : "#18243a", color: "#fff", fontWeight: 700, cursor: "pointer" }}>
+            Premium Users
+          </button>
+        </div>
+        {tab === "users" && (
+          <button onClick={async () => {
+            try {
+              const res = await fetch(`${BACKEND_URL}/api/payments/admin/cleanup`, { method: 'POST', headers: hdrs });
+              const d = await res.json();
+              alert(d.message || d.error);
+              loadUsers();
+            } catch(e) { alert("Error cleaning up users"); }
+          }} style={{ padding: "10px 16px", borderRadius: 10, background: "rgba(225,29,72,0.1)", color: "#e11d48", border: "1px solid rgba(225,29,72,0.2)", cursor: "pointer", fontWeight: 700, fontSize: 13 }}>
+            Clear Expired Premiums
+          </button>
+        )}
       </div>
 
       {loading ? (

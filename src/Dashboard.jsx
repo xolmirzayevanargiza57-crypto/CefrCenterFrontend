@@ -404,6 +404,7 @@ export default function Dashboard() {
   } = useProgress();
 
   const [user, setUser]           = useState(null);
+  const [dbUser, setDbUser]       = useState(null); // Backend user data (isAdmin, isPremium, premiumExpire)
   const [page, setPage]           = useState("dash");
   const [dropOpen, setDropOpen]   = useState(false);
   const [sideOpen, setSideOpen]   = useState(window.innerWidth > 768);
@@ -415,6 +416,18 @@ export default function Dashboard() {
   const userAddedRef = useRef(false);
   const timerRef = useRef(null);
   const syncTimerRef = useRef(null);
+
+  // Fetch backend user info (isAdmin, isPremium, premiumExpire)
+  const fetchDbUser = useCallback(async (email) => {
+    try {
+      const res = await fetch(`${BACKEND_URL}/api/user/progress?email=${encodeURIComponent(email)}`);
+      if (res.ok) {
+        const data = await res.json();
+        setDbUser(data);
+        // Auto-expire check: if premiumExpire passed, it won't show as active
+      }
+    } catch (e) { console.warn("Failed to fetch dbUser:", e.message); }
+  }, []);
 
   const NAV = [
     { pg: "dash",          label: "Dashboard",     ic: "grid"   },
@@ -431,7 +444,10 @@ export default function Dashboard() {
     { pg: "notifications", label: "Notifications", ic: "bell",   badge: unreadNotifs > 0 ? unreadNotifs : null },
     { pg: "settings",      label: "Profile",       ic: "gear"   },
   ];
-  if (user?.isAdmin) NAV.push({ pg: "admin", label: "Admin Panel", ic: "lock", badge: "PRO" });
+  const isAdmin = dbUser?.isAdmin === true;
+  const isPremActive = dbUser?.isPremium && dbUser?.premiumExpire && new Date(dbUser.premiumExpire) > new Date();
+  const premDaysLeft = isPremActive ? Math.max(0, Math.ceil((new Date(dbUser.premiumExpire) - new Date()) / (1000 * 60 * 60 * 24))) : 0;
+  if (isAdmin) NAV.push({ pg: "admin", label: "Admin Panel", ic: "lock", badge: "PRO" });
 
   // Fetch Notifications Count
   useEffect(() => {
@@ -471,13 +487,12 @@ export default function Dashboard() {
         return; 
       }
       setUser(u);
-      setLoading(false); // DARHOL loadingni tugat
-      
-      // Har safar Firebase + MongoDB ga sync qil (leaderboard uchun)
+      setLoading(false);
+      fetchDbUser(u.email);
       addUserToFirestore(u);
     });
     return () => unsub();
-  }, [navigate]);
+  }, [navigate, fetchDbUser]);
 
   useEffect(() => {
     const fn = e => { if (!e.target.closest(".ava-wrap")) setDropOpen(false); };
@@ -593,7 +608,8 @@ export default function Dashboard() {
             {dropOpen && (
               <div style={{position:"absolute",top:42,right:0,background:"#131d2e",border:"0.5px solid rgba(255,255,255,0.14)",borderRadius:12,padding:12,minWidth:200,zIndex:400}}>
                 <p style={{fontSize:13,fontWeight:600,marginBottom:2,color:"#f0f4ff"}}>{user?.displayName || progress.username || "Student"}</p>
-                <p style={{fontSize:11,color:"#8b9bbf",marginBottom:10}}>{user?.email}</p>
+                <p style={{fontSize:11,color:"#8b9bbf",marginBottom:4}}>{user?.email}</p>
+                {isPremActive && <p style={{fontSize:11,color:"#EF9F27",marginBottom:4,fontWeight:700}}>⭐ Premium — {premDaysLeft} days left</p>}
                 <hr style={{border:"none",borderTop:"0.5px solid rgba(255,255,255,0.08)",marginBottom:10}}/>
                 <p style={{fontSize:11,color:"#8b9bbf",marginBottom:10}}>{progress.consecutiveDays} day streak {progress.consecutiveDays>=7?"🔥":""}</p>
                 <button onClick={handleLogout} style={{width:"100%",padding:"8px 10px",borderRadius:8,border:"0.5px solid rgba(255,255,255,0.14)",background:"transparent",color:ACC,fontSize:12,cursor:"pointer",display:"flex",alignItems:"center",gap:8,fontFamily:"inherit"}}>
@@ -630,7 +646,22 @@ export default function Dashboard() {
                 </motion.div>
               );
             })}
+            {/* Premium Status Card at bottom of sidebar */}
             <div style={{marginTop:"auto",paddingTop:14}}>
+              {isPremActive ? (
+                <div style={{padding:"10px 12px",borderRadius:10,background:"linear-gradient(135deg,rgba(239,159,39,0.15),rgba(167,139,250,0.15))",border:"1px solid rgba(239,159,39,0.3)",marginBottom:8}}>
+                  <div style={{fontSize:9,color:"#EF9F27",fontWeight:800,textTransform:"uppercase",letterSpacing:0.5,marginBottom:2}}>⭐ Premium Active</div>
+                  <div style={{fontSize:13,fontWeight:800,color:"#fff"}}>{premDaysLeft} days left</div>
+                  <div style={{fontSize:10,color:"#8b9bbf",marginTop:2}}>Expires: {new Date(dbUser.premiumExpire).toLocaleDateString()}</div>
+                  <div style={{marginTop:6,height:3,borderRadius:2,background:"rgba(255,255,255,0.1)"}}>
+                    <div style={{height:"100%",borderRadius:2,width:`${Math.min(100,(premDaysLeft/30)*100)}%`,background:"linear-gradient(90deg,#EF9F27,#a78bfa)"}}/>
+                  </div>
+                </div>
+              ) : (
+                <button onClick={() => setShowPremiumModal(true)} style={{width:"100%",padding:"10px 12px",borderRadius:10,background:"linear-gradient(135deg,#7c3aed,#a78bfa)",border:"none",color:"#fff",fontWeight:700,fontSize:12,cursor:"pointer",marginBottom:8,boxShadow:"0 4px 16px rgba(124,58,237,0.3)"}}>
+                  ⭐ Get Premium
+                </button>
+              )}
               <div style={{padding:12,borderRadius:10,background:"rgba(255,255,255,0.03)",border:"0.5px solid rgba(255,255,255,0.07)"}}>
                 <div style={{fontSize:9,color:"#4a5568",marginBottom:4,textTransform:"uppercase",letterSpacing:0.5}}>Level</div>
                 <div style={{fontSize:22,fontWeight:800,color:lvlMeta.color}}>{progress.level}</div>
@@ -667,7 +698,7 @@ export default function Dashboard() {
                 </div>
               )}
               {page==="facetoface"    && <FaceToFace     user={user} progress={progress} openPremiumModal={() => setShowPremiumModal(true)} />}
-              {page==="admin"         && <AdminPanel     user={{...user, isAdmin: progress?.isAdmin}} onBack={()=>setPage("dash")} />}
+              {page==="admin"         && <AdminPanel     user={{...user, isAdmin: isAdmin}} onBack={()=>setPage("dash")} />}
               {page==="fullmock"      && <FullMockPage   {...commonProps} allTests={lessons} onBack={()=>setPage("dash")}/>}
               {page==="spin"          && <SpinPage       progress={progress} canSpin={canSpin} recordSpin={recordSpin} prizes={lessons?.SPIN_PRIZES || []}/>}
               {page==="missions"      && <MissionsPage   progress={progress} scores={scores} addXP={addXP} timeBonusClaimed={timeBonusClaimed} setPage={setPage}/>}
