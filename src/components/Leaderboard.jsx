@@ -125,15 +125,28 @@ export default function Leaderboard({ currentUser }) {
                     {rank > 3 && <span style={{ fontSize: 13, fontWeight: 800, color: "rgba(255,255,255,0.2)" }}>#{rank}</span>}
                   </div>
                   
-                  <div style={{ 
-                    width: 38, height: 38, borderRadius: 12, 
-                    background: rank === 1 ? "linear-gradient(135deg, #fbbf24, #d97706)" : (isMe ? "#4a9eff" : "#1e3a5f"), 
-                    display: "flex", alignItems: "center", justifyContent: "center",
-                    fontSize: 14, fontWeight: 900, color: "#fff",
-                    textTransform: "uppercase",
-                    boxShadow: rank === 1 ? "0 4px 12px rgba(217,119,6,0.3)" : "none"
-                  }}>
-                    {u.username?.[0] || u.email?.[0] || "?"}
+                  <div style={{ position: "relative" }}>
+                    <div style={{ 
+                      width: 38, height: 38, borderRadius: "50%", 
+                      background: rank === 1 ? "linear-gradient(135deg, #fbbf24, #d97706)" : (isMe ? "#4a9eff" : "#1e3a5f"), 
+                      display: "flex", alignItems: "center", justifyContent: "center",
+                      fontSize: 14, fontWeight: 900, color: "#fff",
+                      textTransform: "uppercase",
+                      boxShadow: rank === 1 ? "0 4px 12px rgba(217,119,6,0.3)" : "none",
+                      overflow: "hidden",
+                      border: isMe ? "2px solid #4a9eff" : "2px solid rgba(255,255,255,0.05)"
+                    }}>
+                      {u.photoURL ? (
+                        <img src={u.photoURL} alt="" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+                      ) : (
+                        u.username?.[0] || u.email?.[0] || "?"
+                      )}
+                    </div>
+                    {u.isPremium && (
+                      <div style={{ position: "absolute", bottom: -2, right: -2, background: "#EF9F27", borderRadius: "50%", width: 14, height: 14, display: "flex", alignItems: "center", justifyContent: "center", border: "2px solid #131d2e" }}>
+                        <Star size={8} fill="#fff" color="#fff" />
+                      </div>
+                    )}
                   </div>
 
                   <div style={{ flex: 1 }}>

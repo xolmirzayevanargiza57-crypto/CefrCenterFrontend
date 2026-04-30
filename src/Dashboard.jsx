@@ -71,7 +71,9 @@ function Ic({ n, s = 16, c = "currentColor" }) {
     target:  <svg style={st} viewBox="0 0 24 24" fill="none" stroke={c} strokeWidth="2"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>,
     mock:    <svg style={st} viewBox="0 0 24 24" fill="none" stroke={c} strokeWidth="2"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg>,
     trophy:  <svg style={st} viewBox="0 0 24 24" fill="none" stroke={c} strokeWidth="2"><polyline points="8 21 12 21 16 21"/><line x1="12" y1="17" x2="12" y2="21"/><path d="M7 4H17l-1 7a5 5 0 01-4 4 5 5 0 01-4-4L7 4z"/><path d="M5 9H3a2 2 0 01-2-2V5a2 2 0 012-2h2M19 9h2a2 2 0 002-2V5a2 2 0 00-2-2h-2"/></svg>,
-    globe:   <svg style={st} viewBox="0 0 24 24" fill="none" stroke={c} strokeWidth="2" strokeLinejoin="round" strokeLinecap="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z"/></svg>
+    globe:   <svg style={st} viewBox="0 0 24 24" fill="none" stroke={c} strokeWidth="2" strokeLinejoin="round" strokeLinecap="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z"/></svg>,
+    phone:   <svg style={st} viewBox="0 0 24 24" fill="none" stroke={c} strokeWidth="2"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07 19.5 19.5 0 01-6-6 19.79 19.79 0 01-3.07-8.67A2 2 0 014.11 2h3a2 2 0 012 1.72 12.84 12.84 0 00.7 2.81 2 2 0 01-.45 2.11L8.09 9.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45 12.84 12.84 0 002.81.7A2 2 0 0122 16.92z"/></svg>,
+    copy:    <svg style={st} viewBox="0 0 24 24" fill="none" stroke={c} strokeWidth="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>,
   };
   return paths[n] || null;
 }
@@ -629,20 +631,24 @@ export default function Dashboard() {
             })}
             {/* Premium Status Card at bottom of sidebar */}
             <div style={{marginTop:"auto",paddingTop:14}}>
-              {isPremActive ? (
-                <div style={{padding:"10px 12px",borderRadius:10,background:"linear-gradient(135deg,rgba(239,159,39,0.15),rgba(167,139,250,0.15))",border:"1px solid rgba(239,159,39,0.3)",marginBottom:8}}>
-                  <div style={{fontSize:9,color:"#EF9F27",fontWeight:800,textTransform:"uppercase",letterSpacing:0.5,marginBottom:2}}>⭐ Premium Active</div>
-                  <div style={{fontSize:13,fontWeight:800,color:"#fff"}}>{premDaysLeft} days left</div>
-                  <div style={{fontSize:10,color:"#8b9bbf",marginTop:2}}>Expires: {new Date(dbUser.premiumExpire).toLocaleDateString()}</div>
-                  <div style={{marginTop:6,height:3,borderRadius:2,background:"rgba(255,255,255,0.1)"}}>
-                    <div style={{height:"100%",borderRadius:2,width:`${Math.min(100,(premDaysLeft/30)*100)}%`,background:"linear-gradient(90deg,#EF9F27,#a78bfa)"}}/>
+              {/* Premium Status Section */}
+              <div style={{ padding: "16px", borderRadius: "16px", background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.05)", marginBottom: 16 }}>
+                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8 }}>
+                    <span style={{ fontSize: 12, color: "#8b9bbf", fontWeight: 700 }}>SUBSCRIPTION</span>
+                    <span style={{ 
+                      fontSize: 10, fontWeight: 900, padding: "2px 8px", borderRadius: 6,
+                      background: isPremActive ? "rgba(239,159,39,0.2)" : "rgba(255,255,255,0.05)",
+                      color: isPremActive ? "#EF9F27" : "#4a5568"
+                    }}>
+                      {isPremActive ? "PREMIUM" : "FREE"}
+                    </span>
                   </div>
+                  {isPremActive ? (
+                    <div style={{ fontSize: 12, color: "#f0f4ff", fontWeight: 600 }}>Expires: {new Date(dbUser.premiumExpire).toLocaleDateString()}</div>
+                  ) : (
+                    <button onClick={() => setShowPremiumModal(true)} style={{ width: "100%", marginTop: 8, padding: "10px", borderRadius: 10, background: "linear-gradient(135deg,#7c3aed,#a78bfa)", border: "none", color: "#fff", fontSize: 12, fontWeight: 800, cursor: "pointer" }}>Upgrade Now</button>
+                  )}
                 </div>
-              ) : (
-                <button onClick={() => setShowPremiumModal(true)} style={{width:"100%",padding:"10px 12px",borderRadius:10,background:"linear-gradient(135deg,#7c3aed,#a78bfa)",border:"none",color:"#fff",fontWeight:700,fontSize:12,cursor:"pointer",marginBottom:8,boxShadow:"0 4px 16px rgba(124,58,237,0.3)"}}>
-                  ⭐ Get Premium
-                </button>
-              )}
               <div style={{padding:12,borderRadius:10,background:"rgba(255,255,255,0.03)",border:"0.5px solid rgba(255,255,255,0.07)"}}>
                 <div style={{fontSize:9,color:"#4a5568",marginBottom:4,textTransform:"uppercase",letterSpacing:0.5}}>Level</div>
                 <div style={{fontSize:22,fontWeight:800,color:lvlMeta.color}}>{progress.level}</div>
@@ -653,6 +659,25 @@ export default function Dashboard() {
                 {nxp && <div style={{fontSize:9,color:"#4a5568",marginTop:4}}>{nxp-progress.xp} XP to next</div>}
               </div>
               <SystemUptime />
+              
+              {/* Admin Contact Widget */}
+              <div style={{ marginTop: 12, padding: 12, borderRadius: 12, background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.05)" }}>
+                <div style={{ fontSize: 10, fontWeight: 700, color: "#8b9bbf", marginBottom: 8, textTransform: "uppercase" }}>Support</div>
+                <div style={{ display: "flex", alignItems: "center", gap: 10, background: "rgba(0,0,0,0.2)", padding: "8px 10px", borderRadius: 8, border: "0.5px solid rgba(255,255,255,0.05)" }}>
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <div style={{ fontSize: 10, color: "#4a5568" }}>Phone Support</div>
+                    <div style={{ fontSize: 13, fontWeight: 700, color: "#fff", whiteSpace: "nowrap" }}>+998 94 022 44 92</div>
+                  </div>
+                  <button 
+                    onClick={() => { navigator.clipboard.writeText("+998 94 022 44 92"); alert("Number copied!"); }}
+                    style={{ background: "rgba(74, 158, 255, 0.1)", border: "none", borderRadius: 6, padding: "6px", cursor: "pointer", color: ACC }}>
+                    <Ic n="copy" s={14} />
+                  </button>
+                </div>
+                <a href="tel:+998940224492" style={{ textDecoration: "none", display: "flex", alignItems: "center", justifyContent: "center", gap: 8, marginTop: 8, width: "100%", padding: "10px", borderRadius: 8, background: "#1D9E75", color: "#fff", border: "none", fontWeight: 700, fontSize: 12, cursor: "pointer" }}>
+                  <Ic n="phone" s={14} /> Call Admin
+                </a>
+              </div>
             </div>
           </div>
         )}
@@ -690,7 +715,7 @@ export default function Dashboard() {
               {page==="community"     && <Community user={user} progress={progress} />}
             </motion.div>
           </AnimatePresence>
-          {showPremiumModal && <PremiumModal user={user} onClose={() => setShowPremiumModal(false)} />}
+          {showPremiumModal && <PremiumModal user={user} isPremium={isPremActive} premiumExpire={dbUser?.premiumExpire} onClose={() => setShowPremiumModal(false)} />}
         </div>
       </div>
     </div>  

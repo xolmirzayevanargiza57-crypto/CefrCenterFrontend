@@ -12,7 +12,7 @@ function Ic({ n, s = 16, c = "currentColor" }) {
   return d[n] || null;
 }
 
-export default function PremiumModal({ user, onClose }) {
+export default function PremiumModal({ user, onClose, isPremium, premiumExpire }) {
   const PLANS = [
     { id: "30_days_basic", price: 55000, name: "Premium Basic", desc: "Access to standard modules for 30 days", days: 30, color: "#4a9eff" },
     { id: "30_days_pro", price: 49000, name: "Premium Pro", desc: "Best Value! Face-to-Face & More for 30 days", days: 30, color: "#1D9E75", best: true },
@@ -29,6 +29,7 @@ export default function PremiumModal({ user, onClose }) {
   const [comment, setComment] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState("");
+  const [alreadyActive, setAlreadyActive] = useState(isPremium || false);
 
   const CARD_NUMBER = "8600 XXXX XXXX XXXX";
   const CARD_NAME = "HOJIAKBAR";
@@ -81,7 +82,20 @@ export default function PremiumModal({ user, onClose }) {
         <div style={{ padding: 24 }}>
           {error && <div style={{ background: "rgba(225,29,72,0.1)", border: "1px solid rgba(225,29,72,0.2)", color: "#e11d48", padding: "10px 14px", borderRadius: 10, fontSize: 13, marginBottom: 20, fontWeight: 600 }}>{error}</div>}
 
-          {step === "select_plan" && (
+          {alreadyActive ? (
+            <div style={{ textAlign: "center", padding: "20px 0" }}>
+              <div style={{ width: 64, height: 64, background: "rgba(239,159,39,0.1)", borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 16px", border: "1px solid rgba(239,159,39,0.3)" }}>
+                <Ic n="check" s={32} c="#EF9F27" />
+              </div>
+              <h2 style={{ fontSize: 20, fontWeight: 800, color: "#fff", marginBottom: 10 }}>Premium already active!</h2>
+              <p style={{ fontSize: 14, color: "#8b9bbf", marginBottom: 24, lineHeight: 1.5 }}>
+                You already have an active Premium subscription.<br/>It expires on: <strong style={{ color: "#fff" }}>{premiumExpire ? new Date(premiumExpire).toLocaleDateString() : "Lifetime"}</strong>.
+              </p>
+              <button onClick={onClose} style={{ width: "100%", padding: "14px", background: "#18243a", border: "1px solid rgba(255,255,255,0.1)", color: "#fff", borderRadius: 12, cursor: "pointer", fontWeight: 700 }}>
+                Done
+              </button>
+            </div>
+          ) : step === "select_plan" ? (
             <div>
               <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(130px, 1fr))", gap: 16 }}>
                 {PLANS.map(p => (
@@ -99,9 +113,7 @@ export default function PremiumModal({ user, onClose }) {
                 Continue
               </button>
             </div>
-          )}
-
-          {step === "select_method" && (
+          ) : step === "select_method" ? (
             <div>
               <p style={{ fontSize: 14, color: "#8b9bbf", marginBottom: 16 }}>Select Payment Method:</p>
               <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
@@ -119,9 +131,7 @@ export default function PremiumModal({ user, onClose }) {
               </div>
               <button onClick={() => setStep("select_plan")} style={{ width: "100%", marginTop: 20, padding: "12px", background: "transparent", border: "1px solid rgba(255,255,255,0.1)", color: "#8b9bbf", borderRadius: 10, cursor: "pointer" }}>Back</button>
             </div>
-          )}
-
-          {step === "upload_receipt" && (
+          ) : step === "upload_receipt" ? (
             <form onSubmit={handleCheckout}>
               <div style={{ background: "rgba(74,158,255,0.1)", border: "1px solid rgba(74,158,255,0.2)", borderRadius: 12, padding: 16, marginBottom: 20 }}>
                 <p style={{ fontSize: 13, color: "#4a9eff", fontWeight: 700, marginBottom: 12 }}>Transfer the payment to the card below and upload receipt:</p>
@@ -179,9 +189,7 @@ export default function PremiumModal({ user, onClose }) {
                 </button>
               </div>
             </form>
-          )}
-
-          {step === "success" && (
+          ) : (
             <div style={{ textAlign: "center", padding: "20px 0" }}>
               <div style={{ width: 64, height: 64, background: "rgba(29,158,117,0.15)", borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 16px", border: "1px solid rgba(29,158,117,0.3)" }}>
                 <Ic n="check" s={32} c="#1D9E75" />

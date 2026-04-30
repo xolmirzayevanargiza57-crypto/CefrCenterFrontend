@@ -39,9 +39,10 @@ export default function FaceToFace({ progress, openPremiumModal }) {
       
       socketRef.current = io(BACKEND_URL.replace("/api", ""), { transports: ['polling', 'websocket'] });
 
-      socketRef.current.on("match_found", async ({ room, caller }) => {
+      socketRef.current.on("match_found", async ({ room, caller, partnerName }) => {
         setConnecting(false);
         setInCall(true);
+        socketRef.current.partnerName = partnerName;
         setupWebRTC(caller);
       });
 
@@ -114,7 +115,7 @@ export default function FaceToFace({ progress, openPremiumModal }) {
 
   const startSearch = () => {
     setConnecting(true);
-    socketRef.current.emit("join_queue");
+    socketRef.current.emit("join_queue", { username: progress?.username || "Learner" });
   };
 
   const cancelSearch = () => {
@@ -129,7 +130,10 @@ export default function FaceToFace({ progress, openPremiumModal }) {
     peerConnectionRef.current = null;
     socketRef.current.emit("leave_queue"); // Notify backend to drop from rooms, backend handles it via disconnect mostly but we can add a custom 'end_call' later
     // To gracefully clear remote video
-    if (remoteVideoRef.current) remoteVideoRef.current.srcObject = null;
+    if (remoteVideoRef.current) {
+      remoteVideoRef.current.srcObject = null;
+      remoteVideoRef.current.load(); // Force reset
+    }
   };
 
   const toggleMic = () => {
@@ -215,7 +219,7 @@ export default function FaceToFace({ progress, openPremiumModal }) {
           )}
           
           <div style={{ position: "absolute", bottom: 16, left: 16, background: "rgba(0,0,0,0.6)", padding: "4px 10px", borderRadius: 6, fontSize: 12, fontWeight: 700, color: "#fff" }}>
-            {inCall ? "Partner" : (connecting ? "Searching..." : "Idle")}
+            {inCall ? `Partner: ${socketRef.current.partnerName || "Real Student"}` : (connecting ? "Searching..." : "Idle")}
           </div>
         </div>
       </div>

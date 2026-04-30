@@ -13,6 +13,9 @@ function Ic({ n, s = 16, c = "currentColor" }) {
     shield: <svg style={st} viewBox="0 0 24 24" fill="none" stroke={c} strokeWidth="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>,
     user:   <svg style={st} viewBox="0 0 24 24" fill="none" stroke={c} strokeWidth="2"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>,
     crown:  <svg style={st} viewBox="0 0 24 24" fill="none" stroke={c} strokeWidth="2"><path d="M2 20h20M3 10l3 7h12l3-7-5 3-4-6-4 6-5-3z"/></svg>,
+    bell:   <svg style={st} viewBox="0 0 24 24" fill="none" stroke={c} strokeWidth="2"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg>,
+    plus:   <svg style={st} viewBox="0 0 24 24" fill="none" stroke={c} strokeWidth="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>,
+    logout: <svg style={st} viewBox="0 0 24 24" fill="none" stroke={c} strokeWidth="2"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>,
   };
   return d[n] || null;
 }
@@ -38,6 +41,15 @@ export default function AdminPanel({ user, onBack }) {
   const [actionLoading, setActionLoading] = useState({});
   const [toast, setToast]           = useState(null);
   const [filterStatus, setFilterStatus] = useState("all");
+  
+  // Rejection State
+  const [rejectingId, setRejectingId]   = useState(null);
+  const [rejectReason, setRejectReason] = useState("");
+
+  // Notification State
+  const [notifs, setNotifs]             = useState([]);
+  const [notifForm, setNotifForm]       = useState({ title: "", message: "", type: "info" });
+  const [notifLoading, setNotifLoading] = useState(false);
 
   // AdminPanel can be used both embedded in Dashboard (user prop) or standalone (/admin route)
   const token = localStorage.getItem("cefr_admin_token");
@@ -45,7 +57,6 @@ export default function AdminPanel({ user, onBack }) {
   const userEmail = user?.email || (token ? "xojiakbar@admin.com" : null);
 
   const hdrs = userEmail ? { "x-user-email": userEmail } : {};
-
   const showToast = (msg, ok = true) => {
     setToast({ msg, ok });
     setTimeout(() => setToast(null), 3000);
@@ -58,23 +69,36 @@ export default function AdminPanel({ user, onBack }) {
       if (res.ok) setPayments(data);
       else showToast(data.error || "Failed to load payments", false);
     } catch (e) { showToast("Network error", false); }
-  }, [userEmail]);
+  }, [hdrs]);
 
   const loadUsers = useCallback(async () => {
     try {
       const res  = await fetch(`${BACKEND_URL}/api/payments/admin/users`, { headers: hdrs });
       const data = await res.json();
       if (res.ok) setUsers(data);
+    } catch (e) { showToast("Network error", false); }
+  }, [hdrs]);
+
+  const loadNotifs = useCallback(async () => {
+    try {
+      const res  = await fetch(`${BACKEND_URL}/api/notifications`, { headers: hdrs });
+      const data = await res.json();
+      if (res.ok) setNotifs(data);
     } catch (e) { console.error(e); }
-  }, [userEmail]);
+  }, [hdrs]);
 
   useEffect(() => {
     if (!isAdmin) return;
     setLoading(true);
-    Promise.all([loadPayments(), loadUsers()]).finally(() => setLoading(false));
-  }, [isAdmin, loadPayments, loadUsers]);
+    Promise.all([loadPayments(), loadUsers(), loadNotifs()]).finally(() => setLoading(false));
+  }, [isAdmin, loadPayments, loadUsers, loadNotifs]);
 
-  const handleAction = async (id, action) => {
+  const handleLogoutAdmin = () => {
+    localStorage.removeItem("cefr_admin_token");
+    window.location.reload();
+  };
+
+  const handleAction = async (id, action, reason = "") => {
     setActionLoading(p => ({ ...p, [id + action]: true }));
     try {
       const isDel    = action === "delete";
@@ -83,7 +107,12 @@ export default function AdminPanel({ user, onBack }) {
         ? `/api/payments/admin/${id}`
         : `/api/payments/admin/${id}/${action}`;
 
-      const res  = await fetch(`${BACKEND_URL}${endpoint}`, { method, headers: hdrs });
+      const body = action === "reject" ? JSON.stringify({ reason }) : null;
+      const res  = await fetch(`${BACKEND_URL}${endpoint}`, { 
+        method, 
+        headers: { ...hdrs, "Content-Type": "application/json" },
+        body
+      });
       const data = await res.json();
       if (res.ok) {
         showToast(
@@ -91,6 +120,8 @@ export default function AdminPanel({ user, onBack }) {
           action === "reject"  ? "❌ Payment rejected."                   :
                                  "🗑️ Record deleted."
         );
+        setRejectingId(null);
+        setRejectReason("");
         await loadPayments();
         if (action === "approve") await loadUsers();
       } else {
@@ -98,6 +129,52 @@ export default function AdminPanel({ user, onBack }) {
       }
     } catch (e) { showToast("Network error", false); }
     finally { setActionLoading(p => { const n = {...p}; delete n[id+action]; return n; }); }
+  };
+
+  const handleRemovePremium = async (email) => {
+    if (!window.confirm(`Are you sure you want to remove premium from ${email}?`)) return;
+    try {
+      const res = await fetch(`${BACKEND_URL}/api/payments/admin/user/${encodeURIComponent(email)}/remove-premium`, {
+        method: "POST",
+        headers: hdrs
+      });
+      const data = await res.json();
+      showToast(data.message || data.error, res.ok);
+      if (res.ok) loadUsers();
+    } catch (e) { showToast("Network error", false); }
+  };
+
+  const handleCreateNotif = async (e) => {
+    e.preventDefault();
+    if (!notifForm.title || !notifForm.message) return;
+    setNotifLoading(true);
+    try {
+      const res = await fetch(`${BACKEND_URL}/api/notifications`, {
+        method: "POST",
+        headers: { ...hdrs, "Content-Type": "application/json" },
+        body: JSON.stringify(notifForm)
+      });
+      if (res.ok) {
+        showToast("📢 Notification sent to all users!");
+        setNotifForm({ title: "", message: "", type: "info" });
+        loadNotifs();
+      } else {
+        const d = await res.json();
+        showToast(d.error || "Failed", false);
+      }
+    } catch (e) { showToast("Network error", false); }
+    finally { setNotifLoading(false); }
+  };
+
+  const handleDeleteNotif = async (id) => {
+    if (!window.confirm("Delete this notification?")) return;
+    try {
+      const res = await fetch(`${BACKEND_URL}/api/notifications/${id}`, { method: "DELETE", headers: hdrs });
+      if (res.ok) {
+        showToast("Notification deleted");
+        loadNotifs();
+      }
+    } catch (e) { showToast("Network error", false); }
   };
 
   const handleCleanup = async () => {
@@ -151,11 +228,16 @@ export default function AdminPanel({ user, onBack }) {
           </h1>
           <p style={{ color: "#8b9bbf", fontSize: 14 }}>Manage payment requests and premium users</p>
         </div>
-        {onBack && (
-          <button onClick={onBack} style={{ padding: "10px 16px", borderRadius: 10, background: "rgba(255,255,255,0.05)", color: "#fff", border: "1px solid rgba(255,255,255,0.1)", cursor: "pointer", fontWeight: 700 }}>
-            ← Back to Dashboard
+        <div style={{ display: "flex", gap: 8 }}>
+          {onBack && (
+            <button onClick={onBack} style={{ padding: "10px 16px", borderRadius: 10, background: "rgba(255,255,255,0.05)", color: "#fff", border: "1px solid rgba(255,255,255,0.1)", cursor: "pointer", fontWeight: 700 }}>
+              ← Dashboard
+            </button>
+          )}
+          <button onClick={handleLogoutAdmin} style={{ padding: "10px 16px", borderRadius: 10, background: "rgba(225,29,72,0.1)", color: "#e11d48", border: "1px solid rgba(225,29,72,0.2)", cursor: "pointer", fontWeight: 700, display: "flex", alignItems: "center", gap: 8 }}>
+            <Ic n="logout" s={16} /> Log Out
           </button>
-        )}
+        </div>
       </div>
 
       {/* Stats Row */}
@@ -177,8 +259,9 @@ export default function AdminPanel({ user, onBack }) {
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 20, flexWrap: "wrap", gap: 10 }}>
         <div style={{ display: "flex", gap: 8 }}>
           {[
-            { id: "payments", label: `Payment Requests ${pendingCount > 0 ? `(${pendingCount} pending)` : ""}` },
-            { id: "users",    label: `Premium Users (${premiumUsers.length} active)` },
+            { id: "payments", label: `Payment Requests ${pendingCount > 0 ? `(${pendingCount})` : ""}` },
+            { id: "users",    label: `Users` },
+            { id: "notifications", label: "Notifications" },
           ].map(t => (
             <button key={t.id} onClick={() => setTab(t.id)}
               style={{ padding: "10px 18px", borderRadius: 10, border: "none", background: tab === t.id ? "#4a9eff" : "#18243a", color: "#fff", fontWeight: 700, cursor: "pointer", fontSize: 13, transition: "all .2s" }}>
@@ -281,7 +364,7 @@ export default function AdminPanel({ user, onBack }) {
                         <td style={{ padding: "14px 16px" }}>
                           <div style={{ display: "flex", gap: 6, alignItems: "center", flexWrap: "nowrap" }}>
                             {/* View Receipt */}
-                            <button onClick={() => setPreviewImage(`${BACKEND_URL}${p.receiptFileUrl}`)}
+                            <button onClick={() => setPreviewImage(p.receiptFileUrl.startsWith('http') ? p.receiptFileUrl : `${BACKEND_URL}${p.receiptFileUrl}`)}
                               title="View Receipt"
                               style={{ padding: "6px 10px", background: "rgba(74,158,255,0.1)", border: "1px solid rgba(74,158,255,0.2)", borderRadius: 7, color: "#4a9eff", cursor: "pointer", display: "flex", alignItems: "center", gap: 4, fontSize: 11, fontWeight: 600 }}>
                               <Ic n="eye" s={13} /> Receipt
@@ -298,16 +381,35 @@ export default function AdminPanel({ user, onBack }) {
                               </button>
                             )}
 
-                            {/* Reject (only pending) */}
-                            {p.status === "pending" && (
-                              <button
-                                disabled={!!actionLoading[p._id + "reject"]}
-                                onClick={() => handleAction(p._id, "reject")}
-                                title="Reject Payment"
-                                style={{ padding: "6px 10px", background: "rgba(225,29,72,0.1)", border: "1px solid rgba(225,29,72,0.2)", borderRadius: 7, color: "#e11d48", cursor: "pointer", display: "flex", alignItems: "center", gap: 4, fontSize: 11, fontWeight: 700, opacity: actionLoading[p._id+"reject"] ? 0.5 : 1 }}>
-                                <Ic n="x" s={13} /> Reject
-                              </button>
-                            )}
+                             {/* Reject (only pending) */}
+                             {p.status === "pending" && (
+                               <div style={{ position: "relative" }}>
+                                 {rejectingId === p._id ? (
+                                   <div style={{ position: "absolute", bottom: "100%", right: 0, background: "#1e293b", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 12, padding: 12, zIndex: 10, minWidth: 200, marginBottom: 10, boxShadow: "0 10px 30px rgba(0,0,0,0.5)" }}>
+                                      <p style={{ fontSize: 11, color: "#fff", marginBottom: 8, fontWeight: 700 }}>REJECTION REASON:</p>
+                                      <input 
+                                        autoFocus
+                                        placeholder="e.g. Invalid receipt" 
+                                        value={rejectReason}
+                                        onChange={e => setRejectReason(e.target.value)}
+                                        style={{ width: "100%", background: "rgba(0,0,0,0.2)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 6, color: "#fff", padding: "6px 8px", fontSize: 12, marginBottom: 8 }}
+                                      />
+                                      <div style={{ display: "flex", gap: 6 }}>
+                                        <button onClick={() => setRejectingId(null)} style={{ flex: 1, padding: "6px", borderRadius: 6, border: "1px solid rgba(255,255,255,0.1)", background: "transparent", color: "#8b9bbf", fontSize: 11, cursor: "pointer" }}>Cancel</button>
+                                        <button onClick={() => handleAction(p._id, "reject", rejectReason)} style={{ flex: 1, padding: "6px", borderRadius: 6, boder: "none", background: "#e11d48", color: "#fff", fontSize: 11, fontWeight: 700, cursor: "pointer" }}>Confirm</button>
+                                      </div>
+                                   </div>
+                                 ) : (
+                                   <button
+                                     disabled={!!actionLoading[p._id + "reject"]}
+                                     onClick={() => setRejectingId(p._id)}
+                                     title="Reject Payment"
+                                     style={{ padding: "6px 10px", background: "rgba(225,29,72,0.1)", border: "1px solid rgba(225,29,72,0.2)", borderRadius: 7, color: "#e11d48", cursor: "pointer", display: "flex", alignItems: "center", gap: 4, fontSize: 11, fontWeight: 700, opacity: actionLoading[p._id+"reject"] ? 0.5 : 1 }}>
+                                     <Ic n="x" s={13} /> Reject
+                                   </button>
+                                 )}
+                               </div>
+                             )}
 
                             {/* Delete */}
                             <button
@@ -327,8 +429,7 @@ export default function AdminPanel({ user, onBack }) {
           )}
         </div>
 
-      ) : (
-
+      ) : tab === "users" ? (
         /* ── PREMIUM USERS GRID ─────────────────────────────────────── */
         <div>
           {users.length === 0 ? (
@@ -369,6 +470,11 @@ export default function AdminPanel({ user, onBack }) {
                         <div style={{ marginTop: 8, height: 3, borderRadius: 2, background: "rgba(255,255,255,0.08)" }}>
                           <div style={{ height: "100%", borderRadius: 2, width: `${Math.min(100, (daysLeft / 90) * 100)}%`, background: `linear-gradient(90deg, ${planColor}, ${planColor}88)` }} />
                         </div>
+                        <button 
+                          onClick={() => handleRemovePremium(u.email)}
+                          style={{ width: "100%", marginTop: 12, padding: "6px", borderRadius: 8, background: "rgba(225,29,72,0.1)", border: "1px solid rgba(225,29,72,0.2)", color: "#e11d48", fontSize: 10, fontWeight: 800, cursor: "pointer", textTransform: "uppercase" }}>
+                          Remove Premium
+                        </button>
                       </div>
                     ) : (
                       <span style={{ fontSize: 11, fontWeight: 600, color: "#4a5568", background: "rgba(255,255,255,0.04)", padding: "4px 10px", borderRadius: 20 }}>Free User</span>
@@ -378,6 +484,79 @@ export default function AdminPanel({ user, onBack }) {
               })}
             </div>
           )}
+        </div>
+      ) : (
+        /* ── NOTIFICATIONS TAB ─────────────────────────────────────── */
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1.5fr", gap: 24, alignItems: "start" }}>
+          {/* Create Notif Form */}
+          <div style={{ background: "#131d2e", border: "1px solid rgba(255,255,255,0.05)", borderRadius: 20, padding: 24 }}>
+            <h3 style={{ fontSize: 16, fontWeight: 800, color: "#fff", marginBottom: 4, display: "flex", alignItems: "center", gap: 10 }}>
+              <Ic n="bell" s={18} c="#4a9eff" /> Send Global Notification
+            </h3>
+            <p style={{ color: "#8b9bbf", fontSize: 12, marginBottom: 20 }}>This will be visible to all users instantly.</p>
+            
+            <form onSubmit={handleCreateNotif} style={{ display: "flex", flexDirection: "column", gap: 14 }}>
+              <div>
+                <label style={{ fontSize: 11, fontWeight: 700, color: "#5a6a8c", marginBottom: 6, display: "block" }}>TITLE</label>
+                <input 
+                  placeholder="e.g. New Update Available!" 
+                  value={notifForm.title}
+                  onChange={e => setNotifForm({...notifForm, title: e.target.value})}
+                  style={{ width: "100%", background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.1)", color: "#fff", padding: "12px", borderRadius: 10, fontSize: 14 }}
+                />
+              </div>
+              <div>
+                <label style={{ fontSize: 11, fontWeight: 700, color: "#5a6a8c", marginBottom: 6, display: "block" }}>MESSAGE</label>
+                <textarea 
+                  rows={3}
+                  placeholder="Tell users what's happening..." 
+                  value={notifForm.message}
+                  onChange={e => setNotifForm({...notifForm, message: e.target.value})}
+                  style={{ width: "100%", background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.1)", color: "#fff", padding: "12px", borderRadius: 10, fontSize: 14, resize: "none" }}
+                />
+              </div>
+              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
+                <div>
+                  <label style={{ fontSize: 11, fontWeight: 700, color: "#5a6a8c", marginBottom: 6, display: "block" }}>TYPE</label>
+                  <select 
+                    value={notifForm.type}
+                    onChange={e => setNotifForm({...notifForm, type: e.target.value})}
+                    style={{ width: "100%", background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.1)", color: "#fff", padding: "10px", borderRadius: 10, fontSize: 14 }}>
+                    <option value="info">Info (Blue)</option>
+                    <option value="success">Success (Green)</option>
+                    <option value="warning">Warning (Orange)</option>
+                    <option value="error">Critical (Red)</option>
+                  </select>
+                </div>
+                <div style={{ display: "flex", alignItems: "flex-end" }}>
+                  <button type="submit" disabled={notifLoading} style={{ width: "100%", padding: "12px", borderRadius: 10, background: "#4a9eff", border: "none", color: "#fff", fontWeight: 700, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", gap: 8 }}>
+                    {notifLoading ? <Ic n="refresh" s={14} /> : <><Ic n="plus" s={14} /> Send</>}
+                  </button>
+                </div>
+              </div>
+            </form>
+          </div>
+
+          {/* Notif List */}
+          <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+             <h3 style={{ fontSize: 14, fontWeight: 700, color: "#fff", marginBottom: 4 }}>Recent Notifications</h3>
+             {notifs.length === 0 ? (
+               <div style={{ padding: 40, textAlign: "center", color: "#4a5568", border: "1px dashed rgba(255,255,255,0.05)", borderRadius: 16 }}>No sent notifications.</div>
+             ) : (
+               notifs.slice(0, 10).map(n => (
+                 <div key={n._id} style={{ background: "#131d2e", border: "1px solid rgba(255,255,255,0.05)", borderRadius: 16, padding: 16, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                   <div>
+                     <div style={{ fontSize: 13, fontWeight: 800, color: "#fff", marginBottom: 2 }}>{n.title}</div>
+                     <div style={{ fontSize: 11, color: "#8b9bbf", lineHeight: 1.4 }}>{n.message}</div>
+                     <div style={{ fontSize: 10, color: "#334155", marginTop: 4 }}>{new Date(n.createdAt).toLocaleDateString()}</div>
+                   </div>
+                   <button onClick={() => handleDeleteNotif(n._id)} style={{ padding: 8, background: "rgba(225,29,72,0.05)", color: "#e11d48", border: "none", borderRadius: 8, cursor: "pointer" }}>
+                     <Ic n="trash" s={14} />
+                   </button>
+                 </div>
+               ))
+             )}
+          </div>
         </div>
       )}
 
