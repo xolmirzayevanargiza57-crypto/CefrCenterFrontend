@@ -22,7 +22,6 @@ import Community    from "./Community";
 import PremiumModal from "./PremiumModal.jsx";
 import FaceToFace   from "./FaceToFace.jsx";
 import AdminPanel   from "./AdminPanel.jsx";
-import SecurityGuard from "./SecurityGuard.jsx";
 
 import { useProgress, LEVEL_THRESHOLDS, CEFR_META } from "./useProgress";
 import { scoreToCEFR, scoreToWritingBand } from "./scoring";
@@ -395,7 +394,6 @@ export default function Dashboard() {
   const [timeBonusClaimed, setTimeBonusClaimed] = useState(false);
   const [lessons, setLessons]     = useState(null);
   const [unreadNotifs, setUnreadNotifs] = useState(0);
-  const [isAdminVerified, setIsAdminVerified] = useState(false);
   const userAddedRef = useRef(false);
   const timerRef = useRef(null);
   const syncTimerRef = useRef(null);
@@ -705,11 +703,7 @@ export default function Dashboard() {
                 </div>
               )}
               {page==="facetoface"    && <FaceToFace     user={user} progress={progress} openPremiumModal={() => setShowPremiumModal(true)} />}
-              {page==="admin"         && (
-                !isAdminVerified 
-                  ? <SecurityGuard user={user} onVerified={() => setIsAdminVerified(true)} />
-                  : <AdminPanel user={{...user, isAdmin: isAdmin}} onBack={()=>{setPage("dash"); setIsAdminVerified(false);}} />
-              )}
+              {page==="admin"         && <AdminPanel     user={{...user, isAdmin: isAdmin}} onBack={()=>setPage("dash")} />}
               {page==="fullmock"      && <FullMockPage   {...commonProps} allTests={lessons} onBack={()=>setPage("dash")}/>}
               {page==="spin"          && <SpinPage       progress={progress} canSpin={canSpin} recordSpin={recordSpin} prizes={lessons?.SPIN_PRIZES || []}/>}
               {page==="missions"      && <MissionsPage   progress={progress} scores={scores} addXP={addXP} timeBonusClaimed={timeBonusClaimed} setPage={setPage}/>}
