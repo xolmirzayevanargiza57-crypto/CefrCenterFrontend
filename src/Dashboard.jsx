@@ -395,7 +395,7 @@ export default function Dashboard() {
   const [timeBonusClaimed, setTimeBonusClaimed] = useState(false);
   const [lessons, setLessons]     = useState(null);
   const [unreadNotifs, setUnreadNotifs] = useState(0);
-  const [isVerified, setIsVerified] = useState(false);
+  const [isAdminVerified, setIsAdminVerified] = useState(false);
   const userAddedRef = useRef(false);
   const timerRef = useRef(null);
   const syncTimerRef = useRef(null);
@@ -407,7 +407,7 @@ export default function Dashboard() {
       if (res.ok) {
         const data = await res.json();
         setDbUser(data);
-        // Auto-expire check: if premiumExpire passed, it won't show as active
+        console.log("Admin Check:", data.isAdmin);
       }
     } catch (e) { console.warn("Failed to fetch dbUser:", e.message); }
   }, []);
@@ -511,20 +511,15 @@ export default function Dashboard() {
   const handleLogout = async () => { setDropOpen(false); await signOut(auth); navigate("/", { replace: true }); };
 
   // TEZ loading screen
-  if (loading) return (
+  if (loading || (user && !dbUser)) return (
     <div style={{display:"flex",alignItems:"center",justifyContent:"center",minHeight:"100vh",background:"#0b1120",color:"#8b9bbf",fontFamily:"sans-serif",fontSize:14}}>
       <div style={{textAlign:"center"}}>
         <div style={{width:32,height:32,borderRadius:"50%",border:`2px solid ${ACC}33`,borderTopColor:ACC,animation:"spin .6s linear infinite",margin:"0 auto 12px"}}/>
         <style>{`@keyframes spin{to{transform:rotate(360deg)}}`}</style>
-        Loading...
+        Syncing Profile...
       </div>
     </div>
   );
-
-  // SECURE SHIELD - ONLY FOR ADMINS
-  if (user && dbUser?.isAdmin && !isVerified) {
-    return <SecurityGuard user={user} isAdmin={true} onVerified={() => setIsVerified(true)} />;
-  }
 
   if (!progress.onboarded) return <US onSelect={setInitialLevel} />;
 
@@ -710,7 +705,11 @@ export default function Dashboard() {
                 </div>
               )}
               {page==="facetoface"    && <FaceToFace     user={user} progress={progress} openPremiumModal={() => setShowPremiumModal(true)} />}
-              {page==="admin"         && <AdminPanel     user={{...user, isAdmin: isAdmin}} onBack={()=>setPage("dash")} />}
+              {page==="admin"         && (
+                !isAdminVerified 
+                  ? <SecurityGuard user={user} onVerified={() => setIsAdminVerified(true)} />
+                  : <AdminPanel user={{...user, isAdmin: isAdmin}} onBack={()=>{setPage("dash"); setIsAdminVerified(false);}} />
+              )}
               {page==="fullmock"      && <FullMockPage   {...commonProps} allTests={lessons} onBack={()=>setPage("dash")}/>}
               {page==="spin"          && <SpinPage       progress={progress} canSpin={canSpin} recordSpin={recordSpin} prizes={lessons?.SPIN_PRIZES || []}/>}
               {page==="missions"      && <MissionsPage   progress={progress} scores={scores} addXP={addXP} timeBonusClaimed={timeBonusClaimed} setPage={setPage}/>}

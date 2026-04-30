@@ -22,7 +22,7 @@ export default function AdminPanel({ user, onBack }) {
   
   // Notification States
   const [notifs, setNotifs] = useState([]);
-  const [notifForm, setNotifForm] = useState({ title: "", message: "", type: "info" });
+  const [notifForm, setNotifForm] = useState({ title: "", message: "", type: "info", image: "" });
   const [notifLoading, setNotifLoading] = useState(false);
 
   const userEmail = user?.email || "xojiakbar@admin.com";
@@ -103,7 +103,7 @@ export default function AdminPanel({ user, onBack }) {
       });
       if (res.ok) {
         showToast("Notification broadcasted!");
-        setNotifForm({ title: "", message: "", type: "info" });
+        setNotifForm({ title: "", message: "", type: "info", image: "" });
         loadData();
       }
     } catch (e) { showToast("Failed to send", false); }
@@ -293,6 +293,10 @@ export default function AdminPanel({ user, onBack }) {
                       <label style={{ fontSize: 12, fontWeight: 700, color: "#8b9bbf", display: "block", marginBottom: 6 }}>MESSAGE</label>
                       <textarea value={notifForm.message} onChange={e=>setNotifForm({...notifForm, message:e.target.value})} placeholder="Detailed broadcast message..." style={{ width:"100%", height:120, padding:14, borderRadius:12, background:"rgba(0,0,0,0.2)", border:"1px solid rgba(255,255,255,0.1)", color:"#fff", resize: "none" }} required />
                     </div>
+                    <div>
+                      <label style={{ fontSize: 12, fontWeight: 700, color: "#8b9bbf", display: "block", marginBottom: 6 }}>IMAGE URL (OPTIONAL)</label>
+                      <input type="text" value={notifForm.image} onChange={e=>setNotifForm({...notifForm, image:e.target.value})} placeholder="https://image-link.com/..." style={{ width:"100%", padding:14, borderRadius:12, background:"rgba(0,0,0,0.2)", border:"1px solid rgba(255,255,255,0.1)", color:"#fff" }} />
+                    </div>
                     <button type="submit" disabled={notifLoading} style={{ width: "100%", padding: 14, borderRadius: 12, background: "#4a9eff", border: "none", color: "#fff", fontWeight: 800, fontSize: 14, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", gap: 10 }}>
                       {notifLoading ? <Ic icon={RefreshCw} s={16} className="spin" /> : <Ic icon={Plus} s={18} />} Send Broadcast
                     </button>
@@ -303,9 +307,12 @@ export default function AdminPanel({ user, onBack }) {
                   <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
                     {notifs.map(n => (
                       <div key={n._id} style={{ background: "rgba(255,255,255,0.03)", padding: 20, borderRadius: 20, border: "1px solid rgba(255,255,255,0.05)", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                        <div>
+                        <div style={{ flex: 1, marginRight: 15 }}>
                           <div style={{ fontWeight: 800, color: "#fff", fontSize: 15 }}>{n.title}</div>
                           <div style={{ fontSize: 12, color: "#64748b", marginTop: 4 }}>{n.message}</div>
+                          {n.image && (
+                            <img src={n.image} alt="Notification" style={{ width: "100%", height: 80, objectFit: "cover", borderRadius: 12, marginTop: 12, border: "1px solid rgba(255,255,255,0.1)" }} />
+                          )}
                         </div>
                         <button onClick={()=>deleteNotif(n._id)} style={{ padding: 10, borderRadius: 12, background: "rgba(239,68,68,0.1)", border: "none", color: "#ef4444", cursor: "pointer" }}>
                           <Ic icon={Trash2} s={18} />
