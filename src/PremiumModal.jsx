@@ -30,8 +30,8 @@ export default function PremiumModal({ user, onClose }) {
 
   const handleCheckout = async (e) => {
     e.preventDefault();
-    if (!file) return setError("Iltimos, to'lov chekini (rasm) yuklang.");
-    if (!phone) return setError("Telefon raqamingizni kiriting.");
+    if (!file) return setError("Please upload the payment receipt.");
+    if (!phone) return setError("Please enter your phone number.");
     
     setIsSubmitting(true);
     setError("");
@@ -55,7 +55,7 @@ export default function PremiumModal({ user, onClose }) {
       if (!res.ok) throw new Error(data.error || "Failed");
       setStep("success");
     } catch (err) {
-      setError(err.message || "Xatolik yuz berdi. Qaytadan urinib ko'ring.");
+      setError(err.message || "An error occurred. Please try again.");
     } finally {
       setIsSubmitting(false);
     }
@@ -68,7 +68,7 @@ export default function PremiumModal({ user, onClose }) {
         {/* Header */}
         <div style={{ padding: "20px 24px", borderBottom: "1px solid rgba(255,255,255,0.05)", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
           <h2 style={{ fontSize: 18, fontWeight: 800, color: "#fff", display: "flex", alignItems: "center", gap: 10 }}>
-             Premium Xarid Qilish
+             Purchase Premium
           </h2>
           <button onClick={onClose} style={{ background: "transparent", border: "none", color: "#8b9bbf", cursor: "pointer" }}><Ic n="x" s={20}/></button>
         </div>
@@ -81,53 +81,58 @@ export default function PremiumModal({ user, onClose }) {
               <div style={{ background: "linear-gradient(135deg,rgba(167,139,250,0.1),rgba(124,58,237,0.1))", border: "1px solid #7c3aed", borderRadius: 16, padding: "20px", display: "flex", justifyContent: "space-between", alignItems: "center", cursor: "pointer" }}>
                 <div>
                   <h3 style={{ fontSize: 16, fontWeight: 800, color: "#a78bfa" }}>{plan.name}</h3>
-                  <p style={{ fontSize: 13, color: "#8b9bbf", marginTop: 4 }}>Face to Face va barcha modullar</p>
+                  <p style={{ fontSize: 13, color: "#8b9bbf", marginTop: 4 }}>Face to Face and all modules</p>
                 </div>
                 <div style={{ fontSize: 20, fontWeight: 900, color: "#fff" }}>{plan.price.toLocaleString()} UZS</div>
               </div>
               <button 
                 onClick={() => setStep("select_method")}
                 style={{ width: "100%", marginTop: 24, padding: "14px", borderRadius: 12, border: "none", background: "linear-gradient(135deg,#7c3aed,#a78bfa)", color: "#fff", fontSize: 15, fontWeight: 800, cursor: "pointer", boxShadow: "0 8px 32px rgba(124,58,237,0.3)" }}>
-                Davom etish
+                Continue
               </button>
             </div>
           )}
 
           {step === "select_method" && (
             <div>
-              <p style={{ fontSize: 14, color: "#8b9bbf", marginBottom: 16 }}>To'lov tizimini tanlang:</p>
+              <p style={{ fontSize: 14, color: "#8b9bbf", marginBottom: 16 }}>Select Payment Method:</p>
               <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
-                {["Click", "Payme", "Uzum Bank", "Paynet"].map(m => (
-                  <button key={m} onClick={() => { setMethod(m); setStep("upload_receipt"); }}
+                {[
+                  { id: "click", label: "Click" },
+                  { id: "payme", label: "Payme" },
+                  { id: "uzum", label: "Uzum Bank" },
+                  { id: "paynet", label: "Paynet" }
+                ].map(m => (
+                  <button key={m.id} onClick={() => { setMethod(m.id); setStep("upload_receipt"); }}
                     style={{ background: "#18243a", border: "1px solid rgba(255,255,255,0.1)", padding: "20px 10px", borderRadius: 14, color: "#fff", fontSize: 15, fontWeight: 700, cursor: "pointer", transition: "all .2s" }}>
-                    {m}
+                    {m.label}
                   </button>
                 ))}
               </div>
-              <button onClick={() => setStep("select_plan")} style={{ width: "100%", marginTop: 20, padding: "12px", background: "transparent", border: "1px solid rgba(255,255,255,0.1)", color: "#8b9bbf", borderRadius: 10, cursor: "pointer" }}>Ortga</button>
+              <button onClick={() => setStep("select_plan")} style={{ width: "100%", marginTop: 20, padding: "12px", background: "transparent", border: "1px solid rgba(255,255,255,0.1)", color: "#8b9bbf", borderRadius: 10, cursor: "pointer" }}>Back</button>
             </div>
           )}
 
           {step === "upload_receipt" && (
             <form onSubmit={handleCheckout}>
               <div style={{ background: "rgba(74,158,255,0.1)", border: "1px solid rgba(74,158,255,0.2)", borderRadius: 12, padding: 16, marginBottom: 20 }}>
-                <p style={{ fontSize: 13, color: "#4a9eff", fontWeight: 700, marginBottom: 12 }}>Quyidagi raqamga to'lov qiling va chekni yuklang:</p>
+                <p style={{ fontSize: 13, color: "#4a9eff", fontWeight: 700, marginBottom: 12 }}>Transfer the payment to the card below and upload receipt:</p>
                 <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 8, fontSize: 14 }}>
-                  <span style={{ color: "#8b9bbf" }}>Karta raqami:</span> <span style={{ color: "#fff", fontWeight: 800, letterSpacing: 1 }}><Ic n="card" s={14} c="#a78bfa" /> {CARD_NUMBER}</span>
+                  <span style={{ color: "#8b9bbf" }}>Card Number:</span> <span style={{ color: "#fff", fontWeight: 800, letterSpacing: 1 }}><Ic n="card" s={14} c="#a78bfa" /> {CARD_NUMBER}</span>
                 </div>
                 <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 8, fontSize: 14 }}>
-                  <span style={{ color: "#8b9bbf" }}>Karta egasi:</span> <span style={{ color: "#fff", fontWeight: 700 }}>{CARD_NAME}</span>
+                  <span style={{ color: "#8b9bbf" }}>Cardholder:</span> <span style={{ color: "#fff", fontWeight: 700 }}>{CARD_NAME}</span>
                 </div>
                 <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 8, fontSize: 14 }}>
-                  <span style={{ color: "#8b9bbf" }}>Summa:</span> <span style={{ color: "#fff", fontWeight: 700 }}>{plan.price.toLocaleString()} UZS</span>
+                  <span style={{ color: "#8b9bbf" }}>Amount:</span> <span style={{ color: "#fff", fontWeight: 700 }}>{plan.price.toLocaleString()} UZS</span>
                 </div>
                 <div style={{ display: "flex", justifyContent: "space-between", fontSize: 14, background: "rgba(0,0,0,0.2)", padding: "6px 10px", borderRadius: 6, marginTop: 8 }}>
-                  <span style={{ color: "#8b9bbf" }}>Izoh (Comment):</span> <span style={{ color: "#a78bfa", fontWeight: 700 }}>{plan.name}, userId: {user?.uid?.slice(-6)}</span>
+                  <span style={{ color: "#8b9bbf" }}>Comment:</span> <span style={{ color: "#a78bfa", fontWeight: 700 }}>{plan.name}, userId: {user?.uid?.slice(-6)}</span>
                 </div>
               </div>
 
               <div style={{ marginBottom: 16 }}>
-                <label style={{ display: "block", fontSize: 12, fontWeight: 700, color: "#8b9bbf", marginBottom: 6 }}>To'lov cheki (Rasm yoki PDF) *</label>
+                <label style={{ display: "block", fontSize: 12, fontWeight: 700, color: "#8b9bbf", marginBottom: 6 }}>Payment Receipt (Image or PDF) *</label>
                 <div style={{ 
                   border: "2px dashed rgba(255,255,255,0.2)", borderRadius: 12, padding: "20px", textAlign: "center", 
                   background: file ? "rgba(29,158,117,0.1)" : "rgba(255,255,255,0.02)", cursor: "pointer", position: "relative" 
@@ -136,31 +141,31 @@ export default function PremiumModal({ user, onClose }) {
                   {file ? (
                     <div style={{ color: "#1D9E75", fontWeight: 700 }}><Ic n="check" s={18} /> {file.name}</div>
                   ) : (
-                     <div style={{ color: "#a78bfa", fontSize: 13 }}><Ic n="upload" s={20} /><br/>Faylni tanlash uchun bosing</div>
+                     <div style={{ color: "#a78bfa", fontSize: 13 }}><Ic n="upload" s={20} /><br/>Click to select a file</div>
                   )}
                 </div>
               </div>
 
               <div style={{ display: "flex", gap: 12, marginBottom: 16 }}>
                 <div style={{ flex: 1 }}>
-                  <label style={{ display: "block", fontSize: 12, fontWeight: 700, color: "#8b9bbf", marginBottom: 6 }}>Telefon raqam *</label>
+                  <label style={{ display: "block", fontSize: 12, fontWeight: 700, color: "#8b9bbf", marginBottom: 6 }}>Phone Number *</label>
                   <input type="text" value={phone} onChange={e => setPhone(e.target.value)} placeholder="+998 90 123 45 67" required style={{ width: "100%", background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", color: "#fff", padding: "10px 14px", borderRadius: 10, fontSize: 14 }} />
                 </div>
                 <div style={{ flex: 1 }}>
-                  <label style={{ display: "block", fontSize: 12, fontWeight: 700, color: "#8b9bbf", marginBottom: 6 }}>Summa (UZS) *</label>
+                  <label style={{ display: "block", fontSize: 12, fontWeight: 700, color: "#8b9bbf", marginBottom: 6 }}>Amount (UZS) *</label>
                   <input type="number" value={amount} onChange={e => setAmount(e.target.value)} required style={{ width: "100%", background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", color: "#fff", padding: "10px 14px", borderRadius: 10, fontSize: 14 }} />
                 </div>
               </div>
 
               <div style={{ marginBottom: 20 }}>
-                <label style={{ display: "block", fontSize: 12, fontWeight: 700, color: "#8b9bbf", marginBottom: 6 }}>Qo'shimcha izoh (Ixtiyoriy)</label>
-                <input type="text" value={comment} onChange={e => setComment(e.target.value)} placeholder="Tranzaksiya ID si yoki izoh..." style={{ width: "100%", background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", color: "#fff", padding: "10px 14px", borderRadius: 10, fontSize: 14 }} />
+                <label style={{ display: "block", fontSize: 12, fontWeight: 700, color: "#8b9bbf", marginBottom: 6 }}>Additional comment (Optional)</label>
+                <input type="text" value={comment} onChange={e => setComment(e.target.value)} placeholder="Transaction ID or comment..." style={{ width: "100%", background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", color: "#fff", padding: "10px 14px", borderRadius: 10, fontSize: 14 }} />
               </div>
 
               <div style={{ display: "flex", gap: 12 }}>
-                <button type="button" onClick={() => setStep("select_method")} style={{ padding: "14px", background: "transparent", border: "1px solid rgba(255,255,255,0.1)", color: "#8b9bbf", borderRadius: 12, cursor: "pointer", fontWeight: 700 }}>Ortga</button>
+                <button type="button" onClick={() => setStep("select_method")} style={{ padding: "14px", background: "transparent", border: "1px solid rgba(255,255,255,0.1)", color: "#8b9bbf", borderRadius: 12, cursor: "pointer", fontWeight: 700 }}>Back</button>
                 <button type="submit" disabled={isSubmitting} style={{ flex: 1, padding: "14px", background: "#4a9eff", border: "none", color: "#fff", borderRadius: 12, cursor: "pointer", fontWeight: 800, opacity: isSubmitting ? 0.6 : 1 }}>
-                  {isSubmitting ? "Yuborilmoqda..." : "Tasdiqlash va Yuborish"}
+                  {isSubmitting ? "Submitting..." : "Confirm & Submit"}
                 </button>
               </div>
             </form>
@@ -171,12 +176,12 @@ export default function PremiumModal({ user, onClose }) {
               <div style={{ width: 64, height: 64, background: "rgba(29,158,117,0.15)", borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 16px", border: "1px solid rgba(29,158,117,0.3)" }}>
                 <Ic n="check" s={32} c="#1D9E75" />
               </div>
-              <h2 style={{ fontSize: 20, fontWeight: 800, color: "#fff", marginBottom: 10 }}>So'rov yuborildi!</h2>
+              <h2 style={{ fontSize: 20, fontWeight: 800, color: "#fff", marginBottom: 10 }}>Request Submitted!</h2>
               <p style={{ fontSize: 14, color: "#8b9bbf", marginBottom: 24, lineHeight: 1.5 }}>
-                Sizning to'lovingiz adminlarimiz tomonidan tekshiriladi. Tasdiqlangach, profilingiz avtomatik ravishda Premium holatiga o'tadi (odatda 5-15 daqiqa ichida).
+                Your payment will be reviewed by our admins. Once approved, your profile will automatically upgrade to Premium (usually within 5-15 minutes).
               </p>
               <button onClick={onClose} style={{ width: "100%", padding: "14px", background: "#18243a", border: "1px solid rgba(255,255,255,0.1)", color: "#fff", borderRadius: 12, cursor: "pointer", fontWeight: 700 }}>
-                Yopish
+                Close
               </button>
             </div>
           )}
