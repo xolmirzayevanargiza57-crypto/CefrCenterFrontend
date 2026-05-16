@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Check, Crown, CreditCard, Image as ImageIcon, X, Send, ShieldCheck, Zap } from "lucide-react";
+import { Check, Crown, CreditCard, Image as ImageIcon, X, Send, ShieldCheck, Zap, RefreshCw } from "lucide-react";
 import BACKEND_URL from "./config/api";
 
 export default function PremiumModal({ user, onClose, isPremium, premiumExpire }) {
@@ -59,16 +59,25 @@ export default function PremiumModal({ user, onClose, isPremium, premiumExpire }
 
   if (isPremium) {
     return (
-      <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.85)", backdropFilter: "blur(20px)", zIndex: 9999, display: "flex", alignItems: "center", justifyContent: "center", padding: 20 }}>
-        <div style={{ width: "100%", maxWidth: 460, background: "#131d2e", borderRadius: 32, padding: 40, textAlign: "center", border: "1px solid rgba(251,191,36,0.3)", boxShadow: "0 25px 50px rgba(0,0,0,0.5)" }}>
-           <div style={{ width: 80, height: 80, borderRadius: "50%", background: "rgba(251,191,36,0.1)", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 24px" }}>
-              <Crown size={40} color="#fbbf24" fill="#fbbf24" />
+      <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.8)", backdropFilter: "blur(15px)", zIndex: 9999, display: "flex", alignItems: "center", justifyContent: "center", padding: 20 }}>
+        <div style={{ width: "100%", maxWidth: 440, background: "linear-gradient(135deg, #131d2e 0%, #0b1120 100%)", borderRadius: 40, padding: 48, textAlign: "center", border: "1px solid rgba(251,191,36,0.2)", boxShadow: "0 40px 100px rgba(0,0,0,0.8)", position: "relative", overflow: "hidden" }}>
+           <div style={{ position: "absolute", top: -20, right: -20, width: 140, height: 140, background: "radial-gradient(circle, rgba(251,191,36,0.15) 0%, transparent 70%)", pointerEvents: "none" }} />
+           
+           <div style={{ width: 90, height: 90, borderRadius: "50%", background: "rgba(251,191,36,0.1)", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 32px", border: "1px solid rgba(251,191,36,0.3)", boxShadow: "0 0 40px rgba(251,191,36,0.2)" }}>
+              <Crown size={44} color="#fbbf24" fill="#fbbf24" style={{ filter: "drop-shadow(0 0 10px rgba(251,191,36,0.5))" }} />
            </div>
-           <h2 style={{ fontSize: 28, fontWeight: 900, color: "#fff", marginBottom: 16 }}>Premium Student</h2>
-           <p style={{ color: "#8b9bbf", fontSize: 16, lineHeight: 1.6, marginBottom: 32 }}>
-             You have full access to all features until <span style={{ color: "#fbbf24", fontWeight: 800 }}>{new Date(premiumExpire).toLocaleDateString()}</span>. Continue your mastery!
+           
+           <h2 style={{ fontSize: 32, fontWeight: 900, color: "#fff", marginBottom: 12, letterSpacing: "-0.5px" }}>Premium Access</h2>
+           <div style={{ fontSize: 13, fontWeight: 800, color: "#fbbf24", textTransform: "uppercase", letterSpacing: 2, marginBottom: 24 }}>Active Student</div>
+           
+           <p style={{ color: "#8b9bbf", fontSize: 16, lineHeight: 1.7, marginBottom: 40 }}>
+             Welcome to the elite tier! Your full access is guaranteed until <br />
+             <span style={{ color: "#fff", fontWeight: 900, fontSize: 18 }}>{new Date(premiumExpire).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })}</span>
            </p>
-           <button onClick={onClose} style={{ width: "100%", padding: 16, borderRadius: 16, background: "#fbbf24", border: "none", color: "#000", fontWeight: 900, fontSize: 16, cursor: "pointer" }}>Dismiss</button>
+           
+           <button onClick={onClose} style={{ width: "100%", padding: "18px 0", borderRadius: 20, background: "#fbbf24", border: "none", color: "#000", fontWeight: 900, fontSize: 16, cursor: "pointer", transition: "transform 0.2s", boxShadow: "0 15px 30px rgba(251,191,36,0.2)" }}>
+              Continue Learning
+           </button>
         </div>
       </div>
     );

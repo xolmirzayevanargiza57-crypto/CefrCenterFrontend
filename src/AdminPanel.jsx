@@ -235,9 +235,35 @@ export default function AdminPanel({ user, onBack }) {
              <div>
                 <h2 style={{ fontSize: 24, fontWeight: 900, marginBottom: 8 }}>Global Broadcast</h2>
                 <p style={{ color: "#64748b", marginBottom: 32 }}>Push live notifications to all students</p>
-                <form onSubmit={handleSendNotif} style={{ display: "flex", flexDirection: "column", gap: 20 }}>
+                <form onSubmit={handleSendNotif} style={{ display: "flex", flexDirection: "column", gap: 16 }}>
                    <input type="text" placeholder="Announcement Title" value={notifForm.title} onChange={e=>setNotifForm({...notifForm, title:e.target.value})} style={{ padding: 16, borderRadius: 16, background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.05)", color: "#fff" }} required />
                    <textarea placeholder="Write your message here..." value={notifForm.message} onChange={e=>setNotifForm({...notifForm, message:e.target.value})} style={{ padding: 16, borderRadius: 16, background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.05)", color: "#fff", minHeight: 120 }} required />
+                   
+                   <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
+                     <div>
+                       <label style={{ fontSize: 11, fontWeight: 800, color: "#64748b", display: "block", marginBottom: 8 }}>TYPE / CATEGORY</label>
+                       <select value={notifForm.type} onChange={e=>setNotifForm({...notifForm, type:e.target.value})} style={{ width: "100%", padding: 16, borderRadius: 16, background: "#131d2e", border: "1px solid rgba(255,255,255,0.05)", color: "#fff", fontSize: 13, fontWeight: 700 }}>
+                         <option value="update">Update</option>
+                         <option value="feature">Feature</option>
+                         <option value="tip">Tip</option>
+                         <option value="streak">Streak</option>
+                         <option value="info">Info</option>
+                       </select>
+                     </div>
+                     <div>
+                       <label style={{ fontSize: 11, fontWeight: 800, color: "#64748b", display: "block", marginBottom: 8 }}>ICON (VISUAL)</label>
+                       <select value={notifForm.icon || "bell"} onChange={e=>setNotifForm({...notifForm, icon:e.target.value})} style={{ width: "100%", padding: 16, borderRadius: 16, background: "#131d2e", border: "1px solid rgba(255,255,255,0.05)", color: "#fff", fontSize: 13, fontWeight: 700 }}>
+                         <option value="bell">Bell (Default)</option>
+                         <option value="zap">Zap (Power)</option>
+                         <option value="star">Star (Special)</option>
+                         <option value="award">Award (Prize)</option>
+                         <option value="fire">Fire (Streak)</option>
+                         <option value="book">Book (Study)</option>
+                         <option value="globe">Globe (Comm)</option>
+                       </select>
+                     </div>
+                   </div>
+
                    <div>
                       <label style={{ fontSize: 11, fontWeight: 800, color: "#64748b", display: "block", marginBottom: 8 }}>ATTACH IMAGE (FROM GALLERY)</label>
                       <input 
@@ -249,8 +275,9 @@ export default function AdminPanel({ user, onBack }) {
                       <div style={{ marginTop: 8, fontSize: 11, color: "#4a5568" }}>OR USE EXTERNAL URL</div>
                       <input type="text" placeholder="https://image-link.com/photo.jpg" value={notifForm.image} onChange={e=>setNotifForm({...notifForm, image:e.target.value, imageFile: null})} style={{ width: "100%", padding: 16, borderRadius: 16, background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.05)", color: "#fff", marginTop: 8 }} />
                    </div>
-                   <button type="submit" style={{ padding: 16, borderRadius: 16, background: "#4a9eff", border: "none", color: "#fff", fontWeight: 800, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", gap: 10 }}>
-                      <Plus size={18} /> Publish Broadcast
+                   <button type="submit" disabled={loading} style={{ padding: 16, borderRadius: 16, background: "#4a9eff", border: "none", color: "#fff", fontWeight: 800, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", gap: 10, opacity: loading ? 0.7 : 1 }}>
+                      {loading ? <RefreshCw className="spin" size={18} /> : <Plus size={18} />} 
+                      {loading ? "Publishing..." : "Publish Broadcast"}
                    </button>
                 </form>
              </div>
