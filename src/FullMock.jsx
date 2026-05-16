@@ -29,7 +29,6 @@
     { key: "listening", label: "Listening",  ic: "ear",  color: "#1D9E75", duration: "~30 min", desc: "6 parts · 35 questions · Real audio" },
     { key: "reading",   label: "Reading",    ic: "book", color: "#378ADD", duration: "~60 min", desc: "5 parts · 35 questions · Gap fill, MCQ, Matching" },
     { key: "writing",   label: "Writing",    ic: "pen",  color: "#EF9F27", duration: "~60 min", desc: "3 parts · Email, Letter, Essay" },
-    { key: "speaking",  label: "Speaking",   ic: "mic",  color: "#D4537E", duration: "~15 min", desc: "4 parts · Interview, Comparison, Long turn, Discussion" },
   ];
 
   export default function FullMock({ progress, scores, saveScore, addXP, addCoins, isPremiumActive, activatePremium, getPremiumExpiry, clearSectionScores, onBack, allTests = {} }) {
@@ -128,7 +127,7 @@
               </div>
             ))}
           </div>
-          <span style={{ fontSize:12,color:"#8b9bbf" }}>Section {stepIdx+1}/4</span>
+          <span style={{ fontSize:12,color:"#8b9bbf" }}>Section {stepIdx+1}/3</span>
         </div>
 
         {/* Section header */}
@@ -137,7 +136,7 @@
             <Ic n={currentStep.ic} s={20} c={currentStep.color}/>
           </div>
           <div>
-            <div style={{ fontSize:11,fontWeight:700,color:currentStep.color,textTransform:"uppercase",letterSpacing:0.5 }}>Section {stepIdx+1} of 4</div>
+            <div style={{ fontSize:11,fontWeight:700,color:currentStep.color,textTransform:"uppercase",letterSpacing:0.5 }}>Section {stepIdx+1} of 3</div>
             <div style={{ fontSize:15,fontWeight:700,color:"#f0f4ff" }}>{currentStep.label}</div>
           </div>
           <div style={{ marginLeft:"auto",display:"flex",gap:8,alignItems:"center" }}>
@@ -158,9 +157,6 @@
           )}
           {currentStep.key === "writing" && (
             <WritingPage {...commonProps} tests={allTests.WRITING_TESTS || []}/>
-          )}
-          {currentStep.key === "speaking" && (
-            <SpeakingPage {...commonProps} tests={allTests.SPEAKING_TESTS || []} onBack={completeStep}/>
           )}
         </div>
 
@@ -187,7 +183,7 @@
             <Ic n="mock" s={36} c="#a78bfa"/>
           </div>
           <h2 style={{ fontSize:24,fontWeight:800,color:"#f0f4ff",marginBottom:8 }}>Mock Exam Complete!</h2>
-          <p style={{ fontSize:14,color:"#8b9bbf" }}>You have completed all 4 sections of the Full Mock Exam.</p>
+          <p style={{ fontSize:14,color:"#8b9bbf" }}>You have completed all 3 sections of the Full Mock Exam.</p>
         </div>
 
         <div style={{ display:"grid",gap:10,marginBottom:24 }}>

@@ -413,7 +413,7 @@ export default function Dashboard() {
     { pg: "listening",     label: "Listening",     ic: "ear"    },
     { pg: "reading",       label: "Reading",       ic: "book"   },
     { pg: "writing",       label: "Writing",       ic: "pen"    },
-    { pg: "speaking",      label: "Speaking",      ic: "mic"    },
+    { pg: "speaking",      label: "Speaking (Maintenance)", ic: "mic", badge: "FIX" },
     { pg: "analytics",     label: "Analytics",     ic: "bolt",   badge: "NEW" },
     { pg: "community",     label: "Community Hub", ic: "globe",   badge: "NEW" },
     { pg: "vocabulary",    label: "Vocabulary",    ic: "book",   badge: "NEW" },

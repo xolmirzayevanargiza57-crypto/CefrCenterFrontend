@@ -255,7 +255,11 @@ export default function Notifications() {
                     {/* Image support */}
                     {notif.image && (
                       <div style={{ borderRadius: 12, overflow: "hidden", border: "1px solid rgba(255,255,255,0.08)", marginTop: 12, background: "#000" }}>
-                        <img src={notif.image} alt="news" style={{ width: "100%", height: "auto", display: "block", maxHeight: 500 }} />
+                        <img 
+                          src={notif.image.startsWith('http') ? notif.image : `${BACKEND_URL.replace('/api','')}${notif.image}`} 
+                          alt="news" 
+                          style={{ width: "100%", height: "auto", display: "block", maxHeight: 500 }} 
+                        />
                       </div>
                     )}
                   </div>

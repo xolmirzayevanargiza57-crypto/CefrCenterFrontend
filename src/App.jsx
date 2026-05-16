@@ -96,7 +96,7 @@ export default function App() {
       <Routes>
         <Route path="/"            element={<Root />} />
         <Route path="/login"       element={<LoginWrapper />} />
-        <Route path="/admin"       element={<AdminPanel />} />
+        <Route path="/admin"       element={<AdminWrapper />} />
         <Route path="/us"          element={<Us />} />
         <Route path="/dashboard"   element={<Dashboard />} />
         <Route path="/dashboard/*" element={<Dashboard />} />
@@ -104,6 +104,24 @@ export default function App() {
       </Routes>
     </BrowserRouter>
   );
+}
+
+function AdminWrapper() {
+  const [user, setUser] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    return auth.onAuthStateChanged(u => {
+      setUser(u);
+      setLoading(false);
+    });
+  }, []);
+
+  if (loading) return <Loader />;
+  if (!user) return <Navigate to="/login" replace />;
+  
+  return <AdminPanel user={user} onBack={() => navigate("/dashboard")} />;
 }
 
 function LoginWrapper() {

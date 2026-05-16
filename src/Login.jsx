@@ -96,7 +96,7 @@ export default function Login() {
             return;
           }
         }
-        navigate("/dashboard");
+        navigate("/admin");
         setLoading(false);
         return;
       }
