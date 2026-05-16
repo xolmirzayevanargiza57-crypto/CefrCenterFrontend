@@ -6,7 +6,7 @@ import {
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
-export default function Flashcards({ vocabulary = [] }) {
+export default function Flashcards({ vocabulary = [], onBack }) {
   const [cards, setCards] = useState([]);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isFlipped, setIsFlipped] = useState(false);
@@ -81,6 +81,9 @@ export default function Flashcards({ vocabulary = [] }) {
     <div style={{ maxWidth: 500, margin: "0 auto", padding: "20px 16px" }}>
       <header style={{ marginBottom: 32, display: "flex", alignItems: "center", justifyContent: "space-between" }}>
         <div>
+          <button onClick={onBack} style={{ background: "transparent", border: "none", color: "#8b9bbf", fontSize: 13, fontWeight: 700, cursor: "pointer", display: "flex", alignItems: "center", gap: 6, marginBottom: 8 }}>
+            <ChevronLeft size={16} /> Back to Hub
+          </button>
           <h1 style={{ fontSize: 24, fontWeight: 900, color: "#fff", display: "flex", alignItems: "center", gap: 10 }}>
             <Brain color="#4a9eff" /> Smart Cards
           </h1>

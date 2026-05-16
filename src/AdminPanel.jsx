@@ -6,110 +6,7 @@ import {
 } from "lucide-react";
 import BACKEND_URL from "./config/api";
 
-// --- SECURITY SHIELD COMPONENT ---
-function AdminSecurityShield({ onVerified, adminEmail }) {
-  const [step, setStep] = useState("faceid"); // faceid or otp
-  const [status, setStatus] = useState("idle"); // idle, verifying, success, error
-  const [otp, setOtp] = useState("");
-  const [error, setError] = useState("");
-  const [settings, setSettings] = useState(null);
-
-  useEffect(() => {
-    fetchSettings();
-  }, []);
-
-  const fetchSettings = async () => {
-    try {
-      const res = await fetch(`${BACKEND_URL}/api/admin/security?email=${adminEmail}`, {
-        headers: { "x-user-email": adminEmail }
-      });
-      if (res.ok) setSettings(await res.json());
-    } catch (e) { console.error("Failed to fetch admin settings"); }
-  };
-
-  const handleFaceID = async () => {
-    setStatus("verifying");
-    setError("");
-    
-    // Simulate WebAuthn Biometric Check
-    // In production, this would use navigator.credentials.get
-    setTimeout(() => {
-      const isSuccess = true; // For simulation
-      if (isSuccess) {
-        setStatus("success");
-        setTimeout(() => {
-          setStep("otp");
-          setStatus("idle");
-        }, 800);
-      } else {
-        setStatus("error");
-        setError("Identity could not be verified. Unknown face detected.");
-      }
-    }, 2000);
-  };
-
-  const handleOTP = () => {
-    if (otp === (settings?.otpCode || "887766")) {
-      onVerified();
-    } else {
-      setError("Incorrect safety code. Please try again.");
-    }
-  };
-
-  return (
-    <div style={{ position: "fixed", inset: 0, background: "#0b1120", zIndex: 99999, display: "flex", alignItems: "center", justifyContent: "center", fontFamily: "Inter, sans-serif" }}>
-      <div style={{ width: "100%", maxWidth: 400, padding: 32, textAlign: "center" }}>
-        
-        <div style={{ width: 80, height: 80, borderRadius: "50%", background: "rgba(74,158,255,0.1)", border: "1px solid rgba(74,158,255,0.2)", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 24px" }}>
-            {step === "faceid" ? <Camera size={36} color="#4a9eff" /> : <Shield size={36} color="#fbbf24" />}
-        </div>
-        
-        <h2 style={{ fontSize: 24, fontWeight: 900, color: "#fff", marginBottom: 8 }}>
-            {step === "faceid" ? "Admin Face Identity" : "Authorization Code"}
-        </h2>
-        <p style={{ color: "#8b9bbf", fontSize: 14, marginBottom: 32 }}>
-            {step === "faceid" ? "Scan your biometrics to enter the control zone." : "Enter the unique 6-digit administrative code."}
-        </p>
-
-        {step === "faceid" ? (
-          <div style={{ padding: 24, background: "rgba(255,255,255,0.03)", borderRadius: 24, border: "1px solid rgba(255,255,255,0.05)" }}>
-            {status === "verifying" ? (
-               <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 16 }}>
-                  <div style={{ width: "100%", height: 3, background: "#4a9eff", boxShadow: "0 0 15px #4a9eff", borderRadius: 10, animation: "scan 2s linear infinite" }} />
-                  <span style={{ fontSize: 11, fontWeight: 800, color: "#4a9eff" }}>VERIFYING BIOMETRICS...</span>
-               </div>
-            ) : status === "success" ? (
-               <div style={{ color: "#10b981", fontWeight: 800, fontSize: 14 }}>IDENTITY MATCHED!</div>
-            ) : (
-               <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-                 {error && <div style={{ color: "#ef4444", fontSize: 13, background: "rgba(239,68,68,0.1)", padding: 10, borderRadius: 10 }}>{error}</div>}
-                 <button onClick={handleFaceID} style={{ width: "100%", padding: 16, borderRadius: 16, background: "#4a9eff", border: "none", color: "#fff", fontWeight: 800, cursor: "pointer" }}>Start Face Scan</button>
-               </div>
-            )}
-          </div>
-        ) : (
-          <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-             <input 
-               type="text" maxLength={6} placeholder="· · · · · ·" 
-               value={otp} onChange={e => setOtp(e.target.value)}
-               style={{ width: "100%", padding: 20, borderRadius: 16, background: "rgba(0,0,0,0.3)", border: "1px solid rgba(255,255,255,0.1)", color: "#fff", fontSize: 24, textAlign: "center", fontWeight: 900, letterSpacing: 8 }}
-             />
-             {error && <div style={{ color: "#ef4444", fontSize: 13 }}>{error}</div>}
-             <button onClick={handleOTP} style={{ width: "100%", padding: 16, borderRadius: 16, background: "#fbbf24", border: "none", color: "#000", fontWeight: 900, cursor: "pointer" }}>Verify & Login</button>
-          </div>
-        )}
-
-        <div style={{ marginTop: 40, color: "rgba(255,255,255,0.2)", fontSize: 11 }}>
-            Secure Session • End-to-End Encrypted
-        </div>
-      </div>
-
-      <style>{`
-        @keyframes scan { 0% { transform: translateY(-10px); opacity: 0; } 50% { opacity: 1; } 100% { transform: translateY(10px); opacity: 0; } }
-      `}</style>
-    </div>
-  );
-}
+// Admin security legacy module removed.
 
 // --- MAIN ADMIN PANEL ---
 export default function AdminPanel({ user, onBack }) {
@@ -151,8 +48,8 @@ export default function AdminPanel({ user, onBack }) {
   }, [adminEmail]);
 
   useEffect(() => {
-    if (isVerified) loadData();
-  }, [isVerified, loadData]);
+    loadData();
+  }, [loadData]);
 
   const handleAction = async (id, action, reason = "") => {
     try {
@@ -208,10 +105,6 @@ export default function AdminPanel({ user, onBack }) {
       if (res.ok) loadData();
     } catch (e) { alert("Delete failed"); }
   };
-
-  if (!isVerified) {
-    return <AdminSecurityShield adminEmail={adminEmail} onVerified={() => setIsVerified(true)} />;
-  }
 
   const Ic = ({ icon: Icon, s = 16, c = "currentColor", className = "" }) => <Icon size={s} color={c} className={className} />;
 

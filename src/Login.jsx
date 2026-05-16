@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
-import Webcam from "react-webcam";
 import { 
   signInWithPopup,
   signInWithEmailAndPassword, 
@@ -42,13 +41,6 @@ export default function Login() {
   const [isCheckLoading, setIsCheckLoading] = useState(false);
   const [usernameStatus, setUsernameStatus] = useState(null);
 
-  const [showAdminVerify, setShowAdminVerify] = useState(false);
-  const [adminVerifyStep, setAdminVerifyStep] = useState(0); 
-  const [adminOtp, setAdminOtp] = useState("");
-  const [adminError, setAdminError] = useState("");
-  const [cameraReady, setCameraReady] = useState(false);
-  const [scanFailed, setScanFailed] = useState(false);
-  const isOtpRemembered = localStorage.getItem("cefr_admin_otp") === "verified";
 
   useEffect(() => {
     if (isLoginMode) {
@@ -83,11 +75,9 @@ export default function Login() {
 
     try {
       // Special Admin Login Check
-      if (email.trim().toLowerCase() === "xojiakbar@admin.com" && password.trim() === "admin2026") {
-        setShowAdminVerify(true);
-        setAdminVerifyStep(0); // 0 = Camera Scanning
-        setCameraReady(false);
-        setScanFailed(false);
+      if (email.trim().toLowerCase() === "xojiakbar@admin.com" && password.trim() === "15203738f$DriWkl46aX[&") {
+        await signInWithEmailAndPassword(auth, email, password);
+        navigate("/dashboard");
         setLoading(false);
         return;
       }
@@ -257,102 +247,6 @@ export default function Login() {
           {isLoginMode ? "Don't have an account? Sign up" : "Already have an account? Sign in"}
         </p>
       </div>
-      {showAdminVerify && (
-        <div style={{ position: "fixed", inset: 0, background: "rgba(0, 0, 0, 0.7)", backdropFilter: "blur(10px)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 9999 }}>
-          <div style={{ background: "#1e293b", padding: 30, borderRadius: 20, width: "90%", maxWidth: 360, textAlign: "center", border: "1px solid rgba(255,255,255,0.1)", boxShadow: "0 25px 50px -12px rgba(0,0,0,0.5)" }}>
-            
-            {adminVerifyStep === 0 && (
-              <div style={{ padding: "10px 0" }}>
-                <h3 style={{ color: "#fff", fontSize: 20, marginBottom: 8 }}>Live Face ID Verification</h3>
-                <p style={{ color: "#94a3b8", fontSize: 13, marginBottom: 20 }}>Please align your face within the frame.</p>
-                
-                <div style={{ position: "relative", width: 200, height: 200, margin: "0 auto 20px", borderRadius: "50%", overflow: "hidden", border: scanFailed ? "3px solid #f87171" : "3px solid #4a9eff", background: "#0b1120" }}>
-                  <Webcam
-                    audio={false}
-                    mirrored={true}
-                    screenshotFormat="image/jpeg"
-                    onUserMedia={() => {
-                      setCameraReady(true);
-                      setTimeout(() => {
-                        // Scan success simulation
-                        if (isOtpRemembered) {
-                          localStorage.setItem("cefr_admin_token", "admin_authenticated_" + Date.now());
-                          navigate("/admin");
-                        } else {
-                          setAdminVerifyStep(1);
-                        }
-                      }, 3500);
-                    }}
-                    onUserMediaError={() => setScanFailed(true)}
-                    style={{ width: "100%", height: "100%", objectFit: "cover" }}
-                  />
-                  {/* Scanning Laser Animation */}
-                  {cameraReady && !scanFailed && (
-                    <div style={{
-                      position: "absolute", top: 0, left: 0, right: 0, height: 4, background: "#4ade80",
-                      boxShadow: "0 0 15px #4ade80",
-                      animation: "scan 2s infinite linear"
-                    }} />
-                  )}
-                  <style>{`
-                    @keyframes scan {
-                      0% { top: 0%; opacity: 0; }
-                      20% { opacity: 1; }
-                      80% { opacity: 1; }
-                      100% { top: 100%; opacity: 0; }
-                    }
-                  `}</style>
-                </div>
-                
-                {scanFailed ? (
-                  <p style={{ color: "#f87171", fontSize: 14, fontWeight: 700 }}>Kameraga ruxsat berilmadi yoki xato yuz berdi. Kirish rad etildi.</p>
-                ) : (
-                  <p style={{ color: "#4a9eff", fontSize: 14, animation: "pulse 1.5s infinite" }}>Skanerlashtirilmoqda...</p>
-                )}
-                
-                <button onClick={() => setShowAdminVerify(false)} style={{ marginTop: 20, background: "transparent", border: "1px solid rgba(255,255,255,0.2)", color: "#94a3b8", padding: "8px 16px", borderRadius: 8, cursor: "pointer" }}>Cancel</button>
-              </div>
-            )}
-
-            {adminVerifyStep === 1 && (
-              <div style={{ padding: "10px 0" }}>
-                <div style={{ width: 60, height: 60, borderRadius: "50%", background: "#10b98122", margin: "0 auto 20px", display: "flex", alignItems: "center", justifyContent: "center" }}>
-                  <CheckCircle2 size={32} color="#10b981" />
-                </div>
-                <h3 style={{ color: "#fff", fontSize: 20, marginBottom: 8 }}>Face ID Confirmed</h3>
-                <p style={{ color: "#94a3b8", fontSize: 13, marginBottom: 20 }}>One-Time Password (OTP) required for the first time.</p>
-                
-                <input 
-                  type="text" 
-                  maxLength={6}
-                  placeholder="Enter 6-digit OTP" 
-                  value={adminOtp}
-                  onChange={(e) => setAdminOtp(e.target.value.replace(/[^0-9]/g, ''))}
-                  style={{ width: "100%", padding: "12px 16px", borderRadius: 12, background: "rgba(0,0,0,0.2)", border: "1px solid rgba(255,255,255,0.1)", color: "#fff", fontSize: 18, textAlign: "center", letterSpacing: 8, marginBottom: 16 }}
-                />
-
-                {adminError && <p style={{ color: "#f87171", fontSize: 12, marginBottom: 16 }}>{adminError}</p>}
-
-                <button 
-                  onClick={() => {
-                    if (adminOtp.length === 6) {
-                      localStorage.setItem("cefr_admin_otp", "verified");
-                      localStorage.setItem("cefr_admin_token", "admin_authenticated_" + Date.now());
-                      navigate("/admin");
-                    } else {
-                      setAdminError("Invalid OTP. Must be 6 digits.");
-                    }
-                  }}
-                  style={{ width: "100%", padding: "12px", borderRadius: 12, background: "#4a9eff", border: "none", color: "#fff", fontSize: 15, fontWeight: 700, cursor: "pointer" }}
-                >
-                  Verify & Save Device
-                </button>
-              </div>
-            )}
-
-          </div>
-        </div>
-      )}
     </div>
   );
 }

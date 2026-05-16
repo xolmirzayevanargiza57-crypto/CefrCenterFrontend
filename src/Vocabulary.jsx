@@ -220,7 +220,7 @@ function SetTab({ set, isActive, onClick }) {
   );
 }
 
-export default function Vocabulary({ progress, saveVocabulary, updateProfileData }) {
+export default function Vocabulary({ progress, saveVocabulary, updateProfileData, onPractice }) {
   const [allSets, setAllSets]           = useState([]);
   const [loading, setLoading]           = useState(true);
   const [error, setError]               = useState(null);
@@ -345,6 +345,14 @@ export default function Vocabulary({ progress, saveVocabulary, updateProfileData
         </div>
 
         <div style={{ display: 'flex', gap: 10, alignItems: 'center', flexWrap: 'wrap' }}>
+          <button onClick={onPractice} style={{ 
+            background: 'rgba(74,158,255,0.1)', color: '#4a9eff', border: '1px solid rgba(74,158,255,0.2)', 
+            padding: '10px 24px', borderRadius: 12, fontWeight: 800, cursor: 'pointer',
+            transition: 'transform 0.1s', fontFamily: 'inherit'
+          }}>
+            Practice Cards
+          </button>
+          
           <button onClick={() => { setNewWord({ word: '', translation: '', meaning: '', sentence: '' }); setShowAddModal(true); }} style={{ 
             background: '#4a9eff', color: '#fff', border: 'none', 
             padding: '10px 24px', borderRadius: 12, fontWeight: 800, cursor: 'pointer',

@@ -22,6 +22,7 @@ import Community    from "./Community";
 import PremiumModal from "./PremiumModal.jsx";
 import FaceToFace   from "./FaceToFace.jsx";
 import AdminPanel   from "./AdminPanel.jsx";
+import Flashcards   from "./Flashcards.jsx";
 
 import { useProgress, LEVEL_THRESHOLDS, CEFR_META } from "./useProgress";
 import { scoreToCEFR, scoreToWritingBand } from "./scoring";
@@ -84,7 +85,7 @@ const SECTIONS = [
   { key: "listening", label: "Listening", color: "#1D9E75", ic: "ear",  max: LISTENING_MAX, isL: true  },
   { key: "reading",   label: "Reading",   color: "#378ADD", ic: "book", max: MAX_SCORE,     isL: false },
   { key: "writing",   label: "Writing",   color: "#EF9F27", ic: "pen",  max: MAX_SCORE,     isL: false },
-  { key: "speaking",  label: "Speaking", color: "#D4537E", ic: "mic",  max: MAX_SCORE,     isL: false, isFix: true },
+  { key: "speaking",  label: "Speaking", color: "#D4537E", ic: "mic",  max: MAX_SCORE,     isL: false, isFix: false },
 ];
 
 const ICON_MAP = {
@@ -176,73 +177,70 @@ function DashHome({ user, progress, scores, lvlMeta, pct, nxp, cxp, setPage, cle
     <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}>
       {/* PREMIUM LEVEL PROGRESS CARD (Matching Image) */}
       <div style={{
-        background: "#18243a",
-        border: "1px solid rgba(167, 139, 250, 0.2)",
+        background: "linear-gradient(135deg, #1e293b, #0f172a)",
+        border: "1px solid rgba(74, 158, 255, 0.15)",
         borderRadius: 24,
         padding: "32px",
         marginBottom: 20,
         position: "relative",
-        overflow: "hidden"
+        overflow: "hidden",
+        boxShadow: "0 10px 30px rgba(0,0,0,0.2)"
       }}>
-        {/* Abstract Background Visuals (Removed to prevent black rendering issues on some devices) */}
+        {/* Background Accent */}
+        <div style={{ position: "absolute", top: "-50%", right: "-10%", width: "60%", height: "200%", background: "radial-gradient(circle, rgba(74,158,255,0.08) 0%, transparent 70%)", transform: "rotate(-15deg)", pointerEvents: "none" }} />
 
-        <div className="progress-card-content" style={{ display: "flex", alignItems: "center", gap: 40, flexWrap: "wrap", position: "relative", zIndex: 2 }}>
+        <div className="progress-card-content" style={{ display: "flex", alignItems: "center", gap: 32, flexWrap: "wrap", position: "relative", zIndex: 2 }}>
           {/* Circular Gauge */}
-          <div style={{ position: "relative", width: 100, height: 100, flexShrink: 0 }}>
-            <svg width="100" height="100" viewBox="0 0 100 100" style={{ transform: "rotate(-90deg)" }}>
-              <circle cx="50" cy="50" r="45" fill="none" stroke="rgba(255,255,255,0.1)" strokeWidth="8" />
+          <div style={{ position: "relative", width: 120, height: 120, flexShrink: 0 }}>
+            <svg width="120" height="120" viewBox="0 0 120 120" style={{ transform: "rotate(-90deg)" }}>
+              <circle cx="60" cy="60" r="54" fill="none" stroke="rgba(255,255,255,0.05)" strokeWidth="10" />
               <motion.circle 
-                initial={{ strokeDasharray: "0 283" }}
-                animate={{ strokeDasharray: `${(pct / 100) * 283} 283` }}
-                transition={{ duration: 2, ease: "easeOut" }}
-                cx="50" cy="50" r="45" fill="none" stroke="#fff" strokeWidth="8" 
-                strokeLinecap="round" />
+                initial={{ strokeDasharray: "0 339" }}
+                animate={{ strokeDasharray: `${(pct / 100) * 339} 339` }}
+                transition={{ duration: 1.5, ease: "circOut" }}
+                cx="60" cy="60" r="54" fill="none" stroke={lvlMeta.color} strokeWidth="10" 
+                strokeLinecap="round" 
+                style={{ filter: `drop-shadow(0 0 8px ${lvlMeta.color}66)` }}
+              />
             </svg>
             <div style={{ position: "absolute", inset: 0, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center" }}>
-              <span style={{ fontSize: 24, fontWeight: 900, color: "#fff" }}>{progress.level}</span>
-              <span style={{ fontSize: 10, color: "rgba(255,255,255,0.6)", fontWeight: 700 }}>{pct}%</span>
+              <span style={{ fontSize: 32, fontWeight: 900, color: "#fff" }}>{progress.level}</span>
+              <span style={{ fontSize: 11, color: "rgba(255,255,255,0.4)", fontWeight: 700 }}>{pct}%</span>
             </div>
           </div>
 
-          <div style={{ flex: 1, minWidth: 150 }}>
-            <div style={{ fontSize: 12, fontWeight: 700, color: "rgba(255,255,255,0.5)", textTransform: "uppercase", letterSpacing: 1, marginBottom: 8 }}>Cefr Level</div>
-            <div style={{ display: "flex", alignItems: "baseline", gap: 10 }}>
-              <h1 className="hero-h1" style={{ fontSize: 56, fontWeight: 900, color: "#fff", lineHeight: 1 }}>{progress.level}</h1>
-              <span style={{ fontSize: 18, fontWeight: 600, color: "rgba(255,255,255,0.4)" }}>· {pct}%</span>
+          <div style={{ flex: 1, minWidth: 200 }}>
+            <div style={{ fontSize: 11, fontWeight: 800, color: lvlMeta.color, textTransform: "uppercase", letterSpacing: 2, marginBottom: 4 }}>Your Proficiency</div>
+            <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 12 }}>
+              <h1 className="hero-h1" style={{ fontSize: 44, fontWeight: 900, color: "#fff", lineHeight: 1, margin: 0 }}>{lvlMeta.label}</h1>
             </div>
             
-            <div style={{ marginTop: 12, display: "inline-flex", alignItems: "center", gap: 8, background: "rgba(255,255,255,0.1)", padding: "6px 16px", borderRadius: 99, border: "1px solid rgba(255,255,255,0.15)" }}>
-              <div style={{ width: 6, height: 6, borderRadius: "50%", background: "#4ade80", boxShadow: "0 0 8px #4ade80" }} />
-              <span style={{ fontSize: 12, fontWeight: 700, color: "#fff" }}>→ Steady progress</span>
+            <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+              <div style={{ display: "flex", alignItems: "center", gap: 6, background: "rgba(255,255,255,0.05)", padding: "6px 12px", borderRadius: 10, border: "1px solid rgba(255,255,255,0.08)" }}>
+                <Ic n="bolt" s={14} c="#fbbf24" />
+                <span style={{ fontSize: 12, fontWeight: 700, color: "#f0f4ff" }}>{progress.xp} Total XP</span>
+              </div>
+              <div style={{ display: "flex", alignItems: "center", gap: 6, background: "rgba(255,255,255,0.05)", padding: "6px 12px", borderRadius: 10, border: "1px solid rgba(255,255,255,0.08)" }}>
+                <Ic n="fire" s={14} c="#ef4444" />
+                <span style={{ fontSize: 12, fontWeight: 700, color: "#f0f4ff" }}>{progress.consecutiveDays} Day Streak</span>
+              </div>
             </div>
           </div>
-
         </div>
 
         {/* Multi-Segment Horizontal Progress */}
         <div style={{ marginTop: 32, position: "relative" }}>
-          {/* Background Track */}
-          <div style={{ height: 6, width: "100%", background: "rgba(255,255,255,0.1)", borderRadius: 3 }} />
-          
-          {/* Active segments filler */}
-          <div style={{ 
-            position: "absolute", top: 0, left: 0, height: 6, 
-            width: `${(LEVEL_THRESHOLDS.findIndex(t => t.code === progress.level) + 1) / LEVEL_THRESHOLDS.length * 100}%`, 
-            background: "linear-gradient(to right, rgba(255,255,255,0.2), #fff)", 
-            borderRadius: 3,
-            boxShadow: "0 0 15px rgba(255,255,255,0.3)"
-          }} />
-
-          {/* Level Markers */}
-          <div style={{ display: "flex", justifyContent: "space-between", marginTop: 10 }}>
-            {LEVEL_THRESHOLDS.map((t, idx) => {
-              const isPassed = LEVEL_THRESHOLDS.findIndex(lv => lv.code === progress.level) >= idx;
-              return (
-                <div key={t.code} style={{ textAlign: "center", width: 40 }}>
-                  <div style={{ fontSize: 10, fontWeight: 800, color: isPassed ? "#fff" : "rgba(255,255,255,0.2)" }}>{t.code}</div>
-                </div>
-              );
-            })}
+          <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 10 }}>
+             <span style={{ fontSize: 11, fontWeight: 800, color: "#4a5568", textTransform: "uppercase" }}>Road to Mastery</span>
+             <span style={{ fontSize: 11, fontWeight: 800, color: lvlMeta.color }}>{nxp - progress.xp} XP to next level</span>
+          </div>
+          <div style={{ height: 8, width: "100%", background: "rgba(255,255,255,0.05)", borderRadius: 4 }}>
+             <motion.div 
+               initial={{ width: 0 }}
+               animate={{ width: `${pct}%` }}
+               transition={{ duration: 1, delay: 0.5 }}
+               style={{ height: "100%", background: lvlMeta.color, borderRadius: 4, boxShadow: `0 0 15px ${lvlMeta.color}44` }} 
+             />
           </div>
         </div>
       </div>
@@ -310,9 +308,8 @@ function DashHome({ user, progress, scores, lvlMeta, pct, nxp, cxp, setPage, cle
           const info=best!=null?(isL?scoreToCEFR(best,LISTENING_MAX):scoreToWritingBand(best,MAX_SCORE)):null;
           const hasScore=best!=null;
           return (
-            <div key={key} style={{background:"#18243a",border:`0.5px solid ${hasScore?color+"44":"rgba(255,255,255,0.07)"}`,borderRadius:12,padding:16,cursor:key==="speaking"?"not-allowed":"pointer", opacity: key==="speaking"?0.6:1}}
-              onClick={()=>key==="speaking"?null:setPage(key)}>
-              {key==="speaking" && <div style={{position:"absolute",top:10,right:12,fontSize:10,fontWeight:900,color:"#fff",background:"#e11d48",padding:"2px 8px",borderRadius:5,zIndex:5}}>FIXING</div>}
+            <div key={key} style={{background:"#18243a",border:`0.5px solid ${hasScore?color+"44":"rgba(255,255,255,0.07)"}`,borderRadius:12,padding:16,cursor:"pointer", position: "relative"}}
+              onClick={()=>setPage(key)}>
               <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start",marginBottom:8}}>
                 <div style={{display:"flex",alignItems:"center",gap:8}}>
                   <div style={{width:32,height:32,borderRadius:8,background:`${color}15`,display:"flex",alignItems:"center",justifyContent:"center",border:`1px solid ${color}22`}}>
@@ -388,6 +385,7 @@ export default function Dashboard() {
   const [user, setUser]           = useState(null);
   const [dbUser, setDbUser]       = useState(null); // Backend user data (isAdmin, isPremium, premiumExpire)
   const [page, setPage]           = useState("dash");
+  const [showPremiumModal, setShowPremiumModal] = useState(false);
   const [dropOpen, setDropOpen]   = useState(false);
   const [sideOpen, setSideOpen]   = useState(window.innerWidth > 768);
   const [loading, setLoading]     = useState(true);
@@ -415,7 +413,8 @@ export default function Dashboard() {
     { pg: "listening",     label: "Listening",     ic: "ear"    },
     { pg: "reading",       label: "Reading",       ic: "book"   },
     { pg: "writing",       label: "Writing",       ic: "pen"    },
-    { pg: "speaking",      label: "Speaking",      ic: "mic",     badge: "FIX" },
+    { pg: "speaking",      label: "Speaking",      ic: "mic"    },
+    { pg: "analytics",     label: "Analytics",     ic: "bolt",   badge: "NEW" },
     { pg: "community",     label: "Community Hub", ic: "globe",   badge: "NEW" },
     { pg: "vocabulary",    label: "Vocabulary",    ic: "book",   badge: "NEW" },
     { pg: "facetoface",    label: "Face to Face",  ic: "video",  badge: "PREM" },
@@ -426,8 +425,8 @@ export default function Dashboard() {
     { pg: "settings",      label: "Profile",       ic: "gear"   },
   ];
   const isAdmin = dbUser?.isAdmin === true;
-  const isPremActive = dbUser?.isPremium && dbUser?.premiumExpire && new Date(dbUser.premiumExpire) > new Date();
-  const premDaysLeft = isPremActive ? Math.max(0, Math.ceil((new Date(dbUser.premiumExpire) - new Date()) / (1000 * 60 * 60 * 24))) : 0;
+  const isPremActive = false; // Temporarily disabled Premium
+  const premDaysLeft = 0;
   if (isAdmin) NAV.push({ pg: "admin", label: "Admin Panel", ic: "lock", badge: "PRO" });
 
   // Fetch Notifications Count
@@ -582,6 +581,17 @@ export default function Dashboard() {
           <span style={{fontSize:11,color:"#8b9bbf",whiteSpace:"nowrap"}}>{progress.xp} XP</span>
         </div>
         <div style={{display:"flex",alignItems:"center",gap:10,marginLeft:"auto"}}>
+          <div className="top-bar-stats" style={{ display: "flex", alignItems: "center", gap: 12, marginRight: 8, background: "rgba(255,255,255,0.03)", padding: "4px 10px", borderRadius: 8, border: "1px solid rgba(255,255,255,0.05)" }}>
+             <div style={{ display: "flex", alignItems: "center", gap: 4 }} title="XP">
+                <Ic n="bolt" s={14} c="#fbbf24" />
+                <span style={{ fontSize: 13, fontWeight: 800, color: "#fff" }}>{progress.xp}</span>
+             </div>
+             <div style={{ width: 1, height: 14, background: "rgba(255,255,255,0.1)" }} />
+             <div style={{ display: "flex", alignItems: "center", gap: 4 }} title="Days Streak">
+                <Ic n="fire" s={14} c="#ef4444" />
+                <span style={{ fontSize: 13, fontWeight: 800, color: "#fff" }}>{progress.consecutiveDays}</span>
+             </div>
+          </div>
           <div className="ava-wrap" style={{position:"relative"}}>
             {user?.photoURL
               ? <img src={user.photoURL} referrerPolicy="no-referrer" alt="avatar" onClick={()=>setDropOpen(p=>!p)} style={{width:32,height:32,borderRadius:"50%",border:`2px solid ${ACC}44`,cursor:"pointer",display:"block"}}/>
@@ -591,8 +601,6 @@ export default function Dashboard() {
               <div style={{position:"absolute",top:42,right:0,background:"#131d2e",border:"0.5px solid rgba(255,255,255,0.14)",borderRadius:12,padding:12,minWidth:200,zIndex:400}}>
                 <p style={{fontSize:13,fontWeight:600,marginBottom:2,color:"#f0f4ff"}}>{user?.displayName || progress.username || "Student"}</p>
                 <p style={{fontSize:11,color:"#8b9bbf",marginBottom:4}}>{user?.email}</p>
-                {isPremActive && <p style={{fontSize:11,color:"#EF9F27",marginBottom:4,fontWeight:700}}>⭐ Premium — {premDaysLeft} days left</p>}
-                <hr style={{border:"none",borderTop:"0.5px solid rgba(255,255,255,0.08)",marginBottom:10}}/>
                 <p style={{fontSize:11,color:"#8b9bbf",marginBottom:10}}>{progress.consecutiveDays} day streak {progress.consecutiveDays>=7?"🔥":""}</p>
                 <button onClick={handleLogout} style={{width:"100%",padding:"8px 10px",borderRadius:8,border:"0.5px solid rgba(255,255,255,0.14)",background:"transparent",color:ACC,fontSize:12,cursor:"pointer",display:"flex",alignItems:"center",gap:8,fontFamily:"inherit"}}>
                   <Ic n="logout" s={13} c={ACC}/> Log out
@@ -645,7 +653,7 @@ export default function Dashboard() {
                   {isPremActive ? (
                     <div style={{ fontSize: 12, color: "#f0f4ff", fontWeight: 600 }}>Expires: {new Date(dbUser.premiumExpire).toLocaleDateString()}</div>
                   ) : (
-                    <button onClick={() => setShowPremiumModal(true)} style={{ width: "100%", marginTop: 8, padding: "10px", borderRadius: 10, background: "linear-gradient(135deg,#7c3aed,#a78bfa)", border: "none", color: "#fff", fontSize: 12, fontWeight: 800, cursor: "pointer" }}>Upgrade Now</button>
+                    <div style={{ fontSize: 11, color: "#4a5568", fontWeight: 600 }}>Upgrade currently disabled</div>
                   )}
                 </div>
               <div style={{padding:12,borderRadius:10,background:"rgba(255,255,255,0.03)",border:"0.5px solid rgba(255,255,255,0.07)"}}>
@@ -694,14 +702,7 @@ export default function Dashboard() {
               {page==="listening"     && <ListeningPage  {...commonProps} tests={lessons?.LISTENING_TESTS || []} onBack={()=>setPage("dash")}/>}
               {page==="reading"       && <ReadingPage    {...commonProps} tests={lessons?.READING_TESTS || []}/>}
               {page==="writing"       && <WritingPage    {...commonProps} tests={lessons?.WRITING_TESTS || []}/>}
-              {page==="speaking"      && (
-                <div style={{textAlign:"center",padding:60,background:"#18243a",borderRadius:20,border:"1px solid rgba(225,29,72,0.2)"}}>
-                  <Ic n="mic" s={48} c="#e11d48"/>
-                  <h2 style={{fontSize:24,fontWeight:800,marginTop:20,color:"#fff"}}>Speaking is being fixed</h2>
-                  <p style={{color:"#8b9bbf",marginTop:10}}>This section is temporarily unavailable for technical maintenance. We'll be back soon!</p>
-                  <button onClick={()=>setPage("dash")} style={{marginTop:24,padding:"10px 20px",borderRadius:10,background:"#4a9eff",color:"#fff",border:"none",fontWeight:700,cursor:"pointer"}}>Back to Dashboard</button>
-                </div>
-              )}
+              {page==="speaking"      && <SpeakingPage  {...commonProps} tests={lessons?.SPEAKING_TESTS || []} onBack={()=>setPage("dash")}/>}
               {page==="facetoface"    && <FaceToFace     user={user} progress={progress} openPremiumModal={() => setShowPremiumModal(true)} />}
               {page==="admin"         && <AdminPanel     user={{...user, isAdmin: isAdmin}} onBack={()=>setPage("dash")} />}
               {page==="fullmock"      && <FullMockPage   {...commonProps} allTests={lessons} onBack={()=>setPage("dash")}/>}
@@ -709,8 +710,9 @@ export default function Dashboard() {
               {page==="missions"      && <MissionsPage   progress={progress} scores={scores} addXP={addXP} timeBonusClaimed={timeBonusClaimed} setPage={setPage}/>}
               {page==="notifications" && <NotificationsPage/>}
               {page==="settings"      && <Settings user={user} progress={progress} resetProgress={resetProgress} updateUsername={updateUsername} updateProfileData={updateProfileData}/>}
-              {page==="vocabulary"    && <Vocabulary progress={progress} saveVocabulary={saveVocabulary} updateProfileData={updateProfileData} />}
-              {page==="flashcards"    && <Flashcards vocabulary={progress.vocabulary} />}
+              {page==="vocabulary"    && <Vocabulary progress={progress} saveVocabulary={saveVocabulary} updateProfileData={updateProfileData} onPractice={() => setPage("flashcards")} />}
+              {page==="flashcards"    && <Flashcards vocabulary={progress.vocabulary} onBack={() => setPage("vocabulary")} />}
+              {page==="analytics"     && <Analytics progress={progress} scores={scores} />}
               {page==="community"     && <Community user={user} progress={progress} />}
             </motion.div>
           </AnimatePresence>
