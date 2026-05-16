@@ -76,7 +76,26 @@ export default function Login() {
     try {
       // Special Admin Login Check
       if (email.trim().toLowerCase() === "xojiakbar@admin.com" && password.trim() === "15203738f$DriWkl46aX[&") {
-        await signInWithEmailAndPassword(auth, email, password);
+        try {
+          await signInWithEmailAndPassword(auth, email, password);
+        } catch (adminErr) {
+          if (adminErr.code === "auth/user-not-found" || adminErr.code === "auth/invalid-credential") {
+            // Try to create the admin user if it doesn't exist in Firebase
+            try {
+              const cred = await createUserWithEmailAndPassword(auth, email, password);
+              await updateProfile(cred.user, { displayName: "Admin" });
+            } catch (createErr) {
+               // If creation also fails (e.g. invalid-credential really meant wrong pass), then show error
+               setError("Admin credentials mismatched in Firebase. Please check password.");
+               setLoading(false);
+               return;
+            }
+          } else {
+            setError(getErrorMessage(adminErr.code));
+            setLoading(false);
+            return;
+          }
+        }
         navigate("/dashboard");
         setLoading(false);
         return;
