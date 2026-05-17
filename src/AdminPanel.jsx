@@ -11,6 +11,19 @@ import BACKEND_URL from "./config/api";
 // --- MAIN ADMIN PANEL ---
 export default function AdminPanel({ user, onBack }) {
   const [isVerified, setIsVerified] = useState(false);
+  const [loginForm, setLoginForm] = useState({ email: "", password: "" });
+  const [loginError, setLoginError] = useState("");
+
+  const handleLogin = (e) => {
+    e.preventDefault();
+    if (loginForm.email === "xojiakbar@admin.net" && loginForm.password === "15203738f$DriWkl46aX[&") {
+      setIsVerified(true);
+      setLoginError("");
+    } else {
+      setLoginError("Invalid credentials. Access denied.");
+    }
+  };
+
   const [tab, setTab] = useState("dashboard");
   const [payments, setPayments] = useState([]);
   const [users, setUsers] = useState([]);
@@ -130,6 +143,65 @@ export default function AdminPanel({ user, onBack }) {
   };
 
   const Ic = ({ icon: Icon, s = 16, c = "currentColor", className = "" }) => <Icon size={s} color={c} className={className} />;
+
+  if (!isVerified) {
+    return (
+      <div style={{ position: "fixed", inset: 0, background: "#0b1120", zIndex: 9999, display: "flex", alignItems: "center", justifyContent: "center", fontFamily: "Inter, sans-serif" }}>
+        <style>{`
+          @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+          .login-card { animation: fadeIn 0.4s ease-out; }
+        `}</style>
+        <div className="login-card" style={{ width: "100%", maxWidth: 400, padding: 40, background: "#111827", borderRadius: 32, border: "1px solid rgba(255,255,255,0.05)", boxShadow: "0 25px 50px -12px rgba(0,0,0,0.5)" }}>
+          <div style={{ textAlign: "center", marginBottom: 32 }}>
+            <div style={{ width: 64, height: 64, background: "rgba(74,158,255,0.1)", borderRadius: 20, display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 16px", color: "#4a9eff" }}>
+              <Shield size={32} />
+            </div>
+            <h2 style={{ fontSize: 24, fontWeight: 900, color: "#fff", margin: 0 }}>Gatekeeper</h2>
+            <p style={{ color: "#64748b", marginTop: 8, fontSize: 14 }}>Authorized Personnel Only</p>
+          </div>
+
+          <form onSubmit={handleLogin} style={{ display: "flex", flexDirection: "column", gap: 20 }}>
+            <div>
+              <label style={{ display: "block", fontSize: 11, fontWeight: 800, color: "#64748b", marginBottom: 8, letterSpacing: 1 }}>EMAIL ADDRESS</label>
+              <input 
+                type="email" 
+                required 
+                value={loginForm.email}
+                onChange={e => setLoginForm({...loginForm, email: e.target.value})}
+                style={{ width: "100%", padding: "14px 16px", background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.05)", borderRadius: 12, color: "#fff", fontSize: 14, outline: "none" }}
+                placeholder="admin@cefr.center"
+              />
+            </div>
+            <div>
+              <label style={{ display: "block", fontSize: 11, fontWeight: 800, color: "#64748b", marginBottom: 8, letterSpacing: 1 }}>AUTHENTICATION KEY</label>
+              <input 
+                type="password" 
+                required 
+                value={loginForm.password}
+                onChange={e => setLoginForm({...loginForm, password: e.target.value})}
+                style={{ width: "100%", padding: "14px 16px", background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.05)", borderRadius: 12, color: "#fff", fontSize: 14, outline: "none" }}
+                placeholder="••••••••••••"
+              />
+            </div>
+
+            {loginError && (
+              <div style={{ padding: "10px 14px", background: "rgba(239,68,68,0.1)", border: "1px solid rgba(239,68,68,0.2)", borderRadius: 12, color: "#ef4444", fontSize: 13, fontWeight: 600 }}>
+                {loginError}
+              </div>
+            )}
+
+            <button type="submit" style={{ padding: 16, background: "#4a9eff", border: "none", borderRadius: 16, color: "#fff", fontWeight: 800, fontSize: 14, cursor: "pointer", transition: "all 0.2s" }}>
+              Authorize Access
+            </button>
+
+            <button type="button" onClick={onBack} style={{ background: "none", border: "none", color: "#64748b", fontSize: 13, fontWeight: 600, cursor: "pointer", marginTop: 8 }}>
+              Return to System
+            </button>
+          </form>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div style={{ position: "fixed", inset: 0, background: "#0b1120", zIndex: 1000, display: "flex", fontFamily: "Inter, sans-serif", color: "#fff" }}>
