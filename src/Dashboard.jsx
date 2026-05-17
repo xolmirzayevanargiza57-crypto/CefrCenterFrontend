@@ -435,11 +435,16 @@ export default function Dashboard() {
   useEffect(() => {
     const fetchNotifsCount = async () => {
       try {
-        const lastRead = localStorage.getItem("cefr_last_read_notif") || 0;
         const r = await fetch(`${BACKEND_URL}/api/notifications`);
-        const data = await r.json();
-        const unread = data.filter(n => new Date(n.createdAt).getTime() > lastRead).length;
-        setUnreadNotifs(unread);
+        if (r.ok) {
+          const data = await r.json();
+          const readIds = (() => {
+            try { return JSON.parse(localStorage.getItem("cefr_notif_read_v1")) || []; }
+            catch { return []; }
+          })();
+          const count = data.filter(n => !readIds.includes(n._id || n.id)).length;
+          setUnreadNotifs(count);
+        }
       } catch (e) {
         console.error(e);
       }
