@@ -16,7 +16,7 @@ export default function AdminPanel({ user, onBack }) {
 
   const handleLogin = (e) => {
     e.preventDefault();
-    if (loginForm.email === "xojiakbar@admin.net" && loginForm.password === "15203738f$DriWkl46aX[&") {
+    if (loginForm.email === "xojiakbar@admin.com" && loginForm.password === "15203738f$DriWkl46aX[&") {
       setIsVerified(true);
       setLoginError("");
     } else {
