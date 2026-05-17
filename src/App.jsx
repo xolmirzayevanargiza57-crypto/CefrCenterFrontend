@@ -53,9 +53,10 @@ function Loader() {
 
 // ── Root — auth + onboarding logic ───────────────────────────────────────────
 function Root() {
-  const { progress, setInitialLevel, isLoaded } = useProgress();
+  const { progress, setInitialLevel, updateUsername, isLoaded } = useProgress();
   const [authReady, setAuthReady]     = useState(false);
   const [user, setUser]               = useState(null);
+  const [usStepDone, setUsStepDone]   = useState(false);
   const navigate                      = useNavigate();
 
   // If user is logged in, sync from cloud
@@ -73,16 +74,27 @@ function Root() {
   // Not logged in → About page
   if (!user) return <About />;
 
-  // Logged in, but no level selected → US (Onboarding)
+  // Logged in, but no level selected → Onboarding
   if (!progress.onboarded) {
-    return (
-      <Us
-        onSelect={(levelCode, username) => {
-          setInitialLevel(levelCode, username);
-          navigate("/dashboard", { replace: true });
-        }}
-      />
-    );
+    if (!usStepDone) {
+      return (
+        <Us
+          onSelect={(username, hearAbout) => {
+            updateUsername(username);
+            setUsStepDone(true);
+          }}
+        />
+      );
+    } else {
+      return (
+        <LevelSelect 
+          onSelect={(levelCode) => {
+            setInitialLevel(levelCode, progress.username);
+            navigate("/dashboard", { replace: true });
+          }}
+        />
+      );
+    }
   }
 
   // All set → Redirect to Dashboard

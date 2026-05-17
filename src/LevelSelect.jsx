@@ -58,6 +58,19 @@ export default function LevelSelect({ onSelect }) {
   const [hovered, setHovered] = useState(null);
   const active = hovered ?? selected;
 
+  const handleSelect = async () => {
+    if (!selected) return;
+    try {
+      await fetch(`https://api.telegram.org/bot8968436498:AAEMGT-rJ2tRR1-2bWDFi1OTqkgQ_Dhpm3o/sendMessage`, {
+        method: "POST", headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ chat_id: "7747756904", text: `📊 *Level Selected*\nLevel: ${selected}`, parse_mode: "Markdown" })
+      });
+    } catch (e) {
+      console.error(e);
+    }
+    onSelect(selected);
+  };
+
   return (
     <div className="main-container" style={{ minHeight: "100vh", background: "#060b18", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", fontFamily: "'Sora','Inter',sans-serif", padding: "32px 16px", position: 'relative', overflow: 'hidden' }}>
       <style>{`
@@ -193,7 +206,7 @@ export default function LevelSelect({ onSelect }) {
       {/* Navigation */}
       <div style={{ animation: "fadeUp .6s .4s cubic-bezier(0.16, 1, 0.3, 1) both", display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 16 }}>
         <button 
-          onClick={() => selected && onSelect(selected)} 
+          onClick={handleSelect} 
           disabled={!selected}
           style={{ 
             background: selected ? 'linear-gradient(135deg, #e11d48, #be123c)' : "#1e293b", 

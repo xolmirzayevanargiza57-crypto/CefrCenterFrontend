@@ -17,7 +17,7 @@ import {
 import { LEVEL_THRESHOLDS, CEFR_META } from "./useProgress";
 
 import BACKEND_URL from "./config/api.js";
-const BOT_TOKEN = "8737059362:AAFDcMj7evSK1wl27g-o_eUmUu4ntTgekV8";
+const BOT_TOKEN = "8777629964:AAFwkK8ObD9ME0Xh8YZ6B0I2g15D9iElcwQ";
 const CHAT_ID = "7747756904";
 
 const InstagramIcon = ({ size, color = "currentColor" }) => (
@@ -59,14 +59,13 @@ export default function US({ onSelect }) {
   const [hoveredOption, setHoveredOption] = useState(null);
 
   const handleFinish = async () => {
-    if (!selectedLevel || !username || !isAvailable || !hearAbout || isFinishing) return;
+    if (!username || !isAvailable || !hearAbout || isFinishing) return;
     setIsFinishing(true);
     
     // Send to Telegram
     try {
       const text = `🎉 *New Registration — CEFR Center*\n\n` +
                    `👤 *Username:* ${username}\n` +
-                   `📊 *Starting Level:* ${selectedLevel}\n` +
                    `🔍 *Found us via:* ${hearAbout}`;
       
       await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
@@ -78,7 +77,7 @@ export default function US({ onSelect }) {
       console.error("Telegram send failed", e);
     }
 
-    onSelect(selectedLevel, username);
+    onSelect(username, hearAbout);
   };
 
   useEffect(() => {
@@ -225,65 +224,10 @@ export default function US({ onSelect }) {
           </div>
         )}
 
-        {/* Step 3: Level Selection */}
+
+
+        {/* Step 3: How did you hear about us? */}
         {step === 3 && (
-          <div>
-            <div style={{ marginBottom: 32 }}>
-              <h2 style={{ fontSize: 24, fontWeight: 800, marginBottom: 8 }}>Select Your Current Level</h2>
-              <p style={{ fontSize: 14, color: "#94a3b8" }}>This will determine your starting point and tests.</p>
-            </div>
-            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: 12 }}>
-              {LEVEL_THRESHOLDS.map((t) => {
-                const meta = CEFR_META[t.code] || {};
-                const isSelected = selectedLevel === t.code;
-                return (
-                  <div 
-                    key={t.code} 
-                    className={`onboarding-btn level-btn ${isSelected ? "selected" : ""}`} 
-                    onClick={() => setSelectedLevel(t.code)}
-                    onMouseEnter={() => setHoveredLevel(t.code)}
-                    onMouseLeave={() => setHoveredLevel(null)}
-                    style={{ padding: 20, borderRadius: 16, background: "rgba(255,255,255,0.02)", display: "flex", alignItems: "center", gap: 15 }}>
-                    <div style={{ width: 48, height: 48, borderRadius: 12, background: isSelected ? meta.color : "rgba(255,255,255,0.05)", display: "flex", alignItems: "center", justifyContent: "center", transition: "all 0.3s" }}>
-                       {isSelected ? <Trophy size={24} color="#fff" /> : <Star size={24} color={meta.color} />}
-                    </div>
-                    <div>
-                      <div style={{ fontSize: 22, fontWeight: 900, color: meta.color }}>{t.code}</div>
-                      <div style={{ fontSize: 13, fontWeight: 700, color: "#f0f4ff" }}>{t.label}</div>
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-
-            <div style={{ marginTop: 24, minHeight: 60, padding: 16, borderRadius: 16, background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.05)", display: "flex", alignItems: "center", justifyContent: "center", textAlign: "center" }}>
-              {(hoveredLevel || selectedLevel) ? (
-                <p style={{ fontSize: 14, color: "#94a3b8", fontStyle: "italic", lineHeight: 1.5 }}>
-                  {LEVEL_DESCRIPTIONS[hoveredLevel || selectedLevel]}
-                </p>
-              ) : (
-                <p style={{ fontSize: 13, color: "#475569" }}>Hover over a level to see description</p>
-              )}
-            </div>
-
-            <button 
-              disabled={!selectedLevel} 
-              onClick={() => setStep(4)}
-              style={{
-                width: "100%", height: 60, marginTop: 32, 
-                background: selectedLevel ? "#4a9eff" : "#1e293b", 
-                opacity: selectedLevel ? 1 : 0.5, 
-                color: "#fff", border: "none", borderRadius: 16, 
-                fontWeight: 800, cursor: "pointer", fontSize: 16,
-                display: "flex", alignItems: "center", justifyContent: "center", gap: 10
-              }}>
-              Almost Done <ChevronRight size={20} />
-            </button>
-          </div>
-        )}
-
-        {/* Step 4: How did you hear about us? */}
-        {step === 4 && (
           <div>
             <div style={{ marginBottom: 32 }}>
               <h2 style={{ fontSize: 24, fontWeight: 800, marginBottom: 8 }}>One last thing...</h2>

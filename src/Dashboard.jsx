@@ -7,7 +7,7 @@ import Analytics from "./components/Analytics";
 import Leaderboard from "./components/Leaderboard";
 import Vocabulary from "./Vocabulary";
 import { onAuthStateChanged, signOut } from "firebase/auth";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Navigate } from "react-router-dom";
 import US from "./US.jsx";
 import Settings from "./Settings.jsx";
 import ListeningPage from "./Listening.jsx";
@@ -23,6 +23,7 @@ import PremiumModal from "./PremiumModal.jsx";
 import FaceToFace   from "./FaceToFace.jsx";
 import AdminPanel   from "./AdminPanel.jsx";
 import Flashcards   from "./Flashcards.jsx";
+import Messages     from "./Messages.jsx";
 
 import { useProgress, LEVEL_THRESHOLDS, CEFR_META } from "./useProgress";
 import { scoreToCEFR, scoreToWritingBand } from "./scoring";
@@ -85,7 +86,7 @@ const SECTIONS = [
   { key: "listening", label: "Listening", color: "#1D9E75", ic: "ear",  max: LISTENING_MAX, isL: true  },
   { key: "reading",   label: "Reading",   color: "#378ADD", ic: "book", max: MAX_SCORE,     isL: false },
   { key: "writing",   label: "Writing",   color: "#EF9F27", ic: "pen",  max: MAX_SCORE,     isL: false },
-  { key: "speaking",  label: "Speaking", color: "#D4537E", ic: "mic",  max: MAX_SCORE,     isL: false, isFix: false },
+  { key: "speaking",  label: "Speaking (Maintenance)", color: "#D4537E", ic: "mic",  max: MAX_SCORE,     isL: false, disabled: true },
 ];
 
 const ICON_MAP = {
@@ -302,14 +303,14 @@ function DashHome({ user, progress, scores, lvlMeta, pct, nxp, cxp, setPage, cle
         </button>
       </div>
       <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(210px,1fr))",gap:12,marginBottom:20}}>
-        {SECTIONS.map(({key,label,color,ic,max,isL})=>{
+        {SECTIONS.map(({key,label,color,ic,max,isL,disabled})=>{
           const best=getSectionBest(key,isL);
           const pct2=best!=null?Math.round((best/max)*100):0;
           const info=best!=null?(isL?scoreToCEFR(best,LISTENING_MAX):scoreToWritingBand(best,MAX_SCORE)):null;
           const hasScore=best!=null;
           return (
-            <div key={key} style={{background:"#18243a",border:`0.5px solid ${hasScore?color+"44":"rgba(255,255,255,0.07)"}`,borderRadius:12,padding:16,cursor:"pointer", position: "relative"}}
-              onClick={()=>setPage(key)}>
+            <div key={key} style={{background:"#18243a",border:`0.5px solid ${hasScore?color+"44":"rgba(255,255,255,0.07)"}`,borderRadius:12,padding:16,cursor:disabled?"not-allowed":"pointer", position: "relative", opacity:disabled?0.6:1}}
+              onClick={()=>!disabled && setPage(key)}>
               <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start",marginBottom:8}}>
                 <div style={{display:"flex",alignItems:"center",gap:8}}>
                   <div style={{width:32,height:32,borderRadius:8,background:`${color}15`,display:"flex",alignItems:"center",justifyContent:"center",border:`1px solid ${color}22`}}>
@@ -413,10 +414,10 @@ export default function Dashboard() {
     { pg: "listening",     label: "Listening",     ic: "ear"    },
     { pg: "reading",       label: "Reading",       ic: "book"   },
     { pg: "writing",       label: "Writing",       ic: "pen"    },
-    { pg: "speaking",      label: "Speaking (Maintenance)", ic: "mic", badge: "FIX" },
     { pg: "analytics",     label: "Analytics",     ic: "bolt",   badge: "NEW" },
     { pg: "community",     label: "Community Hub", ic: "globe",   badge: "NEW" },
     { pg: "vocabulary",    label: "Vocabulary",    ic: "book",   badge: "NEW" },
+    { pg: "messages",      label: "Messages",      ic: "bell" },
     { pg: "facetoface",    label: "Face to Face",  ic: "video",  badge: "PREM" },
     { pg: "fullmock",      label: "Full Mock",     ic: "mock",  badge: "NEW" },
     { pg: "spin",          label: "Fortune Drum",  ic: "spin",  badge: "HOT" },
@@ -555,8 +556,21 @@ export default function Dashboard() {
 
         @media (max-width: 480px) {
           .top-bar-stats { display: none !important; }
-          .hero-h1 { font-size: 32px !important; }
+          .hero-h1 { font-size: 28px !important; }
           .hero-badge-row { flex-direction: column !important; align-items: flex-start !important; gap: 12px !important; }
+        }
+        @media (max-width: 768px) {
+          .sidebar-container {
+            position: fixed !important;
+            left: 0;
+            z-index: 300;
+            box-shadow: 10px 0 30px rgba(0,0,0,0.6);
+            background: #131d2e;
+          }
+          .main-content {
+            padding: 16px 12px !important;
+            width: 100vw !important;
+          }
         }
       `}</style>
 
@@ -612,9 +626,9 @@ export default function Dashboard() {
       </div>
 
       {/* BODY */}
-      <div style={{display:"flex",flex:1,minHeight:0}}>
+      <div style={{display:"flex",flex:1,minHeight:0, position:"relative"}}>
         {sideOpen && (
-          <div style={{width:210,background:"#131d2e",borderRight:"0.5px solid rgba(255,255,255,0.06)",padding:"12px 8px",display:"flex",flexDirection:"column",gap:2,flexShrink:0,position:"sticky",top:TOPBAR_H,height:`calc(100vh - ${TOPBAR_H}px)`,overflowY:"auto"}}>
+          <div className="sidebar-container" style={{width:210,background:"#131d2e",borderRight:"0.5px solid rgba(255,255,255,0.06)",padding:"12px 8px",display:"flex",flexDirection:"column",gap:2,flexShrink:0,position:"sticky",top:TOPBAR_H,height:`calc(100vh - ${TOPBAR_H}px)`,overflowY:"auto"}}>
             {NAV.map(({pg,label,ic,badge})=>{
               const isActive=page===pg;
               const badgeColor = badge==="HOT"?"#fbbf24":badge==="NEW"?"#a78bfa":badge==="🎯"?null:"#4a9eff";
@@ -702,7 +716,7 @@ export default function Dashboard() {
               {page==="listening"     && <ListeningPage  {...commonProps} tests={lessons?.LISTENING_TESTS || []} onBack={()=>setPage("dash")}/>}
               {page==="reading"       && <ReadingPage    {...commonProps} tests={lessons?.READING_TESTS || []}/>}
               {page==="writing"       && <WritingPage    {...commonProps} tests={lessons?.WRITING_TESTS || []}/>}
-              {page==="speaking"      && <SpeakingPage  {...commonProps} tests={lessons?.SPEAKING_TESTS || []} onBack={()=>setPage("dash")}/>}
+              {page==="speaking"      && <Navigate to="/dashboard" replace />}
               {page==="facetoface"    && <FaceToFace     user={user} progress={progress} openPremiumModal={() => setShowPremiumModal(true)} />}
               {page==="admin"         && <AdminPanel     user={{...user, isAdmin: isAdmin}} onBack={()=>setPage("dash")} />}
               {page==="fullmock"      && <FullMockPage   {...commonProps} allTests={lessons} onBack={()=>setPage("dash")}/>}
@@ -714,6 +728,7 @@ export default function Dashboard() {
               {page==="flashcards"    && <Flashcards vocabulary={progress.vocabulary} onBack={() => setPage("vocabulary")} />}
               {page==="analytics"     && <Analytics progress={progress} scores={scores} />}
               {page==="community"     && <Community user={user} progress={progress} />}
+              {page==="messages"      && <Messages user={user} onBack={()=>setPage("dash")} />}
             </motion.div>
           </AnimatePresence>
           {showPremiumModal && <PremiumModal user={user} isPremium={isPremActive} premiumExpire={dbUser?.premiumExpire} onClose={() => setShowPremiumModal(false)} />}
