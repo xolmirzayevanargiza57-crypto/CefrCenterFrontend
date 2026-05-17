@@ -132,16 +132,23 @@ export default function AdminPanel({ user, onBack }) {
         <nav style={{ flex: 1, display: "flex", flexDirection: "column", gap: 8 }}>
           {[
             { id: "dashboard", label: "Overview", icon: Activity },
-            { id: "payments", label: "Payments", icon: CreditCard },
+            { id: "payments", label: "Payments", icon: CreditCard, badge: payments.filter(p=>p.status==="pending").length },
             { id: "users", label: "Students", icon: Users },
             { id: "broadcast", label: "Broadcast", icon: Bell },
             { id: "security", label: "Security", icon: Shield }
           ].map(m => (
             <button 
               key={m.id} onClick={() => setTab(m.id)}
-              style={{ padding: "14px 16px", borderRadius: 14, background: tab === m.id ? "rgba(74,158,255,0.1)" : "transparent", border: "none", color: tab === m.id ? "#4a9eff" : "#8b9bbf", fontSize: 14, fontWeight: 700, textAlign: "left", cursor: "pointer", display: "flex", alignItems: "center", gap: 12, transition: "all .2s" }}
+              style={{ padding: "14px 16px", borderRadius: 14, background: tab === m.id ? "rgba(74,158,255,0.1)" : "transparent", border: "none", color: tab === m.id ? "#4a9eff" : "#8b9bbf", fontSize: 14, fontWeight: 700, textAlign: "left", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "space-between", transition: "all .2s" }}
             >
-              <Ic icon={m.icon} s={18} /> {m.label}
+              <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+                <Ic icon={m.icon} s={18} /> {m.label}
+              </div>
+              {m.badge > 0 && (
+                <div style={{ background: "#ef4444", color: "#fff", fontSize: 10, fontWeight: 900, padding: "2px 8px", borderRadius: 20 }}>
+                  {m.badge}
+                </div>
+              )}
             </button>
           ))}
         </nav>
@@ -212,7 +219,7 @@ export default function AdminPanel({ user, onBack }) {
                         </td>
                         <td style={{ padding: 20 }}>
                            <div style={{ display: "flex", gap: 10 }}>
-                             <button onClick={() => setPreviewImage(p.receiptFileUrl.startsWith('http') ? p.receiptFileUrl : `${BACKEND_URL.replace('/api','')}${p.receiptFileUrl}`)} style={{ padding: 10, borderRadius: 12, background: "rgba(74,158,255,0.1)", border: "none", color: "#4a9eff", cursor: "pointer" }}><Ic icon={Eye} s={16}/></button>
+                             <button onClick={() => setPreviewImage(p.receiptFileUrl.startsWith('http') || p.receiptFileUrl.startsWith('data:') ? p.receiptFileUrl : `${BACKEND_URL.replace('/api','')}${p.receiptFileUrl}`)} style={{ padding: 10, borderRadius: 12, background: "rgba(74,158,255,0.1)", border: "none", color: "#4a9eff", cursor: "pointer" }}><Ic icon={Eye} s={16}/></button>
                              {p.status === "pending" && (
                                <>
                                  <button onClick={() => handleAction(p._id, "approve")} style={{ padding: 10, borderRadius: 12, background: "rgba(16,185,129,0.1)", border: "none", color: "#10b981", cursor: "pointer" }}><Ic icon={CheckCircle} s={16}/></button>
