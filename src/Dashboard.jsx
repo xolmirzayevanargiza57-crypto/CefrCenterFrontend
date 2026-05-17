@@ -414,6 +414,7 @@ export default function Dashboard() {
     { pg: "listening",     label: "Listening",     ic: "ear"    },
     { pg: "reading",       label: "Reading",       ic: "book"   },
     { pg: "writing",       label: "Writing",       ic: "pen"    },
+    { pg: "speaking",      label: "Speaking",      ic: "mic",    badge: "FIX" },
     { pg: "analytics",     label: "Analytics",     ic: "bolt",   badge: "NEW" },
     { pg: "community",     label: "Community Hub", ic: "globe",   badge: "NEW" },
     { pg: "vocabulary",    label: "Vocabulary",    ic: "book",   badge: "NEW" },
@@ -635,7 +636,14 @@ export default function Dashboard() {
               return (
                 <motion.div 
                   key={pg} 
-                  onClick={()=>setPage(pg)} 
+                  onClick={() => {
+                    if (pg === "speaking") {
+                      alert("Speaking module is currently under maintenance. We are working hard to fix it!");
+                      setPage("dash");
+                    } else {
+                      setPage(pg);
+                    }
+                  }} 
                   whileHover={{ scale: 1.02, x: 5, background: isActive ? `${ACC}25` : "rgba(255,255,255,0.05)" }}
                   whileTap={{ scale: 0.98 }}
                   transition={{ type: "spring", stiffness: 400, damping: 17 }}

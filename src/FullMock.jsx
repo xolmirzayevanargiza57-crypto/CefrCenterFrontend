@@ -77,7 +77,7 @@
           </div>
           <h1 style={{ fontSize:26,fontWeight:800,color:"#f0f4ff",marginBottom:8 }}>Full Mock Exam</h1>
           <p style={{ fontSize:14,color:"#8b9bbf",lineHeight:1.7,maxWidth:480,margin:"0 auto 20px" }}>
-            Experience a complete CEFR exam. Complete all 4 sections in order: Listening, Reading, Writing, and Speaking. Your results are tracked and scored across all sections.
+            Experience a complete CEFR exam. Complete all 3 sections in order: Listening, Reading, and Writing. Your results are tracked and scored across all sections.
           </p>
           <div style={{ display:"flex",justifyContent:"center",gap:16,flexWrap:"wrap",marginBottom:20 }}>
             {[{ic:"clock",label:"~2.5 hours total"},{ic:"bolt",label:"Earn XP for each section"},{ic:"star",label:"Full CEFR band score"}].map(({ic,label})=>(
