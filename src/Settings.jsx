@@ -441,6 +441,39 @@ export default function Settings({ user, progress, resetProgress, updateUsername
       </Section>
 
 
+      <Section title="Subscription" icon={<ShieldCheck size={18} color="#fbbf24" strokeWidth={2.5} />}>
+        <Row 
+          icon={<Crown size={16} color={progress.isPremium && progress.premiumExpire && new Date(progress.premiumExpire) > new Date() ? "#fbbf24" : "#64748b"} />} 
+          label="Current Plan" 
+          desc={progress.isPremium && progress.premiumExpire && new Date(progress.premiumExpire) > new Date() ? "Premium Access" : "Free Plan"}
+          right={
+            <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+              <span style={{ 
+                fontSize: 12, fontWeight: 900, padding: "4px 10px", borderRadius: 8,
+                background: progress.isPremium && progress.premiumExpire && new Date(progress.premiumExpire) > new Date() ? "rgba(251,191,36,0.1)" : "rgba(255,255,255,0.05)",
+                color: progress.isPremium && progress.premiumExpire && new Date(progress.premiumExpire) > new Date() ? "#fbbf24" : "#8b9bbf",
+                textTransform: "uppercase"
+              }}>
+                {progress.isPremium && progress.premiumExpire && new Date(progress.premiumExpire) > new Date() ? "Active" : "Free"}
+              </span>
+            </div>
+          }
+        />
+        {progress.isPremium && progress.premiumExpire && new Date(progress.premiumExpire) > new Date() && (
+          <Row 
+            icon={<Clock size={16} />} 
+            label="Expiration Date" 
+            desc="Your premium access ends on"
+            last
+            right={
+              <span style={{ fontSize: 13, fontWeight: 700, color: "#fff" }}>
+                {new Date(progress.premiumExpire).toLocaleDateString()}
+              </span>
+            }
+          />
+        )}
+      </Section>
+
       {/* ── ACTIVITY stats ────────────────────────────────────────────────── */}
       <Section title="Activity" icon={<History size={18} />}>
         <Row 

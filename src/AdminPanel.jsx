@@ -428,6 +428,11 @@ export default function AdminPanel({ user, onBack }) {
                          <div>
                             <div style={{ fontWeight: 800 }}>{u.username || "New User"}</div>
                             <div style={{ fontSize: 11, color: "#64748b" }}>{u.email}</div>
+                            {u.isPremium && u.premiumExpire && (
+                              <div style={{ fontSize: 10, color: "#fbbf24", fontWeight: 700, marginTop: 4 }}>
+                                Expires: {new Date(u.premiumExpire).toLocaleDateString()}
+                              </div>
+                            )}
                          </div>
                       </div>
                       <div style={{ marginTop: 20, display: "flex", gap: 10 }}>
