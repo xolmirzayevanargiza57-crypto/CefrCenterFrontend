@@ -427,8 +427,8 @@ export default function Dashboard() {
     { pg: "settings",      label: "Profile",       ic: "gear"   },
   ];
   const isAdmin = dbUser?.isAdmin === true;
-  const isPremActive = false; // Temporarily disabled Premium
-  const premDaysLeft = 0;
+  const isPremActive = dbUser?.isPremium === true;
+  const premDaysLeft = isPremActive ? Math.ceil((new Date(dbUser.premiumExpire) - new Date()) / (1000 * 60 * 60 * 24)) : 0;
   if (isAdmin) NAV.push({ pg: "admin", label: "Admin Panel", ic: "lock", badge: "PRO" });
 
   // Fetch Notifications Count
@@ -730,7 +730,7 @@ export default function Dashboard() {
               {page==="reading"       && <ReadingPage    {...commonProps} tests={lessons?.READING_TESTS || []}/>}
               {page==="writing"       && <WritingPage    {...commonProps} tests={lessons?.WRITING_TESTS || []}/>}
               {page==="speaking"      && <Navigate to="/dashboard" replace />}
-              {page==="facetoface"    && <FaceToFace     user={user} progress={progress} openPremiumModal={() => setShowPremiumModal(true)} />}
+              {page==="facetoface"    && <FaceToFace     user={user} progress={{...progress, isPremium: isPremActive}} openPremiumModal={() => setShowPremiumModal(true)} />}
               {page==="admin"         && <AdminPanel     user={{...user, isAdmin: isAdmin}} onBack={()=>setPage("dash")} />}
               {page==="fullmock"      && <FullMockPage   {...commonProps} allTests={lessons} onBack={()=>setPage("dash")}/>}
               {page==="spin"          && <SpinPage       progress={progress} canSpin={canSpin} recordSpin={recordSpin} prizes={lessons?.SPIN_PRIZES || []}/>}
