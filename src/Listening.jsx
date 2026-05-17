@@ -523,7 +523,7 @@ export default function Listening({ user, scores, saveScore, addXP, progress, on
 
         {/* Exit modal */}
         {showExit && (
-          <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,.8)", zIndex: 9999, display: "flex", alignItems: "center", justifyContent: "center" }}>
+          <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,.8)", zIndex: 9999, display: "flex", alignItems: "center", justifyContent: "center", padding: "40px 20px", overflowY: "auto" }}>
             <div style={{ background: "#131d2e", border: "1px solid rgba(255,255,255,.12)", borderRadius: 16, padding: 28, maxWidth: 360 }}>
               <h3 style={{ fontSize: 16, fontWeight: 700, color: "#f0f4ff", marginBottom: 10 }}>Exit test?</h3>
               <p style={{ fontSize: 13, color: "#8b9bbf", marginBottom: 20 }}>You answered <strong>{answeredCount}/{totalQ}</strong> questions. All progress will be <strong style={{ color: "#e11d48" }}>lost</strong>.</p>

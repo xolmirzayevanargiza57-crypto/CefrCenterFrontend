@@ -221,9 +221,8 @@ function SetTab({ set, isActive, onClick }) {
 }
 
 export default function Vocabulary({ progress, saveVocabulary, updateProfileData, onPractice }) {
-  const [allSets, setAllSets]           = useState([]);
-  const [loading, setLoading]           = useState(true);
-  const [error, setError]               = useState(null);
+  const [serverSets, setServerSets] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [usingFallback, setUsingFallback] = useState(false);
   const [selectedSetId, setSelectedSetId] = useState(null);
   const [search, setSearch]             = useState('');
@@ -233,43 +232,22 @@ export default function Vocabulary({ progress, saveVocabulary, updateProfileData
 
   const loadData = useCallback(async () => {
     setLoading(true);
-    setError(null);
     setUsingFallback(false);
 
     try {
       const res = await fetch(`${BACKEND_URL}/api/vocabulary`);
       if (!res.ok) throw new Error('Backend failed');
       const data = await res.json();
-      
-      const customSet = {
-        id: 'personal',
-        category: 'school',
-        categoryLabel: 'Personal Words',
-        fromLangLabel: 'Word',
-        toLangLabel: 'Meaning',
-        words: (progress.vocabulary || []).map(v => ({ ...v, translation: v.definition })),
-        isCustom: true
-      };
-
-      setAllSets([customSet, ...data]);
-      setSelectedSetId(customSet.words.length > 0 ? 'personal' : data[0]?.id);
+      setServerSets(data);
+      if (!selectedSetId) setSelectedSetId(data[0]?.id || 'personal');
     } catch (err) {
-      const customSet = {
-        id: 'personal',
-        category: 'school',
-        categoryLabel: 'Personal Words',
-        fromLangLabel: 'Word',
-        toLangLabel: 'Meaning',
-        words: (progress.vocabulary || []).map(v => ({ ...v, translation: v.definition })),
-        isCustom: true
-      };
       setUsingFallback(true);
-      setAllSets([customSet, ...FALLBACK_DATA]);
-      setSelectedSetId('personal');
+      setServerSets(FALLBACK_DATA);
+      if (!selectedSetId) setSelectedSetId('personal');
     } finally {
       setLoading(false);
     }
-  }, [progress.vocabulary]);
+  }, []); // Only run once or upon manual click
 
   const handleAddWord = (e) => {
     e.preventDefault();
@@ -285,6 +263,18 @@ export default function Vocabulary({ progress, saveVocabulary, updateProfileData
   };
 
   useEffect(() => { loadData(); }, [loadData]);
+
+  // Derive allSets on the fly
+  const customSet = {
+    id: 'personal',
+    category: 'school',
+    categoryLabel: 'Personal Words',
+    fromLangLabel: 'Word',
+    toLangLabel: 'Meaning',
+    words: (progress.vocabulary || []).map(v => ({ ...v, translation: v.definition })),
+    isCustom: true
+  };
+  const allSets = [customSet, ...serverSets];
 
   // ── Loading ──
   if (loading) {
@@ -438,7 +428,7 @@ export default function Vocabulary({ progress, saveVocabulary, updateProfileData
 
       {/* Add Modal */}
       {showAddModal && (
-        <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.85)', zIndex: 9999, display: 'flex', alignItems: 'center', justifyContent: 'center', backdropFilter: 'blur(8px)', animation: 'fadeUp 0.3s ease' }}>
+        <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.85)', zIndex: 9999, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '40px 20px', overflowY: 'auto', backdropFilter: 'blur(8px)', animation: 'fadeUp 0.3s ease' }}>
            <form onSubmit={(e) => {
              e.preventDefault();
              saveVocabulary(newWord.word, newWord.meaning, newWord.sentence);

@@ -59,7 +59,7 @@ export default function PremiumModal({ user, onClose, isPremium, premiumExpire }
 
   if (isPremium) {
     return (
-      <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.8)", backdropFilter: "blur(15px)", zIndex: 9999, display: "flex", alignItems: "center", justifyContent: "center", padding: 20 }}>
+      <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.8)", backdropFilter: "blur(15px)", zIndex: 9999, display: "flex", alignItems: "center", justifyContent: "center", padding: "40px 20px", overflowY: "auto" }}>
         <div style={{ width: "100%", maxWidth: 440, background: "linear-gradient(135deg, #131d2e 0%, #0b1120 100%)", borderRadius: 40, padding: 48, textAlign: "center", border: "1px solid rgba(251,191,36,0.2)", boxShadow: "0 40px 100px rgba(0,0,0,0.8)", position: "relative", overflow: "hidden" }}>
            <div style={{ position: "absolute", top: -20, right: -20, width: 140, height: 140, background: "radial-gradient(circle, rgba(251,191,36,0.15) 0%, transparent 70%)", pointerEvents: "none" }} />
            
@@ -84,7 +84,7 @@ export default function PremiumModal({ user, onClose, isPremium, premiumExpire }
   }
 
   return (
-    <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.9)", backdropFilter: "blur(25px)", zIndex: 9999, display: "flex", alignItems: "center", justifyContent: "center", padding: 20 }}>
+    <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.9)", backdropFilter: "blur(25px)", zIndex: 9999, display: "flex", alignItems: "center", justifyContent: "center", padding: "40px 20px", overflowY: "auto" }}>
       
       <div style={{ width: "100%", maxWidth: 480, background: "#0b1120", border: "1px solid rgba(255,255,255,0.06)", borderRadius: 32, overflow: "hidden", position: "relative", boxShadow: "0 30px 100px rgba(0,0,0,0.6)" }}>
         

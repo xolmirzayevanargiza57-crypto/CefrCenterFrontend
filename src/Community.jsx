@@ -260,7 +260,7 @@ export default function Community({ user, progress }) {
 
       {/* Add Modal */}
       {showAddModal && (
-        <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.85)", backdropFilter: "blur(8px)", zIndex: 1000, display: "flex", alignItems: "center", justifyContent: "center", padding: 16 }}>
+        <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.85)", backdropFilter: "blur(8px)", zIndex: 1000, display: "flex", alignItems: "center", justifyContent: "center", padding: "40px 20px", overflowY: "auto" }}>
           <div style={{ background: "#0f172a", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 32, padding: 32, maxWidth: 600, width: "100%", boxShadow: "0 24px 64px rgba(0,0,0,0.6)" }}>
             <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 28, alignItems: "center" }}>
                <h2 style={{ fontSize: 24, fontWeight: 900, color: "#fff" }}>Share Template</h2>
@@ -325,7 +325,7 @@ export default function Community({ user, progress }) {
 
       {/* Category Modal */}
       {showCatModal && (
-        <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.8)", zIndex: 2000, display: "flex", alignItems: "center", justifyContent: "center", padding: 20 }}>
+        <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.8)", zIndex: 2000, display: "flex", alignItems: "center", justifyContent: "center", padding: "40px 20px", overflowY: "auto" }}>
           <div style={{ background: "#131d2e", borderRadius: 24, border: "1px solid rgba(255,255,255,0.1)", padding: 28, maxWidth: 380, width: "100%", boxShadow: "0 24px 64px rgba(0,0,0,0.5)" }}>
             <h3 style={{ fontSize: 18, fontWeight: 900, marginBottom: 24, color: "#fff" }}>Select Template Type</h3>
             <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>

@@ -545,7 +545,7 @@ export default function Settings({ user, progress, resetProgress, updateUsername
 
       {/* ── PASSWORD MODAL ───────────────────────────────────────────────── */}
       {showPasswordModal && (
-        <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.8)", zIndex: 10000, display: "flex", alignItems: "center", justifyContent: "center", padding: 20 }}>
+        <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.8)", zIndex: 10000, display: "flex", alignItems: "center", justifyContent: "center", padding: "40px 20px", overflowY: "auto" }}>
           <div style={{ background: "#131d2e", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 20, padding: 32, maxWidth: 400, width: "100%", boxShadow: "0 24px 64px rgba(0,0,0,0.6)" }}>
             <h3 style={{ fontSize: 20, fontWeight: 800, color: "#fff", marginBottom: 8 }}>Change Password</h3>
             <p style={{ fontSize: 14, color: "#8b9bbf", marginBottom: 24 }}>Enter your current and new password securely.</p>
@@ -575,7 +575,7 @@ export default function Settings({ user, progress, resetProgress, updateUsername
 
       {/* ── USERNAME MODAL ───────────────────────────────────────────────── */}
       {showUserModal && (
-        <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.8)", zIndex: 10000, display: "flex", alignItems: "center", justifyContent: "center", padding: 20 }}>
+        <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.8)", zIndex: 10000, display: "flex", alignItems: "center", justifyContent: "center", padding: "40px 20px", overflowY: "auto" }}>
           <div style={{ background: "#131d2e", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 20, padding: 32, maxWidth: 400, width: "100%", boxShadow: "0 24px 64px rgba(0,0,0,0.6)" }}>
             <h3 style={{ fontSize: 20, fontWeight: 800, color: "#fff", marginBottom: 8 }}>Change Username</h3>
             <p style={{ fontSize: 14, color: "#8b9bbf", marginBottom: 24 }}>Choose a unique name for the leaderboard.</p>
@@ -624,7 +624,7 @@ export default function Settings({ user, progress, resetProgress, updateUsername
 
       {/* Goal Modal */}
       {showGoalModal && (
-        <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.8)", zIndex: 10000, display: "flex", alignItems: "center", justifyContent: "center", padding: 20 }}>
+        <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.8)", zIndex: 10000, display: "flex", alignItems: "center", justifyContent: "center", padding: "40px 20px", overflowY: "auto" }}>
           <div style={{ background: "#131d2e", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 20, padding: 24, maxWidth: 350, width: "100%", boxShadow: "0 24px 64px rgba(0,0,0,0.6)" }}>
             <h3 style={{ fontSize: 18, fontWeight: 800, color: "#fff", marginBottom: 20 }}>Select Daily Goal</h3>
             <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
