@@ -61,7 +61,7 @@ export default function Leaderboard({ currentUser }) {
             {rank === 3 && <Award size={24} color={color} fill={color} />}
           </div>
         </div>
-        <div style={{ fontSize: 14, fontWeight: 900, color: isMe ? COLORS.premium : "#fff", marginBottom: 12, textAlign: "center", textShadow: "0 2px 4px rgba(0,0,0,0.5)" }}>
+        <div className="podium-user-name" style={{ fontSize: 14, fontWeight: 900, color: isMe ? COLORS.premium : "#fff", marginBottom: 12, textAlign: "center", textShadow: "0 2px 4px rgba(0,0,0,0.5)" }}>
           {user.username || "User"}
         </div>
         <div style={{ 
@@ -74,7 +74,7 @@ export default function Leaderboard({ currentUser }) {
           position: "relative"
         }}>
           <div style={{ position: "absolute", top: -12, background: color, color: "#000", fontSize: 10, fontWeight: 900, padding: "2px 8px", borderRadius: 10 }}>#{rank}</div>
-          <div style={{ fontSize: 20, fontWeight: 900, color: "#fff" }}>{user.xp}</div>
+          <div className="podium-xp" style={{ fontSize: 20, fontWeight: 900, color: "#fff" }}>{user.xp}</div>
           <div style={{ fontSize: 10, fontWeight: 800, color: "rgba(255,255,255,0.4)", textTransform: "uppercase" }}>Points</div>
         </div>
       </div>
@@ -82,15 +82,24 @@ export default function Leaderboard({ currentUser }) {
   };
 
   return (
-    <div style={{ background: "#0b1120", borderRadius: 32, border: "1px solid rgba(255,255,255,0.06)", padding: 32, boxShadow: "0 40px 100px rgba(0,0,0,0.6)", position: "relative", overflow: "hidden" }}>
+    <div className="leaderboard-container" style={{ background: "#0b1120", borderRadius: 32, border: "1px solid rgba(255,255,255,0.06)", padding: 32, boxShadow: "0 40px 100px rgba(0,0,0,0.6)", position: "relative", overflow: "hidden" }}>
       <style>{`
         @keyframes slideUp { from { opacity: 0; transform: translateY(40px); } to { opacity: 1; transform: translateY(0); } }
         .others-scroll::-webkit-scrollbar { width: 4px; }
         .others-scroll::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 10px; }
+        
+        @media (max-width: 640px) {
+          .leaderboard-container { padding: 20px !important; }
+          .leaderboard-header { flex-direction: column !important; align-items: flex-start !important; gap: 16px !important; }
+          .podium-section { gap: 8px !important; padding: 0 !important; min-height: 220px !important; }
+          .podium-user-name { font-size: 11px !important; }
+          .podium-xp { font-size: 16px !important; }
+          .user-rank-summary { flex-direction: column !important; align-items: flex-start !important; gap: 16px !important; }
+        }
       `}</style>
 
       {/* Hero Header */}
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 40 }}>
+      <div className="leaderboard-header" style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 40 }}>
         <div>
            <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 8 }}>
              <div style={{ background: "rgba(251,191,36,0.1)", p: 8, borderRadius: 12, display: "flex", p: 8 }}>
@@ -115,7 +124,7 @@ export default function Leaderboard({ currentUser }) {
       ) : (
         <>
           {/* Podium Section */}
-          <div style={{ display: "flex", alignItems: "flex-end", gap: 16, marginBottom: 48, padding: "0 20px", minHeight: 280 }}>
+          <div className="podium-section" style={{ display: "flex", alignItems: "flex-end", gap: 16, marginBottom: 48, padding: "0 20px", minHeight: 280 }}>
              <PodiumItem user={top3[1]} rank={2} delay={0.15} />
              <PodiumItem user={top3[0]} rank={1} delay={0} />
              <PodiumItem user={top3[2]} rank={3} delay={0.3} />
@@ -154,7 +163,7 @@ export default function Leaderboard({ currentUser }) {
 
           {/* User Specific Rank Summary */}
           {userRank > 0 && (
-            <div style={{ marginTop: 32, padding: "20px 24px", borderRadius: 24, background: "linear-gradient(90deg, #1e293b, #0f172a)", border: "1px solid rgba(74,158,255,0.2)", display: "flex", alignItems: "center", justifyContent: "space-between", boxShadow: "0 10px 30px rgba(0,0,0,0.3)" }}>
+            <div className="user-rank-summary" style={{ marginTop: 32, padding: "20px 24px", borderRadius: 24, background: "linear-gradient(90deg, #1e293b, #0f172a)", border: "1px solid rgba(74,158,255,0.2)", display: "flex", alignItems: "center", justifyContent: "space-between", boxShadow: "0 10px 30px rgba(0,0,0,0.3)" }}>
               <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
                  <div style={{ width: 48, height: 48, borderRadius: 14, background: COLORS.premium, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18, fontWeight: 900, color: "#fff", boxShadow: `0 0 20px ${COLORS.premium}44` }}>#{userRank}</div>
                  <div>

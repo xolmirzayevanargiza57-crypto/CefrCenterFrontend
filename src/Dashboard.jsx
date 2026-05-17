@@ -542,30 +542,25 @@ export default function Dashboard() {
   };
 
   return (
-    <div style={{display:"flex",flexDirection:"column",minHeight:"100vh",background:"#0b1120",color:"#f0f4ff",fontFamily:"'Sora','Inter',sans-serif"}}>
+    <div style={{display:"flex",flexDirection:"column",minHeight:"100vh",width:"100vw",overflowX:"hidden",background:"#0b1120",color:"#f0f4ff",fontFamily:"'Sora','Inter',sans-serif"}}>
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700;800&display=swap');
         @keyframes spin { to{transform:rotate(360deg)} }
         *{box-sizing:border-box;margin:0;padding:0}
         textarea:focus,input:focus{outline:none}
+        /* Prevent annoying horizontal scroll */
+        html, body { overflow-x: hidden; position: relative; width: 100%; }
+        
         ::-webkit-scrollbar{width:4px;height:4px}
         ::-webkit-scrollbar-track{background:transparent}
         ::-webkit-scrollbar-thumb{background:rgba(255,255,255,0.08);border-radius:2px}
 
         @media (max-width: 768px) {
           .dash-grid-top { grid-template-columns: 1fr !important; }
-          .progress-card-content { flex-direction: row !important; align-items: center !important; gap: 16px !important; flex-wrap: nowrap !important; }
+          .progress-card-content { flex-direction: column !important; align-items: center !important; gap: 20px !important; text-align: center !important; }
           .audio-visualizer-decor { display: none !important; }
           .hero-h1 { font-size: 32px !important; }
           .main-content { padding: 16px 12px !important; }
-        }
-
-        @media (max-width: 480px) {
-          .top-bar-stats { display: none !important; }
-          .hero-h1 { font-size: 28px !important; }
-          .hero-badge-row { flex-direction: column !important; align-items: flex-start !important; gap: 12px !important; }
-        }
-        @media (max-width: 768px) {
           .sidebar-container {
             position: fixed !important;
             left: 0;
@@ -573,10 +568,15 @@ export default function Dashboard() {
             box-shadow: 10px 0 30px rgba(0,0,0,0.6);
             background: #131d2e;
           }
-          .main-content {
-            padding: 16px 12px !important;
-            width: 100vw !important;
-          }
+        }
+
+        @media (max-width: 480px) {
+          .top-bar-stats { display: none !important; }
+          .hero-h1 { font-size: 26px !important; }
+          .hero-badge-row { flex-direction: column !important; align-items: center !important; gap: 10px !important; }
+          .progress-card-content { gap: 16px !important; }
+          .progress-card-content div:first-child { width: 100px !important; height: 100px !important; }
+          .progress-card-content svg { width: 100px !important; height: 100px !important; }
         }
       `}</style>
 

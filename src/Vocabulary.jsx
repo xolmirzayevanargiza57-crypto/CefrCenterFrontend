@@ -317,6 +317,14 @@ export default function Vocabulary({ progress, saveVocabulary, updateProfileData
         @keyframes fadeUp { from{opacity:0;transform:translateY(12px)} to{opacity:1;transform:translateY(0)} }
         @keyframes spin    { to{transform:rotate(360deg)} }
         @keyframes pulse   { 0%,100%{opacity:1} 50%{opacity:.5} }
+        
+        @media (max-width: 640px) {
+          .vocab-header { flex-direction: column !important; align-items: stretch !important; gap: 20px !important; }
+          .vocab-actions { flex-direction: column !important; width: 100% !important; }
+          .vocab-actions button { width: 100% !important; justify-content: center !important; }
+          .search-wrap { width: 100% !important; }
+          .search-input { width: 100% !important; }
+        }
       `}</style>
 
       {/* ── Fallback banner ── */}
@@ -333,7 +341,7 @@ export default function Vocabulary({ progress, saveVocabulary, updateProfileData
       )}
 
       {/* ── Header ── */}
-      <div style={styles.header}>
+      <div className="vocab-header" style={styles.header}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
           <div style={{ color: meta.accent }}><BookOpen size={32} /></div>
           <div>
@@ -346,7 +354,7 @@ export default function Vocabulary({ progress, saveVocabulary, updateProfileData
           </div>
         </div>
 
-        <div style={{ display: 'flex', gap: 10, alignItems: 'center', flexWrap: 'wrap' }}>
+        <div className="vocab-actions" style={{ display: 'flex', gap: 10, alignItems: 'center', flexWrap: 'wrap' }}>
           <button onClick={onPractice} style={{ 
             background: 'rgba(74,158,255,0.1)', color: '#4a9eff', border: '1px solid rgba(74,158,255,0.2)', 
             padding: '10px 24px', borderRadius: 12, fontWeight: 800, cursor: 'pointer',
@@ -365,9 +373,10 @@ export default function Vocabulary({ progress, saveVocabulary, updateProfileData
           </button>
 
           {/* Search */}
-          <div style={styles.searchWrap}>
+          <div className="search-wrap" style={styles.searchWrap}>
             <Search size={16} style={styles.searchIcon} color="#475569" />
             <input
+              className="search-input"
               style={styles.searchInput}
               placeholder="Search words..."
               value={search}
