@@ -332,45 +332,8 @@ export default function About() {
           preparation accessible and effective for everyone.
         </p>
 
-        <div className="dev-grid">
-          <div className="dev-card">
-            <div className="dev-card-top">
-              <img
-                src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=300&q=80"
-                alt="Asatillo Alisherov"
-              />
-              <span className="dev-badge instructor-badge">
-                <Award size={12} /> Head Instructor
-              </span>
-            </div>
-            <h3>Asatillo Alisherov</h3>
-            <p className="dev-role">
-              <GraduationCap size={14} /> CEFR & IELTS Instructor
-            </p>
-            <p className="dev-bio-text">
-              Over <strong>3 years</strong> of experience teaching English at
-              B2–C2 levels. Certified IELTS and Cambridge examiner with a track
-              record of helping 300+ students achieve their target scores.
-            </p>
-            <ul className="dev-facts">
-              <li><Award size={13} /> Cambridge CELTA Certified</li>
-              <li><Globe size={13} /> B2–C2 Specialist</li>
-              <li><Briefcase size={13} /> 3+ Years Teaching</li>
-              <li><GraduationCap size={13} /> 300+ Students Coached</li>
-            </ul>
-            <div className="dev-socials">
-              <a
-                href="https://t.me/unknown"
-                target="_blank"
-                rel="noreferrer"
-                className="telegram-icon"
-              >
-                <FaTelegramPlane />
-              </a>
-            </div>
-          </div>
-
-          <div className="dev-card">
+        <div className="dev-grid" style={{ gridTemplateColumns: "1fr", justifyItems: "center" }}>
+          <div className="dev-card" style={{ maxWidth: "500px" }}>
             <div className="dev-card-top">
               <img
                 src="xojiakbar.png"
