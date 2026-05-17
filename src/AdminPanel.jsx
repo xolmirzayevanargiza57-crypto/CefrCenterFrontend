@@ -64,12 +64,18 @@ export default function AdminPanel({ user, onBack }) {
   };
 
   const handleRevokePremium = async (email) => {
-    if (!window.confirm(`Stop Premium for ${email}?`)) return;
+    const reason = prompt(`Enter reason for revoking premium for ${email}:`);
+    if (reason === null) return; // User cancelled
     try {
       const res = await fetch(`${BACKEND_URL}/api/payments/admin/user/${email}/remove-premium`, {
-        method: "POST", headers: hdrs
+        method: "POST", 
+        headers: { ...hdrs, "Content-Type": "application/json" },
+        body: JSON.stringify({ reason: reason || "Administrative action" })
       });
-      if (res.ok) loadData();
+      if (res.ok) {
+        loadData();
+        alert("Premium revoked and user notified.");
+      }
     } catch (e) { alert("Failed to revoke"); }
   };
 
@@ -86,11 +92,13 @@ export default function AdminPanel({ user, onBack }) {
 
   const handleSendNotif = async (e) => {
     e.preventDefault();
+    setLoading(true);
     try {
       const formData = new FormData();
       formData.append("title", notifForm.title);
       formData.append("message", notifForm.message);
       formData.append("type", notifForm.type);
+      formData.append("icon", notifForm.icon || "bell");
       if (notifForm.imageFile) {
         formData.append("imageFile", notifForm.imageFile);
       } else {
@@ -103,11 +111,15 @@ export default function AdminPanel({ user, onBack }) {
         body: formData
       });
       if (res.ok) {
-        setNotifForm({ title: "", message: "", type: "info", image: "", imageFile: null });
+        setNotifForm({ title: "", message: "", type: "info", image: "", imageFile: null, icon: "bell" });
         loadData();
-        alert("Broadcast sent!");
+        alert("Broadcast sent successfully!");
+      } else {
+        const errData = await res.json();
+        alert(`Failed to send: ${errData.error || "Unknown error"}`);
       }
-    } catch (e) { alert("Send failed"); }
+    } catch (e) { alert("Connection failed. Check your network."); }
+    finally { setLoading(false); }
   };
 
   const deleteNotif = async (id) => {
@@ -298,7 +310,7 @@ export default function AdminPanel({ user, onBack }) {
                            <div style={{ fontSize: 12, color: "#64748b", marginTop: 4 }}>{n.message}</div>
                            {n.image && (
                              <img 
-                               src={n.image.startsWith('http') ? n.image : `${BACKEND_URL.replace('/api','')}${n.image}`} 
+                               src={n.image.startsWith('http') || n.image.startsWith('data:') ? n.image : `${BACKEND_URL.replace('/api','')}${n.image}`} 
                                style={{ width: "100%", height: 100, objectFit: "cover", borderRadius: 12, marginTop: 12 }} 
                              />
                            )}

@@ -43,7 +43,7 @@ function lvlFor(xp) {
 
 function calculateStreak(log) {
   if (!log || !Array.isArray(log) || log.length === 0) return 0;
-  const sorted = [...log].filter(l => l.xp > 0);
+  const sorted = [...log];
   if (sorted.length === 0) return 0;
   
   let streak = 0;

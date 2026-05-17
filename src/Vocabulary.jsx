@@ -271,7 +271,11 @@ export default function Vocabulary({ progress, saveVocabulary, updateProfileData
     categoryLabel: 'Personal Words',
     fromLangLabel: 'Word',
     toLangLabel: 'Meaning',
-    words: (progress.vocabulary || []).map(v => ({ ...v, translation: v.definition })),
+    words: (progress.vocabulary || []).map(v => ({ 
+      ...v, 
+      translation: v.definition,
+      sentences: v.sentences || (v.sentence ? [v.sentence] : [])
+    })),
     isCustom: true
   };
   const allSets = [customSet, ...serverSets];
