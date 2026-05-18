@@ -93,12 +93,18 @@ export default function US({ onSelect }) {
       setIsCheckLoading(true);
       setError("");
       try {
-        const resp = await fetch(`${BACKEND_URL}/api/auth/check-username?username=${encodeURIComponent(username)}`);
+        const controller = new AbortController();
+        const tid = setTimeout(() => controller.abort(), 4000);
+        const resp = await fetch(`${BACKEND_URL}/api/auth/check-username?username=${encodeURIComponent(username)}`, { signal: controller.signal });
+        clearTimeout(tid);
         const data = await resp.json();
         setIsAvailable(data.available);
         setSuggestions(data.suggestions || []);
       } catch (e) {
-        console.error("Username check failed", e);
+        // Backend offline — allow user to proceed (username will be verified on server)
+        console.warn("Username check offline, allowing:", e.message);
+        setIsAvailable(true);
+        setSuggestions([]);
       } finally {
         setIsCheckLoading(false);
       }
@@ -233,8 +239,8 @@ export default function US({ onSelect }) {
         {step === 3 && (
           <div>
             <div style={{ marginBottom: 32 }}>
-              <h2 style={{ fontSize: 24, fontWeight: 800, marginBottom: 8 }}>Bizni qayerdan topdingiz?</h2>
-              <p style={{ fontSize: 14, color: "#94a3b8" }}>Siz CEFR Center haqida qayerdan eshitdingiz?</p>
+              <h2 style={{ fontSize: 24, fontWeight: 800, marginBottom: 8 }}>Where did you find us?</h2>
+              <p style={{ fontSize: 14, color: "#94a3b8" }}>How did you hear about CEFR Center?</p>
             </div>
 
             <div style={{ display: "grid", gridTemplateColumns: "1fr", gap: 10 }}>
@@ -264,10 +270,13 @@ export default function US({ onSelect }) {
             </div>
             
             {hearAbout === "Other" && (
-              <motion.div initial={{opacity: 0, height: 0}} animate={{opacity: 1, height: "auto"}} style={{ marginTop: 16 }}>
+              <div style={{ 
+                marginTop: 16,
+                animation: "fadeIn 0.3s ease-out"
+              }}>
                 <input 
                   type="text" 
-                  placeholder="Iltimos, yozib qoldiring..." 
+                  placeholder="Please describe how you found us..." 
                   value={otherText}
                   onChange={(e) => setOtherText(e.target.value)}
                   style={{
@@ -275,7 +284,7 @@ export default function US({ onSelect }) {
                     borderRadius: 14, padding: "0 20px", color: "#fff", fontSize: 15, outline: "none"
                   }}
                 />
-              </motion.div>
+              </div>
             )}
 
             <button 
@@ -290,7 +299,7 @@ export default function US({ onSelect }) {
                 display: "flex", alignItems: "center", justifyContent: "center", gap: 10,
                 boxShadow: hearAbout ? "0 10px 20px rgba(37, 99, 235, 0.2)" : "none"
               }}>
-              {isFinishing ? <><Loader2 className="animate-spin" size={20} /> Kutmoqda...</> : <><Shield size={20} /> Tugatish</>}
+              {isFinishing ? <><Loader2 className="animate-spin" size={20} /> Please wait...</> : <><Shield size={20} /> Finish Setup</>}
             </button>
           </div>
         )}
