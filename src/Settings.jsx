@@ -11,7 +11,7 @@ import {
   CheckCircle, AlertCircle, Camera, LogOut, 
   ChevronRight, Save, Trash2, Download, History,
   Activity, Zap, Database, RefreshCw, Award, Target,
-  TrendingUp, BarChart3, Clock
+  TrendingUp, BarChart3, Clock, ShieldCheck, Crown
 } from "lucide-react";
 
 const STORAGE_KEY = "cefr_center_progress_v1";

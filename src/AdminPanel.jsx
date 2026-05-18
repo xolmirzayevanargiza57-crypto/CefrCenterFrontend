@@ -489,7 +489,7 @@ export default function AdminPanel({ user, onBack }) {
 
       {/* Image Preview Overlay */}
       {previewImage && (
-        <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.95)", zSource: 10001, display: "flex", alignItems: "center", justifyContent: "center", padding: 40 }} onClick={() => setPreviewImage(null)}>
+        <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.95)", zIndex: 10001, display: "flex", alignItems: "center", justifyContent: "center", padding: 40 }} onClick={() => setPreviewImage(null)}>
            <img src={previewImage} alt="Receipt" style={{ maxWidth: "100%", maxHeight: "100%", borderRadius: 24, boxShadow: "0 0 100px rgba(0,0,0,0.5)" }} />
            <button style={{ position: "absolute", top: 32, right: 32, background: "#fff", border: "none", borderRadius: "50%", width: 50, height: 50, cursor: "pointer" }} onClick={() => setPreviewImage(null)}><XCircle size={32} color="#000" /></button>
         </div>

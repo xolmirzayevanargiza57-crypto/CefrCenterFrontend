@@ -82,6 +82,8 @@ function Ic({ n, s = 16, c = "currentColor" }) {
 
 
 
+// Redundant LISTENING_TESTS removed as it is now fetched from the backend via useEffect.
+
 const SECTIONS = [
   { key: "listening", label: "Listening", color: "#1D9E75", ic: "ear",  max: LISTENING_MAX, isL: true  },
   { key: "reading",   label: "Reading",   color: "#378ADD", ic: "book", max: MAX_SCORE,     isL: false },
@@ -426,6 +428,10 @@ export default function Dashboard() {
     { pg: "notifications", label: "Notifications", ic: "bell",   badge: unreadNotifs > 0 ? unreadNotifs : null },
     { pg: "settings",      label: "Profile",       ic: "gear"   },
   ];
+
+  if (!isPremActive) {
+    NAV.splice(NAV.length - 1, 0, { pg: "premium_upgrade", label: "Get Premium", ic: "crown", badge: "HOT" });
+  }
   const isAdmin = dbUser?.isAdmin === true;
   const isPremActive = dbUser?.isPremium === true;
   const premDaysLeft = isPremActive ? Math.ceil((new Date(dbUser.premiumExpire) - new Date()) / (1000 * 60 * 60 * 24)) : 0;
@@ -707,9 +713,9 @@ export default function Dashboard() {
                   ) : (
                     <button 
                       onClick={() => setShowPremiumModal(true)}
-                      style={{ width: "100%", padding: "10px", borderRadius: 10, background: "linear-gradient(135deg, #7c3aed, #a78bfa)", border: "none", color: "#fff", fontWeight: 800, fontSize: 11, cursor: "pointer", boxShadow: "0 4px 12px rgba(124, 58, 237, 0.3)" }}
+                      style={{ width: "100%", padding: "10px", borderRadius: 10, background: "linear-gradient(135deg, #fbbf24, #d97706)", border: "none", color: "#000", fontWeight: 800, fontSize: 11, cursor: "pointer", boxShadow: "0 4px 12px rgba(251,191,36,0.3)" }}
                     >
-                      UNSET TRIAL: 19 DAYS FREE
+                      GET TRIAL: 19 DAYS FREE
                     </button>
                   )}
                 </div>
@@ -763,6 +769,7 @@ export default function Dashboard() {
               {page==="facetoface"    && <FaceToFace     user={user} progress={{...progress, isPremium: isPremActive}} openPremiumModal={() => setShowPremiumModal(true)} />}
               {page==="admin"         && <AdminPanel     user={{...user, isAdmin: isAdmin}} onBack={()=>setPage("dash")} />}
               {page==="fullmock"      && <FullMockPage   {...commonProps} allTests={lessons} onBack={()=>setPage("dash")}/>}
+              {page==="premium_upgrade" && <div style={{ minHeight: "80vh", display: "flex", alignItems: "center", justifyContent: "center"}}><button onClick={() => setShowPremiumModal(true)} style={{ padding: "20px 40px", borderRadius: 20, background: "#fbbf24", color: "#000", fontSize: 24, fontWeight: 900, border: "none", cursor: "pointer"}}>Upgrade Now</button></div>}
               {page==="spin"          && <SpinPage       progress={progress} canSpin={canSpin} recordSpin={recordSpin} prizes={lessons?.SPIN_PRIZES || []}/>}
               {page==="missions"      && <MissionsPage   progress={progress} scores={scores} addXP={addXP} timeBonusClaimed={timeBonusClaimed} setPage={setPage}/>}
               {page==="notifications" && <NotificationsPage/>}

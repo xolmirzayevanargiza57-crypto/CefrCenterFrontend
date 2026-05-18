@@ -1,7 +1,9 @@
 import React, { useState, useEffect, useRef } from "react";
 import { io } from "socket.io-client";
 import BACKEND_URL from "./config/api";
-import { Video, Lock, Crown, User, Mic, MicOff, X, Volume2, VolumeX, MessageSquare } from "lucide-react";
+import { 
+  Video, Lock, Crown, User, Mic, MicOff, X, Volume2, VolumeX, MessageSquare, Zap
+} from "lucide-react";
 
 const Ic = ({ icon: Icon, s = 16, c = "currentColor", className = "" }) => <Icon size={s} color={c} className={className} />;
 
@@ -248,9 +250,9 @@ export default function FaceToFace({ progress, openPremiumModal }) {
         </div>
       </div>
 
-      <div style={{ display: "grid", gridTemplateColumns: aiAnalysis ? "1fr 1fr 340px" : "1fr 1fr", gap: 24, marginBottom: 32, transition: "all 0.3s" }}>
+      <div className="face-grid" style={{ display: "grid", gridTemplateColumns: aiAnalysis ? "1fr 1fr 340px" : "1fr 1fr", gap: 24, marginBottom: 32, transition: "all 0.3s" }}>
         {/* Local Stream */}
-        <div style={{ position: "relative", borderRadius: 28, overflow: "hidden", background: "#0b1120", border: "1px solid rgba(255,255,255,0.05)", aspectRatio: aiAnalysis ? "auto" : "16/9" }}>
+        <div style={{ position: "relative", borderRadius: 28, overflow: "hidden", background: "#0b1120", border: "1px solid rgba(255,255,255,0.05)", aspectRatio: "16/9" }}>
           <video ref={localVideoRef} autoPlay playsInline muted style={{ width: "100%", height: "100%", objectFit: "cover", opacity: videoActive ? 1 : 0 }} />
           {!videoActive && <div style={{ position: "absolute", inset: 0, display: "flex", alignItems: "center", justifyContent: "center", color: "#64748b" }}><User size={64}/></div>}
           <div style={{ position: "absolute", bottom: 20, left: 20, padding: "8px 16px", background: "rgba(0,0,0,0.5)", backdropFilter: "blur(10px)", borderRadius: 12, color: "#fff", fontSize: 13, fontWeight: 700, display: "flex", alignItems: "center", gap: 8 }}>
@@ -259,7 +261,7 @@ export default function FaceToFace({ progress, openPremiumModal }) {
         </div>
 
         {/* Remote Stream */}
-        <div style={{ position: "relative", borderRadius: 28, overflow: "hidden", background: "#0b1120", border: "1px solid rgba(255,255,255,0.05)", aspectRatio: aiAnalysis ? "auto" : "16/9", display: "flex", alignItems: "center", justifyContent: "center" }}>
+        <div style={{ position: "relative", borderRadius: 28, overflow: "hidden", background: "#0b1120", border: "1px solid rgba(255,255,255,0.05)", aspectRatio: "16/9", display: "flex", alignItems: "center", justifyContent: "center" }}>
           <video ref={remoteVideoRef} autoPlay playsInline style={{ width: "100%", height: "100%", objectFit: "cover", display: inCall ? "block" : "none" }} />
           
           {!inCall && (
@@ -332,7 +334,7 @@ export default function FaceToFace({ progress, openPremiumModal }) {
         </div>
       )}
 
-      <div style={{ display: "flex", justifyContent: "center", gap: 16 }}>
+      <div style={{ display: "flex", justifyContent: "center", gap: 16, flexWrap: "wrap" }}>
         {inCall ? (
           <>
             <button onClick={toggleMic} style={{ width: 60, height: 60, borderRadius: 20, border: "none", background: micActive ? "rgba(255,255,255,0.05)" : "rgba(239,68,68,0.2)", color: micActive ? "#fff" : "#ef4444", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}>
@@ -341,7 +343,7 @@ export default function FaceToFace({ progress, openPremiumModal }) {
             <button onClick={toggleVideo} style={{ width: 60, height: 60, borderRadius: 20, border: "none", background: videoActive ? "rgba(255,255,255,0.05)" : "rgba(239,68,68,0.2)", color: videoActive ? "#fff" : "#ef4444", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}>
               <Video size={24}/>
             </button>
-            <button onClick={endCall} style={{ padding: "0 40px", borderRadius: 20, border: "none", background: "#ef4444", color: "#fff", fontWeight: 800, fontSize: 16, cursor: "pointer", boxShadow: "0 10px 20px rgba(239,68,68,0.3)" }}>
+            <button onClick={endCall} style={{ padding: "0 40px", borderRadius: 20, border: "none", background: "#ef4444", color: "#fff", fontWeight: 800, fontSize: 16, cursor: "pointer", boxShadow: "0 10px 20px rgba(239,68,68,0.3)", minHeight: 60 }}>
               End Practice
             </button>
           </>
@@ -357,6 +359,13 @@ export default function FaceToFace({ progress, openPremiumModal }) {
 
       <style>{`
         @keyframes pulse { 0% { transform: scale(1); opacity: 1; } 100% { transform: scale(1.6); opacity: 0; } }
+        @media (max-width: 1024px) {
+          .face-grid { grid-template-columns: 1fr 1fr !important; }
+        }
+        @media (max-width: 768px) {
+          .face-grid { grid-template-columns: 1fr !important; }
+          .face-grid > div { aspect-ratio: 4/3 !important; }
+        }
       `}</style>
     </div>
   );

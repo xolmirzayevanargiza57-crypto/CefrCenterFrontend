@@ -5,4 +5,12 @@
       "destination": "/index.html"
     }
   ]
-}
+}https://github.com/xolmirzayevanargiza57-crypto/CefrCenterBackend   https://github.com/xolmirzayevanargiza57-crypto/CefrCenterFrontend  
+
+Endi hamma rasmlarni cloudinaryga yuklaymiz hattoki pay checklarini ham notfications ni ham mana cloudinary api
+
+CLOUDINARY_CLOUD_NAME=dnvrk1ds9
+CLOUDINARY_API_KEY=252459761425998
+CLOUDINARY_API_SECRET=8g8NO_9UEuzhpfmi6RwES5WAR4g
+
+Loyhani esa tepadagi repolarga push qil mongodb da faqat oz kb li narsalar qoladi yana rasmga o'xshatishga xarakat qil yana sen 7 kun bepul emas 19 kun bepul qil va bizning loyha hosti cefrcenter.vercel.app yana leaderboardni ham yaxshila va hamma joylarni hamm atelefon rusumlariga kichigidan kattasiga qadar moslab chiq premium uchun ham alohida nav qo'sh va rasm ga o'xshatishga xarakat qil rasmdaqa lar ham qo;sh muhimi dan da muhimi responsive bolsin hattoke admin panel ham biznikini narxlari o'zgarmasin lekin iloji boricha 30 000 shularga yaqin qil dizayinini yanada yaxshiroq qilib ko'chirgin yana premium sotib olayotganda rasm bilan birga ismi va telefon raqamini ham yozib qo'ysin yana face to face da ikki userlar bir birini ko'rishmayabdi va ovozlari eshitilmayabdi uni ham to'g'irla yana bitta user end practise qilsa ikkinchisida ham end bolmayabdi uni ham to'g'irla yana gaplashayotgan paytda pastda card chiqarib qo;y AI ularni tinglab ingilzicha matnlar berib tursin u ham Groq bolsin matnlar yozib berib tursin agar bilmasa o'qib berib tursin yana listening test 2 ni yo'q qilib tashla faqat test 1 qolsin
