@@ -254,39 +254,55 @@ function DashHome({ user, progress, scores, lvlMeta, pct, nxp, cxp, setPage, cle
         </div>
       </div>
 
-      {/* REFERRAL BANNER (Matching Image 2) */}
+      {/* REFERRAL BANNER */}
       <div style={{
-        background: "#f8fafc",
-        borderRadius: 16,
-        padding: "20px",
+        background: "linear-gradient(135deg, #0f1f3d 0%, #1a2e55 50%, #0f1f3d 100%)",
+        borderRadius: 20,
+        padding: "20px 24px",
         marginBottom: 20,
-        border: "1px solid #e2e8f0",
-        position: "relative"
+        border: "1px solid rgba(74,158,255,0.2)",
+        position: "relative",
+        overflow: "hidden",
+        boxShadow: "0 8px 24px rgba(0,0,0,0.3)"
       }}>
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 12 }}>
-          <div>
-            <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 4 }}>
-              <span style={{ fontSize: 18 }}>🎁</span>
-              <h3 style={{ fontSize: 16, fontWeight: 800, color: "#1e293b", margin: 0 }}>Do'stlarni taklif qiling</h3>
+        {/* Decorative glow circles */}
+        <div style={{ position: "absolute", top: "-30px", right: "-30px", width: 120, height: 120, borderRadius: "50%", background: "rgba(74,158,255,0.08)", pointerEvents: "none" }} />
+        <div style={{ position: "absolute", bottom: "-20px", left: "20%", width: 80, height: 80, borderRadius: "50%", background: "rgba(74,158,255,0.05)", pointerEvents: "none" }} />
+        
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 14, position: "relative" }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+            <div style={{ width: 44, height: 44, borderRadius: 14, background: "rgba(74,158,255,0.15)", border: "1px solid rgba(74,158,255,0.3)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+              <span style={{ fontSize: 22 }}>🎁</span>
             </div>
-            <p style={{ fontSize: 13, color: "#64748b", margin: 0 }}>5 ta do'stingiz ro'yxatdan o'tib, mashq qilsa — sizga 9 kun Pro bepul!</p>
+            <div>
+              <h3 style={{ fontSize: 15, fontWeight: 800, color: "#fff", margin: 0, marginBottom: 2 }}>Referral Bonus — 9 Days FREE Premium</h3>
+              <p style={{ fontSize: 12, color: "#8bb8ff", margin: 0 }}>Invite 5 friends who register and study — get 9 days Pro free!</p>
+            </div>
           </div>
-          <div style={{ background: "#1e293b", color: "#fff", padding: "4px 12px", borderRadius: 20, fontSize: 12, fontWeight: 800 }}>
-            0/5
+          <div style={{ background: "rgba(74,158,255,0.15)", border: "1px solid rgba(74,158,255,0.3)", color: "#4a9eff", padding: "4px 12px", borderRadius: 20, fontSize: 12, fontWeight: 900, flexShrink: 0 }}>
+            0 / 5
           </div>
         </div>
         
-        {/* Progress bar */}
-        <div style={{ height: 8, background: "#e2e8f0", borderRadius: 4, marginBottom: 16, overflow: "hidden" }}>
-           <div style={{ height: "100%", width: "0%", background: "#4f46e5", borderRadius: 4 }} />
+        {/* Animated progress bar */}
+        <div style={{ height: 6, background: "rgba(255,255,255,0.07)", borderRadius: 3, marginBottom: 14, overflow: "hidden" }}>
+          <motion.div
+            initial={{ width: 0 }}
+            animate={{ width: "0%" }}
+            transition={{ duration: 1, ease: "easeOut" }}
+            style={{ height: "100%", background: "linear-gradient(90deg, #4a9eff, #7dd3ff)", borderRadius: 3, boxShadow: "0 0 10px rgba(74,158,255,0.5)" }}
+          />
         </div>
         
-        <div style={{ display: "flex", gap: 12 }}>
-          <div style={{ flex: 1, background: "#1e293b", color: "#f8fafc", borderRadius: 12, padding: "12px", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 13, fontWeight: 600 }}>
-             🔗 www.cefrai.uz/register?ref=5cd79a89
+        <div style={{ display: "flex", gap: 10, position: "relative" }}>
+          <div style={{ flex: 1, background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 10, padding: "10px 12px", display: "flex", alignItems: "center", gap: 8, fontSize: 12, color: "#8b9bbf", overflow: "hidden" }}>
+            <span style={{ flexShrink: 0 }}>🔗</span>
+            <span style={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>cefrcenter.vercel.app/?ref=invite</span>
           </div>
-          <button style={{ background: "#4f46e5", color: "#fff", border: "none", borderRadius: 12, padding: "0 24px", fontWeight: 800, cursor: "pointer" }}>
-            Ulashish
+          <button
+            onClick={() => { navigator.clipboard.writeText("https://cefrcenter.vercel.app/?ref=invite"); }}
+            style={{ background: "linear-gradient(135deg, #2563eb, #4a9eff)", color: "#fff", border: "none", borderRadius: 10, padding: "0 18px", fontWeight: 800, cursor: "pointer", fontSize: 12, boxShadow: "0 4px 12px rgba(74,158,255,0.3)", flexShrink: 0 }}>
+            Share
           </button>
         </div>
       </div>
@@ -308,13 +324,13 @@ function DashHome({ user, progress, scores, lvlMeta, pct, nxp, cxp, setPage, cle
           </div>
         </div>
 
-        <div style={{ background: "rgba(255, 255, 255, 0.03)", border: "1px solid rgba(255, 255, 255, 0.08)", borderRadius: 24, padding: "20px", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 10 }}>
-           <div style={{ width: 60, height: 60, borderRadius: "50%", background: `${lvlMeta.color}15`, display: "flex", alignItems: "center", justifyContent: "center", border: `2px solid ${lvlMeta.color}33` }}>
-              <span style={{ fontSize: 20, fontWeight: 900, color: lvlMeta.color }}>{lvlMeta.name}</span>
+        <div style={{ background: "rgba(255, 255, 255, 0.03)", border: `1px solid ${lvlMeta.color}33`, borderRadius: 24, padding: "20px", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 10 }}>
+           <div style={{ width: 60, height: 60, borderRadius: "50%", background: `${lvlMeta.color}15`, display: "flex", alignItems: "center", justifyContent: "center", border: `2px solid ${lvlMeta.color}44` }}>
+              <span style={{ fontSize: 20, fontWeight: 900, color: lvlMeta.color }}>{progress.level}</span>
            </div>
            <div style={{ textAlign: "center" }}>
-             <h4 style={{ fontSize: 15, fontWeight: 800, color: "#fff", marginBottom: 2 }}>Level {progress.lvl}</h4>
-             <p style={{ fontSize: 11, color: "#8b9bbf", fontWeight: 600 }}>{nxp - progress.xp} XP to Lvl {progress.lvl + 1}</p>
+             <h4 style={{ fontSize: 15, fontWeight: 800, color: "#fff", marginBottom: 2 }}>CEFR Level</h4>
+             <p style={{ fontSize: 11, color: "#8b9bbf", fontWeight: 600 }}>{nxp ? `${Math.max(0, nxp - progress.xp)} XP to next` : "Max Level! 🏆"}</p>
            </div>
         </div>
       </div>
@@ -471,15 +487,24 @@ export default function Dashboard() {
   const syncTimerRef = useRef(null);
 
   // Fetch backend user info (isAdmin, isPremium, premiumExpire)
+  // Has a 5-second timeout fallback so the app never freezes when backend is offline
   const fetchDbUser = useCallback(async (email) => {
     try {
-      const res = await fetch(`${BACKEND_URL}/api/user/progress?email=${encodeURIComponent(email)}`);
+      const controller = new AbortController();
+      const tid = setTimeout(() => controller.abort(), 5000);
+      const res = await fetch(`${BACKEND_URL}/api/user/progress?email=${encodeURIComponent(email)}`, { signal: controller.signal });
+      clearTimeout(tid);
       if (res.ok) {
         const data = await res.json();
         setDbUser(data);
         console.log("Admin Check:", data.isAdmin);
+      } else {
+        setDbUser({});
       }
-    } catch (e) { console.warn("Failed to fetch dbUser:", e.message); }
+    } catch (e) {
+      console.warn("Backend offline, continuing with local data:", e.message);
+      setDbUser({}); // Fallback so app doesn't freeze
+    }
   }, []);
 
   const NAV = [
@@ -591,13 +616,14 @@ export default function Dashboard() {
 
   const handleLogout = async () => { setDropOpen(false); await signOut(auth); navigate("/", { replace: true }); };
 
-  // TEZ loading screen
-  if (loading || (user && !dbUser)) return (
+  // Loading screen - only shows while Firebase auth is loading
+  // dbUser has a 5s timeout so it won't block forever
+  if (loading) return (
     <div style={{display:"flex",alignItems:"center",justifyContent:"center",minHeight:"100vh",background:"#0b1120",color:"#8b9bbf",fontFamily:"sans-serif",fontSize:14}}>
       <div style={{textAlign:"center"}}>
         <div style={{width:32,height:32,borderRadius:"50%",border:`2px solid ${ACC}33`,borderTopColor:ACC,animation:"spin .6s linear infinite",margin:"0 auto 12px"}}/>
         <style>{`@keyframes spin{to{transform:rotate(360deg)}}`}</style>
-        Syncing Profile...
+        Loading...
       </div>
     </div>
   );

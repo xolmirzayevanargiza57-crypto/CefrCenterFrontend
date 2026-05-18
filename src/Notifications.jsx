@@ -6,15 +6,7 @@ const READ_KEY = "cefr_notif_read_v1";
 
 // Default built-in notifications (admin-set)
 const DEFAULT_NOTIFICATIONS = [
-  {
-    id: "notif_001",
-    type: "update",
-    title: "New Listening Tests Added",
-    message: "We've added 2 new listening tests with audio. Try Test 2 — City Tour!",
-    date: "2026-04-15",
-    icon: "headphones",
-    pinned: true,
-  },
+
   {
     id: "notif_002",
     type: "tip",
