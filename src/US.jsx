@@ -3,7 +3,7 @@ import {
   Zap, 
   CheckCircle2, 
   ChevronRight,
-  ShieldCheck,
+  Shield,
   Star,
   User,
   AlertCircle,
@@ -272,7 +272,7 @@ export default function US({ onSelect }) {
                 display: "flex", alignItems: "center", justifyContent: "center", gap: 10,
                 boxShadow: hearAbout ? "0 10px 20px rgba(37, 99, 235, 0.2)" : "none"
               }}>
-              {isFinishing ? <><Loader2 className="animate-spin" size={20} /> Finalizing...</> : <><ShieldCheck size={20} /> Finish Setup</>}
+              {isFinishing ? <><Loader2 className="animate-spin" size={20} /> Finalizing...</> : <><Shield size={20} /> Finish Setup</>}
             </button>
           </div>
         )}

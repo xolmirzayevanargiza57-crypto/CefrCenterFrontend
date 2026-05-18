@@ -248,6 +248,64 @@ function DashHome({ user, progress, scores, lvlMeta, pct, nxp, cxp, setPage, cle
         </div>
       </div>
 
+      {/* REFERRAL BANNER (Matching Image) */}
+      <div style={{
+        background: "linear-gradient(135deg, #4f46e5, #7c3aed)",
+        borderRadius: 24,
+        padding: "24px",
+        marginBottom: 20,
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "space-between",
+        gap: 20,
+        boxShadow: "0 10px 25px rgba(79,70,229,0.3)",
+        position: "relative",
+        overflow: "hidden",
+        cursor: "pointer"
+      }}>
+        <div style={{ position: "absolute", top: "-20%", right: "-10%", width: "40%", height: "140%", background: "rgba(255,255,255,0.1)", transform: "rotate(30deg)", pointerEvents: "none" }} />
+        <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
+          <div style={{ width: 56, height: 56, borderRadius: "50%", background: "rgba(255,255,255,0.2)", display: "flex", alignItems: "center", justifyContent: "center" }}>
+            <Ic n="bolt" s={28} c="#fff" />
+          </div>
+          <div>
+            <h3 style={{ fontSize: 18, fontWeight: 900, color: "#fff", marginBottom: 2 }}>Referral Bonus</h3>
+            <p style={{ fontSize: 13, color: "rgba(255,255,255,0.8)", fontWeight: 500 }}>Invite 1 friend & get <span style={{ fontWeight: 800, color: "#fff" }}>200 XP</span> instantly!</p>
+          </div>
+        </div>
+        <div style={{ background: "#fff", color: "#4f46e5", padding: "10px 20px", borderRadius: 12, fontWeight: 800, fontSize: 13, boxShadow: "0 4px 12px rgba(0,0,0,0.1)" }}>
+          Invite Now
+        </div>
+      </div>
+
+      {/* STREAK & LEVEL CARD (Matching Image 2 & 3) */}
+      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16, marginBottom: 20 }}>
+        <div style={{ background: "rgba(255, 255, 255, 0.03)", border: "1px solid rgba(255, 255, 255, 0.08)", borderRadius: 24, padding: "20px", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 10 }}>
+          <div style={{ position: "relative" }}>
+            <div style={{ width: 60, height: 60, borderRadius: "50%", background: "rgba(225, 29, 72, 0.1)", display: "flex", alignItems: "center", justifyContent: "center" }}>
+              <Ic n="bolt" s={32} c="#e11d48" />
+            </div>
+            <div style={{ position: "absolute", top: -5, right: -5, background: "#e11d48", color: "#fff", fontSize: 10, fontWeight: 900, width: 22, height: 22, borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", border: "2px solid #060c1a" }}>
+              {user.consecutiveDays || 0}
+            </div>
+          </div>
+          <div style={{ textAlign: "center" }}>
+            <h4 style={{ fontSize: 15, fontWeight: 800, color: "#fff", marginBottom: 2 }}>Day Streak</h4>
+            <p style={{ fontSize: 11, color: "#8b9bbf", fontWeight: 600 }}>Keep it up!</p>
+          </div>
+        </div>
+
+        <div style={{ background: "rgba(255, 255, 255, 0.03)", border: "1px solid rgba(255, 255, 255, 0.08)", borderRadius: 24, padding: "20px", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 10 }}>
+           <div style={{ width: 60, height: 60, borderRadius: "50%", background: `${lvlMeta.color}15`, display: "flex", alignItems: "center", justifyContent: "center", border: `2px solid ${lvlMeta.color}33` }}>
+              <span style={{ fontSize: 20, fontWeight: 900, color: lvlMeta.color }}>{lvlMeta.name}</span>
+           </div>
+           <div style={{ textAlign: "center" }}>
+             <h4 style={{ fontSize: 15, fontWeight: 800, color: "#fff", marginBottom: 2 }}>Level {progress.lvl}</h4>
+             <p style={{ fontSize: 11, color: "#8b9bbf", fontWeight: 600 }}>{nxp - progress.xp} XP to Lvl {progress.lvl + 1}</p>
+           </div>
+        </div>
+      </div>
+
       {overallBand && (
         <div style={{background:"linear-gradient(135deg,#0f1f35,#1a2e4a)",border:`1px solid ${overallCEFR.color}44`,borderRadius:14,padding:"18px 20px",marginBottom:16,display:"flex",alignItems:"center",gap:20,flexWrap:"wrap"}}>
           <div style={{display:"flex",alignItems:"baseline",gap:10}}>

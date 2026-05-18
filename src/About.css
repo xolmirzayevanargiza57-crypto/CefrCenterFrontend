@@ -1151,6 +1151,11 @@ body.dark .footer-top {
     font-size: 28px;
   }
 
+  .hero-content p {
+    font-size: 14px;
+    margin-bottom: 24px;
+  }
+
   .dev-facts {
     grid-template-columns: 1fr;
   }
@@ -1177,6 +1182,41 @@ body.dark .footer-top {
   .features-section,
   .team-section,
   .contact-section {
-    padding: 60px 5%;
+    padding: 50px 5%;
+  }
+
+  .section-label {
+    font-size: 11px;
+    padding: 5px 12px;
+  }
+
+  .feature-card {
+    padding: 24px 20px;
+  }
+
+  .feature-card h3 {
+    font-size: 18px;
+  }
+
+  .info-glass-card {
+    padding: 20px;
+  }
+}
+
+@media (max-width: 380px) {
+  .hero-content h1 {
+    font-size: 24px;
+  }
+
+  .btn-red,
+  .btn-outline {
+    width: 100%;
+    justify-content: center;
+    padding: 12px 16px;
+  }
+
+  .stat-box {
+    width: 100%;
+    min-width: 0;
   }
 }

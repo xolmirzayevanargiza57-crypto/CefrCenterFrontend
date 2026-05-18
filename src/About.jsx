@@ -9,7 +9,7 @@ import {
   Menu,
   X,
   ArrowRight,
-  ShieldCheck,
+  Shield,
   Mail,
   MapPin,
   User,
@@ -239,12 +239,12 @@ export default function About() {
           <div className="hero-badge">
             <Zap size={14} /> Cefr Exam Preparation
           </div>
-          <h1>
-            Master <span>Cefr</span><br />with Confidence
+          <h1 style={{ letterSpacing: "-1.5px" }}>
+            Master English with<br /><span>Advanced AI</span>
           </h1>
           <p>
-            Professional Cefr exam preparation platform with AI-powered
-            feedback, real exam simulations, and expert instructors.
+            Your ultimate destination for CEFR & IELTS preparation. Learn faster, 
+            speak better, and track your progress with our state-of-the-art platform.
           </p>
           <div className="hero-buttons">
             <button onClick={go} className="btn-red">
@@ -373,7 +373,7 @@ export default function About() {
 
         <div className="info-glass-card">
           <div className="badge">
-            <ShieldCheck size={14} /> Secure & Trusted Platform
+            <Shield size={14} /> Secure & Trusted Platform
           </div>
           <p>
             All user data is fully encrypted and protected. We never share your

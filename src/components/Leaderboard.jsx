@@ -91,10 +91,12 @@ export default function Leaderboard({ currentUser }) {
         .lb-scroll::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.05); border-radius: 10px; }
         
         @media (max-width: 640px) {
-          .leaderboard-card { padding: 24px !important; }
-          .lb-header { flex-direction: column !important; align-items: flex-start !important; gap: 20px !important; }
-          .podium-wrap { gap: 10px !important; min-height: 240px !important; padding: 0 !important; }
-          .rank-item { padding: 12px 16px !important; }
+          .leaderboard-card { padding: 20px 10px !important; border-radius: 20px !important; }
+          .lb-header { flex-direction: column !important; gap: 15px !important; margin-bottom: 30px !important; }
+          .podium-wrap { gap: 8px !important; padding: 0 5px !important; min-height: 280px !important; transform: scale(0.95); }
+          .rank-item { padding: 12px !important; gap: 12px !important; border-radius: 16px !important; }
+          .rank-item h3 { font-size: 14px !important; }
+          .rank-item .xp { font-size: 16px !important; }
         }
       `}</style>
 

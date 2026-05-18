@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Check, Crown, CreditCard, Image as ImageIcon, X, Send, ShieldCheck, Zap, RefreshCw, Star, Info } from "lucide-react";
+import { Check, Crown, CreditCard, Image as ImageIcon, X, Send, Shield, Zap, RefreshCw, Star, Info } from "lucide-react";
 import BACKEND_URL from "./config/api";
 
 export default function PremiumModal({ user, onClose, isPremium, premiumExpire }) {
@@ -15,7 +15,7 @@ export default function PremiumModal({ user, onClose, isPremium, premiumExpire }
   const PLANS = [
     { id: 1, name: "Starter", price: 30000, desc: "30 Days Access", icon: Zap, color: "#10b981", days: 30 },
     { id: 2, name: "Scholar", price: 75000, desc: "90 Days + AI Tutor", icon: Crown, color: "#4a9eff", days: 90 },
-    { id: 3, name: "Ultimate", price: 199000, desc: "365 Days Mastery", icon: ShieldCheck, color: "#fbbf24", days: 365 }
+    { id: 3, name: "Ultimate", price: 199000, desc: "365 Days Mastery", icon: Shield, color: "#fbbf24", days: 365 }
   ];
 
   const handleFileUpload = (e) => {
