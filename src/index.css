@@ -89,7 +89,7 @@ a, button, input, select, textarea {
 .animate-fade-up { animation: fadeUp 0.4s ease-out both; }
 .animate-spin    { animation: spin   1s  linear  infinite; }
 .animate-pulse   { animation: pulse  2s  ease    infinite; }
-/* ?? Mobile Glitch Fix */
+/* ?? Mobile Glitch & Responsiveness Fix */
 @media (max-width: 768px) {
   .glass, [class*='card'], [class*='modal'] {
     backdrop-filter: none !important;
@@ -99,4 +99,32 @@ a, button, input, select, textarea {
     backface-visibility: hidden;
     -webkit-backface-visibility: hidden;
   }
+  
+  /* Global responsive spacing */
+  .main-content { padding: 12px 10px !important; }
+  h1 { font-size: 24px !important; }
+  h2 { font-size: 20px !important; }
+  
+  /* Grid layouts */
+  [style*="grid-template-columns"] {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .hero-h1 { font-size: 24px !important; }
+  .btn-primary, .btn-secondary, button {
+    padding: 10px 14px !important;
+    font-size: 13px !important;
+  }
+  input, select, textarea {
+    font-size: 14px !important;
+  }
+}
+
+/* Fix for small phones (iPhone SE, etc.) */
+@media (max-width: 380px) {
+  .top-bar-stats { display: none !important; }
+  .sidebar-container { width: 180px !important; }
+  .logo { font-size: 14px !important; }
 }

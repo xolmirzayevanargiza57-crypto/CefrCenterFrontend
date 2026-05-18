@@ -34,7 +34,7 @@ export default function AdminPanel({ user, onBack }) {
   const [securityForm, setSecurityForm] = useState({ otpCode: "", faceIdToken: "" });
   const [notifForm, setNotifForm] = useState({ title: "", message: "", type: "info", image: "" });
 
-  const adminEmail = user?.email || "admin@cefr.center";
+  const adminEmail = user?.email || "xojiakbar@admin.com";
   const hdrs = { "x-user-email": adminEmail };
 
   const loadData = useCallback(async () => {
@@ -203,49 +203,85 @@ export default function AdminPanel({ user, onBack }) {
     );
   }
 
+  const [sideOpen, setSideOpen] = useState(window.innerWidth > 768);
+  const isMobile = window.innerWidth <= 768;
+
+  useEffect(() => {
+    const handleResize = () => setSideOpen(window.innerWidth > 768);
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
+
   return (
-    <div style={{ position: "fixed", inset: 0, background: "#0b1120", zIndex: 1000, display: "flex", fontFamily: "Inter, sans-serif", color: "#fff" }}>
+    <div style={{ position: "fixed", inset: 0, background: "#0b1120", zIndex: 1000, display: "flex", flexDirection: isMobile ? "column" : "row", fontFamily: "Inter, sans-serif", color: "#fff", overflow: "hidden" }}>
       
-      {/* Sidebar */}
-      <div style={{ width: 280, borderRight: "1px solid rgba(255,255,255,0.05)", padding: 32, display: "flex", flexDirection: "column" }}>
-        <div style={{ marginBottom: 40 }}>
-           <h1 style={{ fontSize: 24, fontWeight: 900, letterSpacing: -1 }}>CEFR <span style={{ color: "#4a9eff" }}>ADMIN</span></h1>
-           <p style={{ fontSize: 11, color: "#64748b", fontWeight: 800, marginTop: 4 }}>v4.0 UNICORN EDITION</p>
+      {/* Mobile Header */}
+      {isMobile && (
+        <div style={{ height: 60, background: "#131d2e", display: "flex", alignItems: "center", padding: "0 20px", borderBottom: "1px solid rgba(255,255,255,0.05)", justifyContent: "space-between", flexShrink: 0 }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+             <button onClick={() => setSideOpen(!sideOpen)} style={{ background: "none", border: "none", color: "#fff", cursor: "pointer" }}><Activity size={24} /></button>
+             <h1 style={{ fontSize: 18, fontWeight: 900, margin: 0 }}>ADMIN</h1>
+          </div>
+          {loading && <RefreshCw className="spin" size={18} color="#4a9eff" />}
         </div>
+      )}
 
-        <nav style={{ flex: 1, display: "flex", flexDirection: "column", gap: 8 }}>
-          {[
-            { id: "dashboard", label: "Overview", icon: Activity },
-            { id: "payments", label: "Payments", icon: CreditCard, badge: payments.filter(p=>p.status==="pending").length },
-            { id: "users", label: "Students", icon: Users },
-            { id: "broadcast", label: "Broadcast", icon: Bell },
-            { id: "security", label: "Security", icon: Shield }
-          ].map(m => (
-            <button 
-              key={m.id} onClick={() => setTab(m.id)}
-              style={{ padding: "14px 16px", borderRadius: 14, background: tab === m.id ? "rgba(74,158,255,0.1)" : "transparent", border: "none", color: tab === m.id ? "#4a9eff" : "#8b9bbf", fontSize: 14, fontWeight: 700, textAlign: "left", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "space-between", transition: "all .2s" }}
-            >
-              <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-                <Ic icon={m.icon} s={18} /> {m.label}
-              </div>
-              {m.badge > 0 && (
-                <div style={{ background: "#ef4444", color: "#fff", fontSize: 10, fontWeight: 900, padding: "2px 8px", borderRadius: 20 }}>
-                  {m.badge}
+      {/* Sidebar */}
+      {(sideOpen || !isMobile) && (
+        <div style={{ 
+          width: isMobile ? "100%" : 280, 
+          height: isMobile ? "auto" : "100%",
+          position: isMobile ? "absolute" : "relative",
+          top: isMobile ? 60 : 0,
+          left: 0,
+          zIndex: 1001,
+          background: "#131d2e",
+          borderRight: isMobile ? "none" : "1px solid rgba(255,255,255,0.05)", 
+          padding: 32, 
+          display: "flex", 
+          flexDirection: "column",
+          boxShadow: isMobile ? "0 20px 40px rgba(0,0,0,0.5)" : "none",
+          transition: "all 0.3s ease"
+        }}>
+          <div style={{ marginBottom: 40, display: isMobile ? "none" : "block" }}>
+             <h1 style={{ fontSize: 24, fontWeight: 900, letterSpacing: -1 }}>CEFR <span style={{ color: "#4a9eff" }}>ADMIN</span></h1>
+             <p style={{ fontSize: 11, color: "#64748b", fontWeight: 800, marginTop: 4 }}>v4.0 UNICORN EDITION</p>
+          </div>
+
+          <nav style={{ flex: 1, display: "flex", flexDirection: "column", gap: 8 }}>
+            {[
+              { id: "dashboard", label: "Overview", icon: Activity },
+              { id: "payments", label: "Payments", icon: CreditCard, badge: payments.filter(p=>p.status==="pending").length },
+              { id: "users", label: "Students", icon: Users },
+              { id: "broadcast", label: "Broadcast", icon: Bell },
+              { id: "security", label: "Security", icon: Shield }
+            ].map(m => (
+              <button 
+                key={m.id} onClick={() => { setTab(m.id); if(isMobile) setSideOpen(false); }}
+                style={{ padding: "14px 16px", borderRadius: 14, background: tab === m.id ? "rgba(74,158,255,0.1)" : "transparent", border: "none", color: tab === m.id ? "#4a9eff" : "#8b9bbf", fontSize: 14, fontWeight: 700, textAlign: "left", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "space-between", transition: "all .2s" }}
+              >
+                <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+                  <Ic icon={m.icon} s={18} /> {m.label}
                 </div>
-              )}
-            </button>
-          ))}
-        </nav>
+                {m.badge > 0 && (
+                  <div style={{ background: "#ef4444", color: "#fff", fontSize: 10, fontWeight: 900, padding: "2px 8px", borderRadius: 20 }}>
+                    {m.badge}
+                  </div>
+                )}
+              </button>
+            ))}
+          </nav>
 
-        <button onClick={onBack} style={{ padding: "14px", borderRadius: 14, background: "rgba(239,68,68,0.1)", border: "none", color: "#ef4444", fontWeight: 800, display: "flex", alignItems: "center", justifyContent: "center", gap: 10, cursor: "pointer" }}>
-          <Ic icon={LogOut} s={18} /> Exit Panel
-        </button>
-      </div>
+          <button onClick={onBack} style={{ padding: "14px", borderRadius: 14, background: "rgba(239,68,68,0.1)", border: "none", color: "#ef4444", fontWeight: 800, display: "flex", alignItems: "center", justifyContent: "center", gap: 10, cursor: "pointer", marginTop: 20 }}>
+            <Ic icon={LogOut} s={18} /> Exit Panel
+          </button>
+        </div>
+      )}
 
       {/* Main Content */}
-      <div style={{ flex: 1, overflowY: "auto", padding: 40 }}>
+      <div style={{ flex: 1, overflowY: "auto", padding: isMobile ? "20px 16px" : 40 }}>
         
-        {loading && <div style={{ position: "fixed", top: 40, right: 40 }}><RefreshCw className="spin" size={20} color="#4a9eff" /></div>}
+        {!isMobile && loading && <div style={{ position: "fixed", top: 40, right: 40 }}><RefreshCw className="spin" size={20} color="#4a9eff" /></div>}
 
         {tab === "dashboard" && (
            <div>
@@ -322,7 +358,7 @@ export default function AdminPanel({ user, onBack }) {
         )}
 
         {tab === "broadcast" && (
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 40 }}>
+          <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "1fr 1fr", gap: isMobile ? 24 : 40 }}>
              <div>
                 <h2 style={{ fontSize: 24, fontWeight: 900, marginBottom: 8 }}>Global Broadcast</h2>
                 <p style={{ color: "#64748b", marginBottom: 32 }}>Push live notifications to all students</p>

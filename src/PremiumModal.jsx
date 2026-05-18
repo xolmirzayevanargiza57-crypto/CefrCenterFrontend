@@ -9,6 +9,8 @@ export default function PremiumModal({ user, onClose, isPremium, premiumExpire }
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState(false);
+  const [payName, setPayName] = useState("");
+  const [payPhone, setPayPhone] = useState("");
 
   const PLANS = [
     { id: 1, name: "Starter", price: 49000, desc: "30 Days Access", icon: Zap, color: "#10b981" },
@@ -38,6 +40,9 @@ export default function PremiumModal({ user, onClose, isPremium, premiumExpire }
     formData.append("email", user.email);
     formData.append("amount", amount);
     formData.append("receipt", receipt);
+    formData.append("username", payName || user.displayName || "");
+    formData.append("phone", payPhone || "");
+    formData.append("planId", `${amount === 49000 ? 30 : amount === 99000 ? 90 : 365}_days`);
 
     try {
       const res = await fetch(`${BACKEND_URL}/api/payments/submit`, {
@@ -152,11 +157,34 @@ export default function PremiumModal({ user, onClose, isPremium, premiumExpire }
                      <div style={{ fontSize: 11, color: "#8b9bbf", lineHeight: 1.5 }}>Please transfer <strong style={{ color: "#fbbf24" }}>{amount.toLocaleString()} UZS</strong>. After payment, upload a clear screenshot of your receipt.</div>
                   </div>
 
+                  <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12, marginBottom: 18 }}>
+                    <div>
+                      <label style={{ fontSize: 10, fontWeight: 800, color: "#64748b", display: "block", marginBottom: 6, textTransform: "uppercase" }}>Full Name</label>
+                      <input 
+                        type="text" 
+                        placeholder="Your Name"
+                        value={payName}
+                        onChange={(e) => setPayName(e.target.value)}
+                        style={{ width: "100%", background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 12, padding: "10px 14px", color: "#fff", outline: "none", fontSize: 13 }}
+                      />
+                    </div>
+                    <div>
+                      <label style={{ fontSize: 10, fontWeight: 800, color: "#64748b", display: "block", marginBottom: 6, textTransform: "uppercase" }}>Phone Number</label>
+                      <input 
+                        type="text" 
+                        placeholder="+998"
+                        value={payPhone}
+                        onChange={(e) => setPayPhone(e.target.value)}
+                        style={{ width: "100%", background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 12, padding: "10px 14px", color: "#fff", outline: "none", fontSize: 13 }}
+                      />
+                    </div>
+                  </div>
+
                   <div style={{ marginBottom: 24 }}>
                     <label style={{ display: "block", marginBottom: 12 }}>
-                      <div style={{ width: "100%", height: 120, borderRadius: 20, border: "2px dashed rgba(255,255,255,0.1)", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", cursor: "pointer", transition: "all 0.2s", background: receipt ? "rgba(16,185,129,0.05)" : "rgba(255,255,255,0.02)" }}>
-                         <ImageIcon size={32} color={receipt ? "#10b981" : "#64748b"} />
-                         <span style={{ fontSize: 12, fontWeight: 700, color: receipt ? "#10b981" : "#8b9bbf", marginTop: 10 }}>{receipt ? receipt.name : "Attach Payment Receipt"}</span>
+                      <div style={{ width: "100%", height: 100, borderRadius: 20, border: "2px dashed rgba(255,255,255,0.1)", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", cursor: "pointer", transition: "all 0.2s", background: receipt ? "rgba(16,185,129,0.05)" : "rgba(255,255,255,0.02)" }}>
+                         <ImageIcon size={28} color={receipt ? "#10b981" : "#64748b"} />
+                         <span style={{ fontSize: 11, fontWeight: 700, color: receipt ? "#10b981" : "#8b9bbf", marginTop: 8 }}>{receipt ? receipt.name : "Attach Payment Receipt"}</span>
                       </div>
                       <input type="file" accept="image/*" onChange={handleFileUpload} style={{ display: "none" }} />
                     </label>

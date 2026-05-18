@@ -133,6 +133,52 @@ export default function FaceToFace({ progress, openPremiumModal }) {
     socketRef.current.emit("leave_queue");
   };
 
+  const [aiAnalysis, setAiAnalysis] = useState(null);
+  const [isAiListening, setIsAiListening] = useState(false);
+  const [transcript, setTranscript] = useState("");
+  const recognitionRef = useRef(null);
+
+  // AI Evaluation Logic
+  const startAiListening = () => {
+    if (!('webkitSpeechRecognition' in window)) {
+      alert("Your browser does not support speech recognition. Please use Chrome.");
+      return;
+    }
+    const SpeechRecognition = window.webkitSpeechRecognition;
+    recognitionRef.current = new SpeechRecognition();
+    recognitionRef.current.continuous = true;
+    recognitionRef.current.interimResults = true;
+    recognitionRef.current.lang = "en-US";
+
+    recognitionRef.current.onresult = (event) => {
+      let final = "";
+      for (let i = event.resultIndex; i < event.results.length; ++i) {
+        if (event.results[i].isFinal) final += event.results[i][0].transcript;
+      }
+      setTranscript(prev => prev + " " + final);
+    };
+
+    recognitionRef.current.start();
+    setIsAiListening(true);
+    setAiAnalysis(null);
+  };
+
+  const stopAiListening = async () => {
+    if (recognitionRef.current) recognitionRef.current.stop();
+    setIsAiListening(false);
+    if (transcript.length < 10) return;
+
+    try {
+      const res = await fetch(`${BACKEND_URL}/api/ai/speaking`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ transcript, prompt: "Casual conversation practice" })
+      });
+      const data = await res.json();
+      setAiAnalysis(data);
+    } catch (err) { console.error("AI Evaluation failed", err); }
+  };
+
   const toggleMic = () => {
     if (localStreamRef.current) {
       localStreamRef.current.getAudioTracks()[0].enabled = !micActive;
@@ -180,15 +226,31 @@ export default function FaceToFace({ progress, openPremiumModal }) {
             REAL-TIME CONNECTION ACTIVE
           </div>
         </div>
-        <div style={{ padding: "8px 16px", borderRadius: 12, background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.05)", display: "flex", alignItems: "center", gap: 10 }}>
-          <Crown size={18} color="#fbbf24" />
-          <span style={{ fontSize: 13, fontWeight: 800, color: "#fff" }}>PREMIUM STUDENT</span>
+        <div style={{ display: "flex", gap: 12 }}>
+          <button 
+             onClick={isAiListening ? stopAiListening : startAiListening}
+             style={{ 
+               padding: "10px 20px", borderRadius: 14, 
+               background: isAiListening ? "rgba(225,29,72,0.15)" : "rgba(74,158,255,0.1)", 
+               border: `1px solid ${isAiListening ? "#ef4444" : "#4a9eff"}`,
+               color: isAiListening ? "#ef4444" : "#4a9eff",
+               fontWeight: 800, fontSize: 13, cursor: "pointer",
+               display: "flex", alignItems: "center", gap: 8
+             }}
+          >
+            <Ic icon={isAiListening ? Volume2 : Zap} s={16} />
+            {isAiListening ? "Stop AI Analyst" : "Start AI Analyst"}
+          </button>
+          <div style={{ padding: "8px 16px", borderRadius: 12, background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.05)", display: "flex", alignItems: "center", gap: 10 }}>
+            <Crown size={18} color="#fbbf24" />
+            <span style={{ fontSize: 13, fontWeight: 800, color: "#fff" }}>PREMIUM</span>
+          </div>
         </div>
       </div>
 
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 24, marginBottom: 32 }}>
+      <div style={{ display: "grid", gridTemplateColumns: aiAnalysis ? "1fr 1fr 340px" : "1fr 1fr", gap: 24, marginBottom: 32, transition: "all 0.3s" }}>
         {/* Local Stream */}
-        <div style={{ position: "relative", borderRadius: 28, overflow: "hidden", background: "#0b1120", border: "1px solid rgba(255,255,255,0.05)", aspectRatio: "16/9" }}>
+        <div style={{ position: "relative", borderRadius: 28, overflow: "hidden", background: "#0b1120", border: "1px solid rgba(255,255,255,0.05)", aspectRatio: aiAnalysis ? "auto" : "16/9" }}>
           <video ref={localVideoRef} autoPlay playsInline muted style={{ width: "100%", height: "100%", objectFit: "cover", opacity: videoActive ? 1 : 0 }} />
           {!videoActive && <div style={{ position: "absolute", inset: 0, display: "flex", alignItems: "center", justifyContent: "center", color: "#64748b" }}><User size={64}/></div>}
           <div style={{ position: "absolute", bottom: 20, left: 20, padding: "8px 16px", background: "rgba(0,0,0,0.5)", backdropFilter: "blur(10px)", borderRadius: 12, color: "#fff", fontSize: 13, fontWeight: 700, display: "flex", alignItems: "center", gap: 8 }}>
@@ -197,7 +259,7 @@ export default function FaceToFace({ progress, openPremiumModal }) {
         </div>
 
         {/* Remote Stream */}
-        <div style={{ position: "relative", borderRadius: 28, overflow: "hidden", background: "#0b1120", border: "1px solid rgba(255,255,255,0.05)", aspectRatio: "16/9", display: "flex", alignItems: "center", justifyContent: "center" }}>
+        <div style={{ position: "relative", borderRadius: 28, overflow: "hidden", background: "#0b1120", border: "1px solid rgba(255,255,255,0.05)", aspectRatio: aiAnalysis ? "auto" : "16/9", display: "flex", alignItems: "center", justifyContent: "center" }}>
           <video ref={remoteVideoRef} autoPlay playsInline style={{ width: "100%", height: "100%", objectFit: "cover", display: inCall ? "block" : "none" }} />
           
           {!inCall && (
@@ -231,7 +293,44 @@ export default function FaceToFace({ progress, openPremiumModal }) {
             </div>
           )}
         </div>
+
+        {/* AI ANALYSIS CARD */}
+        {aiAnalysis && (
+          <div style={{ background: "#131d2e", borderRadius: 28, border: "1px solid rgba(74, 158, 255, 0.2)", padding: 24, animation: "fUp .5s ease", display: "flex", flexDirection: "column", gap: 20 }}>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+              <h3 style={{ fontSize: 18, fontWeight: 900, color: "#fff", margin: 0 }}>AI Feedback</h3>
+              <button onClick={() => setAiAnalysis(null)} style={{ background: "none", border: "none", color: "#64748b", cursor: "pointer" }}><Ic icon={X} s={16} /></button>
+            </div>
+
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
+              {Object.entries(aiAnalysis.scores).map(([k, v]) => (
+                <div key={k} style={{ background: "rgba(255,255,255,0.03)", padding: 12, borderRadius: 16, border: "1px solid rgba(255,255,255,0.05)" }}>
+                  <div style={{ fontSize: 10, color: "#8b9bbf", fontWeight: 800, textTransform: "uppercase", marginBottom: 4 }}>{k}</div>
+                  <div style={{ fontSize: 18, fontWeight: 900, color: "#4a9eff" }}>{v}</div>
+                </div>
+              ))}
+            </div>
+
+            <div style={{ flex: 1, minHeight: 0, overflowY: "auto", paddingRight: 8 }}>
+               <div style={{ fontSize: 13, color: "#f0f4ff", lineHeight: 1.6, background: "rgba(0,0,0,0.2)", padding: 16, borderRadius: 18, fontStyle: "italic", marginBottom: 16 }}>
+                 "{aiAnalysis.evaluation}"
+               </div>
+               <div style={{ fontSize: 12, color: "#8b9bbf", lineHeight: 1.6 }}>
+                 <strong>Tips:</strong> {aiAnalysis.feedback}
+               </div>
+            </div>
+          </div>
+        )}
       </div>
+
+      {isAiListening && (
+        <div style={{ background: "rgba(74,158,255,0.05)", border: "1px solid rgba(74,158,255,0.2)", borderRadius: 20, padding: "16px 24px", marginBottom: 24, display: "flex", alignItems: "center", gap: 16, animation: "pulse 2s infinite" }}>
+          <div style={{ width: 12, height: 12, borderRadius: "50%", background: "#ef4444" }} />
+          <div style={{ flex: 1, fontSize: 14, color: "#8b9bbf", fontStyle: "italic" }}>
+            AI Analysts is listening to your speech... "{transcript.slice(-60)}..."
+          </div>
+        </div>
+      )}
 
       <div style={{ display: "flex", justifyContent: "center", gap: 16 }}>
         {inCall ? (
@@ -262,3 +361,4 @@ export default function FaceToFace({ progress, openPremiumModal }) {
     </div>
   );
 }
+

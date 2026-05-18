@@ -635,7 +635,7 @@ export default function Dashboard() {
       <div style={{display:"flex",flex:1,minHeight:0, position:"relative"}}>
         {sideOpen && (
           <div className="sidebar-container" style={{width:210,background:"#131d2e",borderRight:"0.5px solid rgba(255,255,255,0.06)",padding:"12px 8px",display:"flex",flexDirection:"column",gap:2,flexShrink:0,position:"sticky",top:TOPBAR_H,height:`calc(100vh - ${TOPBAR_H}px)`,overflowY:"auto"}}>
-            {NAV.map(({pg,label,ic,badge})=>{
+            {NAV.filter(n => !["facetoface", "admin"].includes(n.pg)).map(({pg,label,ic,badge})=>{
               const isActive=page===pg;
               const badgeColor = badge==="HOT"?"#fbbf24":badge==="NEW"?"#a78bfa":badge==="🎯"?null:"#4a9eff";
               return (
@@ -663,6 +663,29 @@ export default function Dashboard() {
                 </motion.div>
               );
             })}
+
+            {/* PREMIUM NAV SECTION */}
+            {isPremActive && (
+              <div style={{ marginTop: 24, marginBottom: 12 }}>
+                <div style={{ fontSize: 10, fontWeight: 900, color: "#EF9F27", padding: "0 12px", marginBottom: 8, letterSpacing: 1.5, display: "flex", alignItems: "center", gap: 8 }}>
+                   <Ic n="award" s={12} c="#EF9F27" /> PRO FEATURES
+                </div>
+                {NAV.filter(n => ["facetoface", "admin"].includes(n.pg)).map(({pg,label,ic,badge})=>{
+                  const isActive=page===pg;
+                  return (
+                    <motion.div 
+                      key={pg} 
+                      onClick={() => setPage(pg)} 
+                      whileHover={{ scale: 1.02, x: 5, background: "rgba(239,159,39,0.1)" }}
+                      style={{display:"flex",alignItems:"center",gap:10,padding:"9px 12px",borderRadius:9,cursor:"pointer",fontSize:13,fontWeight:isActive?700:500,background:isActive?"rgba(239,159,39,0.15)":"transparent",color:isActive?"#EF9F27" : "#8b9bbf"}}>
+                      <Ic n={ic} s={18} c={isActive ? "#EF9F27" : "#8b9bbf"}/>
+                      {label}
+                      <span style={{marginLeft:"auto",fontSize:9,fontWeight:900,color:"#EF9F27",background:"rgba(239,159,39,0.1)",padding:"1px 6px",borderRadius:6}}>PRO</span>
+                    </motion.div>
+                  );
+                })}
+              </div>
+            )}
             {/* Premium Status Card at bottom of sidebar */}
             <div style={{marginTop:"auto",paddingTop:14}}>
               {/* Premium Status Section */}
@@ -678,9 +701,16 @@ export default function Dashboard() {
                     </span>
                   </div>
                   {isPremActive ? (
-                    <div style={{ fontSize: 12, color: "#f0f4ff", fontWeight: 600 }}>Expires: {new Date(dbUser.premiumExpire).toLocaleDateString()}</div>
+                    <div style={{ fontSize: 12, color: "#f0f4ff", fontWeight: 600, display: "flex", alignItems: "center", gap: 6 }}>
+                       <Ic n="timer" s={12} c="#EF9F27" /> Expires: {new Date(dbUser.premiumExpire).toLocaleDateString()}
+                    </div>
                   ) : (
-                    <div style={{ fontSize: 11, color: "#4a5568", fontWeight: 600 }}>Upgrade currently disabled</div>
+                    <button 
+                      onClick={() => setShowPremiumModal(true)}
+                      style={{ width: "100%", padding: "10px", borderRadius: 10, background: "linear-gradient(135deg, #7c3aed, #a78bfa)", border: "none", color: "#fff", fontWeight: 800, fontSize: 11, cursor: "pointer", boxShadow: "0 4px 12px rgba(124, 58, 237, 0.3)" }}
+                    >
+                      UNSET TRIAL: 19 DAYS FREE
+                    </button>
                   )}
                 </div>
               <div style={{padding:12,borderRadius:10,background:"rgba(255,255,255,0.03)",border:"0.5px solid rgba(255,255,255,0.07)"}}>
