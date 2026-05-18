@@ -178,108 +178,121 @@ function DashHome({ user, progress, scores, lvlMeta, pct, nxp, cxp, setPage, cle
   const overallCEFR = overallBand ? bandToCEFR(overallBand) : null;
   return (
     <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}>
-      {/* PREMIUM LEVEL PROGRESS CARD (Matching Image) */}
+      {/* PREMIUM LEVEL PROGRESS CARD (Matching Image 1) */}
       <div style={{
-        background: "linear-gradient(135deg, #1e293b, #0f172a)",
-        border: "1px solid rgba(74, 158, 255, 0.15)",
-        borderRadius: 24,
-        padding: "32px",
+        background: "linear-gradient(90deg, #2b3b75, #4f46e5)",
+        borderRadius: 16,
+        padding: "16px 24px",
         marginBottom: 20,
-        position: "relative",
-        overflow: "hidden",
-        boxShadow: "0 10px 30px rgba(0,0,0,0.2)"
+        boxShadow: "0 8px 24px rgba(79,70,229,0.3)",
+        color: "#fff",
+        display: "flex", flexDirection: "column", gap: 16
       }}>
-        {/* Background Accent */}
-        <div style={{ position: "absolute", top: "-50%", right: "-10%", width: "60%", height: "200%", background: "radial-gradient(circle, rgba(74,158,255,0.08) 0%, transparent 70%)", transform: "rotate(-15deg)", pointerEvents: "none" }} />
-
-        <div className="progress-card-content" style={{ display: "flex", alignItems: "center", gap: 32, flexWrap: "wrap", position: "relative", zIndex: 2 }}>
-          {/* Circular Gauge */}
-          <div style={{ position: "relative", width: 120, height: 120, flexShrink: 0 }}>
-            <svg width="120" height="120" viewBox="0 0 120 120" style={{ transform: "rotate(-90deg)" }}>
-              <circle cx="60" cy="60" r="54" fill="none" stroke="rgba(255,255,255,0.05)" strokeWidth="10" />
-              <motion.circle 
-                initial={{ strokeDasharray: "0 339" }}
-                animate={{ strokeDasharray: `${(pct / 100) * 339} 339` }}
-                transition={{ duration: 1.5, ease: "circOut" }}
-                cx="60" cy="60" r="54" fill="none" stroke={lvlMeta.color} strokeWidth="10" 
-                strokeLinecap="round" 
-                style={{ filter: `drop-shadow(0 0 8px ${lvlMeta.color}66)` }}
-              />
-            </svg>
-            <div style={{ position: "absolute", inset: 0, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center" }}>
-              <span style={{ fontSize: 32, fontWeight: 900, color: "#fff" }}>{progress.level}</span>
-              <span style={{ fontSize: 11, color: "rgba(255,255,255,0.4)", fontWeight: 700 }}>{pct}%</span>
-            </div>
-          </div>
-
-          <div style={{ flex: 1, minWidth: 200 }}>
-            <div style={{ fontSize: 11, fontWeight: 800, color: lvlMeta.color, textTransform: "uppercase", letterSpacing: 2, marginBottom: 4 }}>Your Proficiency</div>
-            <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 12 }}>
-              <h1 className="hero-h1" style={{ fontSize: 44, fontWeight: 900, color: "#fff", lineHeight: 1, margin: 0 }}>{lvlMeta.label}</h1>
+        {/* Top Row: Circular gauge & Stats */}
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
+            {/* Circular Gauge */}
+            <div style={{ position: "relative", width: 60, height: 60 }}>
+              <svg width="60" height="60" viewBox="0 0 60 60" style={{ transform: "rotate(-90deg)" }}>
+                <circle cx="30" cy="30" r="26" fill="none" stroke="rgba(255,255,255,0.1)" strokeWidth="6" />
+                <motion.circle 
+                  initial={{ strokeDasharray: "0 163" }}
+                  animate={{ strokeDasharray: `${(pct / 100) * 163} 163` }}
+                  transition={{ duration: 1.5 }}
+                  cx="30" cy="30" r="26" fill="none" stroke="#a5b4fc" strokeWidth="6" strokeLinecap="round" 
+                />
+              </svg>
+              <div style={{ position: "absolute", inset: 0, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center" }}>
+                <span style={{ fontSize: 16, fontWeight: 900 }}>{progress.level}</span>
+                <span style={{ fontSize: 8, fontWeight: 700, color: "rgba(255,255,255,0.7)" }}>{pct}%</span>
+              </div>
             </div>
             
-            <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
-              <div style={{ display: "flex", alignItems: "center", gap: 6, background: "rgba(255,255,255,0.05)", padding: "6px 12px", borderRadius: 10, border: "1px solid rgba(255,255,255,0.08)" }}>
-                <Ic n="bolt" s={14} c="#fbbf24" />
-                <span style={{ fontSize: 12, fontWeight: 700, color: "#f0f4ff" }}>{progress.xp} Total XP</span>
+            {/* Title & Subtitle */}
+            <div>
+              <div style={{ fontSize: 10, fontWeight: 700, color: "rgba(255,255,255,0.7)", letterSpacing: 1, textTransform: "uppercase" }}>CEFR LEVEL</div>
+              <div style={{ display: "flex", alignItems: "baseline", gap: 8 }}>
+                <h1 style={{ fontSize: 24, fontWeight: 900, margin: 0 }}>{progress.level}</h1>
+                <span style={{ fontSize: 12, color: "rgba(255,255,255,0.7)" }}>• {pct}%</span>
               </div>
-              <div style={{ display: "flex", alignItems: "center", gap: 6, background: "rgba(255,255,255,0.05)", padding: "6px 12px", borderRadius: 10, border: "1px solid rgba(255,255,255,0.08)" }}>
-                <Ic n="fire" s={14} c="#ef4444" />
-                <span style={{ fontSize: 12, fontWeight: 700, color: "#f0f4ff" }}>{progress.consecutiveDays} Day Streak</span>
+              <div style={{ marginTop: 4, background: "rgba(255,255,255,0.1)", padding: "4px 10px", borderRadius: 12, fontSize: 11, display: "inline-block" }}>
+                → Steady progress
               </div>
             </div>
           </div>
+          
+          <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
+             {/* Equilizer graphic (mock) */}
+             <div style={{ display: "flex", alignItems: "flex-end", gap: 2, height: 24, opacity: 0.6 }}>
+               {[4,8,12,16,10,14,6,12,8,4,10,6].map((h, i) => <div key={i} style={{ width: 3, height: h, background: "#fff", borderRadius: 2 }}/>)}
+             </div>
+             
+             {/* Book Icon Button */}
+             <div style={{ width: 40, height: 40, borderRadius: 12, background: "rgba(255,255,255,0.1)", display: "flex", alignItems: "center", justifyContent: "center", position: "relative" }}>
+                <Ic n="book" s={18} c="#fff" />
+                <div style={{ position: "absolute", top: -4, right: -4, background: "#ef4444", color: "#fff", fontSize: 10, fontWeight: 800, width: 16, height: 16, borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center" }}>7</div>
+             </div>
+             
+             {/* Close Button */}
+             <div style={{ width: 30, height: 30, borderRadius: "50%", background: "rgba(255,255,255,0.2)", display: "flex", alignItems: "center", justifyContent: "center" }}>
+               <span style={{ fontSize: 12, fontWeight: 800 }}>X</span>
+             </div>
+          </div>
         </div>
-
-        {/* Multi-Segment Horizontal Progress */}
-        <div style={{ marginTop: 32, position: "relative" }}>
-          <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 10 }}>
-             <span style={{ fontSize: 11, fontWeight: 800, color: "#4a5568", textTransform: "uppercase" }}>Road to Mastery</span>
-             <span style={{ fontSize: 11, fontWeight: 800, color: lvlMeta.color }}>{nxp - progress.xp} XP to next level</span>
-          </div>
-          <div style={{ height: 8, width: "100%", background: "rgba(255,255,255,0.05)", borderRadius: 4 }}>
-             <motion.div 
-               initial={{ width: 0 }}
-               animate={{ width: `${pct}%` }}
-               transition={{ duration: 1, delay: 0.5 }}
-               style={{ height: "100%", background: lvlMeta.color, borderRadius: 4, boxShadow: `0 0 15px ${lvlMeta.color}44` }} 
-             />
-          </div>
+        
+        {/* Bottom Progress Bar */}
+        <div style={{ position: "relative", marginTop: 8 }}>
+           <div style={{ display: "flex", justifyContent: "space-between", position: "absolute", width: "100%", top: 12, padding: "0 10%", color: "rgba(255,255,255,0.5)", fontSize: 10, fontWeight: 700 }}>
+             <span>B1</span>
+             <span>B2</span>
+             <span>C1</span>
+           </div>
+           
+           <div style={{ height: 6, background: "rgba(255,255,255,0.1)", borderRadius: 3, width: "100%", overflow: "hidden" }}>
+             <motion.div initial={{ width: 0 }} animate={{ width: `${pct}%` }} transition={{ duration: 1 }} style={{ height: "100%", background: "#a5b4fc", borderRadius: 3 }} />
+           </div>
         </div>
       </div>
 
-      {/* REFERRAL BANNER (Matching Image) */}
+      {/* REFERRAL BANNER (Matching Image 2) */}
       <div style={{
-        background: "linear-gradient(135deg, #4f46e5, #7c3aed)",
-        borderRadius: 24,
-        padding: "24px",
+        background: "#f8fafc",
+        borderRadius: 16,
+        padding: "20px",
         marginBottom: 20,
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "space-between",
-        gap: 20,
-        boxShadow: "0 10px 25px rgba(79,70,229,0.3)",
-        position: "relative",
-        overflow: "hidden",
-        cursor: "pointer"
+        border: "1px solid #e2e8f0",
+        position: "relative"
       }}>
-        <div style={{ position: "absolute", top: "-20%", right: "-10%", width: "40%", height: "140%", background: "rgba(255,255,255,0.1)", transform: "rotate(30deg)", pointerEvents: "none" }} />
-        <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
-          <div style={{ width: 56, height: 56, borderRadius: "50%", background: "rgba(255,255,255,0.2)", display: "flex", alignItems: "center", justifyContent: "center" }}>
-            <Ic n="bolt" s={28} c="#fff" />
-          </div>
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 12 }}>
           <div>
-            <h3 style={{ fontSize: 18, fontWeight: 900, color: "#fff", marginBottom: 2 }}>Referral Bonus</h3>
-            <p style={{ fontSize: 13, color: "rgba(255,255,255,0.8)", fontWeight: 500 }}>Invite 1 friend & get <span style={{ fontWeight: 800, color: "#fff" }}>200 XP</span> instantly!</p>
+            <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 4 }}>
+              <span style={{ fontSize: 18 }}>🎁</span>
+              <h3 style={{ fontSize: 16, fontWeight: 800, color: "#1e293b", margin: 0 }}>Do'stlarni taklif qiling</h3>
+            </div>
+            <p style={{ fontSize: 13, color: "#64748b", margin: 0 }}>5 ta do'stingiz ro'yxatdan o'tib, mashq qilsa — sizga 9 kun Pro bepul!</p>
+          </div>
+          <div style={{ background: "#1e293b", color: "#fff", padding: "4px 12px", borderRadius: 20, fontSize: 12, fontWeight: 800 }}>
+            0/5
           </div>
         </div>
-        <div style={{ background: "#fff", color: "#4f46e5", padding: "10px 20px", borderRadius: 12, fontWeight: 800, fontSize: 13, boxShadow: "0 4px 12px rgba(0,0,0,0.1)" }}>
-          Invite Now
+        
+        {/* Progress bar */}
+        <div style={{ height: 8, background: "#e2e8f0", borderRadius: 4, marginBottom: 16, overflow: "hidden" }}>
+           <div style={{ height: "100%", width: "0%", background: "#4f46e5", borderRadius: 4 }} />
+        </div>
+        
+        <div style={{ display: "flex", gap: 12 }}>
+          <div style={{ flex: 1, background: "#1e293b", color: "#f8fafc", borderRadius: 12, padding: "12px", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 13, fontWeight: 600 }}>
+             🔗 www.cefrai.uz/register?ref=5cd79a89
+          </div>
+          <button style={{ background: "#4f46e5", color: "#fff", border: "none", borderRadius: 12, padding: "0 24px", fontWeight: 800, cursor: "pointer" }}>
+            Ulashish
+          </button>
         </div>
       </div>
 
       {/* STREAK & LEVEL CARD (Matching Image 2 & 3) */}
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16, marginBottom: 20 }}>
+      <div className="dash-sub-grid" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16, marginBottom: 20 }}>
         <div style={{ background: "rgba(255, 255, 255, 0.03)", border: "1px solid rgba(255, 255, 255, 0.08)", borderRadius: 24, padding: "20px", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 10 }}>
           <div style={{ position: "relative" }}>
             <div style={{ width: 60, height: 60, borderRadius: "50%", background: "rgba(225, 29, 72, 0.1)", display: "flex", alignItems: "center", justifyContent: "center" }}>
@@ -641,6 +654,7 @@ export default function Dashboard() {
           .progress-card-content { gap: 16px !important; }
           .progress-card-content div:first-child { width: 100px !important; height: 100px !important; }
           .progress-card-content svg { width: 100px !important; height: 100px !important; }
+          .dash-sub-grid { grid-template-columns: 1fr !important; gap: 10px !important; }
         }
       `}</style>
 
@@ -794,15 +808,15 @@ export default function Dashboard() {
                 <div style={{ display: "flex", alignItems: "center", gap: 10, background: "rgba(0,0,0,0.2)", padding: "8px 10px", borderRadius: 8, border: "0.5px solid rgba(255,255,255,0.05)" }}>
                   <div style={{ flex: 1, minWidth: 0 }}>
                     <div style={{ fontSize: 10, color: "#4a5568" }}>Phone Support</div>
-                    <div style={{ fontSize: 13, fontWeight: 700, color: "#fff", whiteSpace: "nowrap" }}>+998 94 022 44 92</div>
+                    <div style={{ fontSize: 13, fontWeight: 700, color: "#fff", whiteSpace: "nowrap" }}>+998 94 146 44 42</div>
                   </div>
                   <button 
-                    onClick={() => { navigator.clipboard.writeText("+998 94 022 44 92"); alert("Number copied!"); }}
+                    onClick={() => { navigator.clipboard.writeText("+998 94 146 44 42"); alert("Number copied!"); }}
                     style={{ background: "rgba(74, 158, 255, 0.1)", border: "none", borderRadius: 6, padding: "6px", cursor: "pointer", color: ACC }}>
                     <Ic n="copy" s={14} />
                   </button>
                 </div>
-                <a href="tel:+998940224492" style={{ textDecoration: "none", display: "flex", alignItems: "center", justifyContent: "center", gap: 8, marginTop: 8, width: "100%", padding: "10px", borderRadius: 8, background: "#1D9E75", color: "#fff", border: "none", fontWeight: 700, fontSize: 12, cursor: "pointer" }}>
+                <a href="tel:+998941464442" style={{ textDecoration: "none", display: "flex", alignItems: "center", justifyContent: "center", gap: 8, marginTop: 8, width: "100%", padding: "10px", borderRadius: 8, background: "#1D9E75", color: "#fff", border: "none", fontWeight: 700, fontSize: 12, cursor: "pointer" }}>
                   <Ic n="phone" s={14} /> Call Admin
                 </a>
               </div>

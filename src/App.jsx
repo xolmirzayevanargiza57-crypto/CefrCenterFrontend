@@ -98,6 +98,7 @@ function Root() {
   }
 
   // All set → Redirect to Dashboard
+  if (user?.email === "xojiakbar@admin.com") return <Navigate to="/admin" replace />;
   return <Navigate to="/dashboard" replace />;
 }
 
@@ -148,6 +149,9 @@ function LoginWrapper() {
   }, []);
 
   if (loading) return <Loader />;
-  if (user) return <Navigate to="/dashboard" replace />;
+  if (user) {
+    if (user.email === "xojiakbar@admin.com") return <Navigate to="/admin" replace />;
+    return <Navigate to="/dashboard" replace />;
+  }
   return <Login />;
 }

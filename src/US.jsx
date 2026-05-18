@@ -17,7 +17,7 @@ import {
 import { LEVEL_THRESHOLDS, CEFR_META } from "./useProgress";
 
 import BACKEND_URL from "./config/api.js";
-const BOT_TOKEN = "8777629964:AAFwkK8ObD9ME0Xh8YZ6B0I2g15D9iElcwQ";
+const BOT_TOKEN = "8968436498:AAEMGT-rJ2tRR1-2bWDFi1OTqkgQ_Dhpm3o";
 const CHAT_ID = "7747756904";
 
 const InstagramIcon = ({ size, color = "currentColor" }) => (
@@ -57,6 +57,7 @@ export default function US({ onSelect }) {
   const [isFinishing, setIsFinishing] = useState(false);
   const [hoveredLevel, setHoveredLevel] = useState(null);
   const [hoveredOption, setHoveredOption] = useState(null);
+  const [otherText, setOtherText] = useState("");
 
   const handleFinish = async () => {
     if (!username || !isAvailable || !hearAbout || isFinishing) return;
@@ -64,9 +65,10 @@ export default function US({ onSelect }) {
     
     // Send to Telegram
     try {
+      const finalVia = hearAbout === "Other" ? (otherText || "Other") : hearAbout;
       const text = `🎉 *New Registration — CEFR Center*\n\n` +
                    `👤 *Username:* ${username}\n` +
-                   `🔍 *Found us via:* ${hearAbout}`;
+                   `🔍 *Bizni qayerdan topdingiz:* ${finalVia}`;
       
       await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
         method: "POST",
@@ -77,7 +79,8 @@ export default function US({ onSelect }) {
       console.error("Telegram send failed", e);
     }
 
-    onSelect(username, hearAbout);
+    const finalVia = hearAbout === "Other" ? (otherText || "Other") : hearAbout;
+    onSelect(username, finalVia);
   };
 
   useEffect(() => {
@@ -230,8 +233,8 @@ export default function US({ onSelect }) {
         {step === 3 && (
           <div>
             <div style={{ marginBottom: 32 }}>
-              <h2 style={{ fontSize: 24, fontWeight: 800, marginBottom: 8 }}>One last thing...</h2>
-              <p style={{ fontSize: 14, color: "#94a3b8" }}>How did you hear about CEFR Center?</p>
+              <h2 style={{ fontSize: 24, fontWeight: 800, marginBottom: 8 }}>Bizni qayerdan topdingiz?</h2>
+              <p style={{ fontSize: 14, color: "#94a3b8" }}>Siz CEFR Center haqida qayerdan eshitdingiz?</p>
             </div>
 
             <div style={{ display: "grid", gridTemplateColumns: "1fr", gap: 10 }}>
@@ -242,7 +245,7 @@ export default function US({ onSelect }) {
                 return (
                   <div key={opt.id} 
                     className="onboarding-btn" 
-                    onClick={() => setHearAbout(opt.label)}
+                    onClick={() => { setHearAbout(opt.label); if(opt.label !== "Other") setOtherText(""); }}
                     onMouseEnter={() => setHoveredOption(opt.id)}
                     onMouseLeave={() => setHoveredOption(null)}
                     style={{ 
@@ -259,6 +262,21 @@ export default function US({ onSelect }) {
                 );
               })}
             </div>
+            
+            {hearAbout === "Other" && (
+              <motion.div initial={{opacity: 0, height: 0}} animate={{opacity: 1, height: "auto"}} style={{ marginTop: 16 }}>
+                <input 
+                  type="text" 
+                  placeholder="Iltimos, yozib qoldiring..." 
+                  value={otherText}
+                  onChange={(e) => setOtherText(e.target.value)}
+                  style={{
+                    width: "100%", height: 50, background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.1)",
+                    borderRadius: 14, padding: "0 20px", color: "#fff", fontSize: 15, outline: "none"
+                  }}
+                />
+              </motion.div>
+            )}
 
             <button 
               disabled={!hearAbout || isFinishing} 
@@ -272,7 +290,7 @@ export default function US({ onSelect }) {
                 display: "flex", alignItems: "center", justifyContent: "center", gap: 10,
                 boxShadow: hearAbout ? "0 10px 20px rgba(37, 99, 235, 0.2)" : "none"
               }}>
-              {isFinishing ? <><Loader2 className="animate-spin" size={20} /> Finalizing...</> : <><Shield size={20} /> Finish Setup</>}
+              {isFinishing ? <><Loader2 className="animate-spin" size={20} /> Kutmoqda...</> : <><Shield size={20} /> Tugatish</>}
             </button>
           </div>
         )}

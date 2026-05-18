@@ -27,7 +27,7 @@ import {
 import { FaTelegramPlane } from "react-icons/fa";
 import "./About.css";
 
-const BOT_TOKEN = "8737059362:AAFDcMj7evSK1wl27g-o_eUmUu4ntTgekV8";
+const BOT_TOKEN = "8968436498:AAEMGT-rJ2tRR1-2bWDFi1OTqkgQ_Dhpm3o";
 const CHAT_ID = "7747756904";
 
 export default function About() {
@@ -474,7 +474,7 @@ export default function About() {
               <Phone size={18} />
               <div>
                 <span className="ci-label">Phone</span>
-                <span className="ci-val">+998 94 022 44 92</span>
+                <span className="ci-val">+998 94 146 44 42</span>
               </div>
             </div>
             <div className="contact-item">
