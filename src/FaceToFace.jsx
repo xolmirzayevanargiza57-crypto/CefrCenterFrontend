@@ -13,7 +13,7 @@ export default function FaceToFace({ progress, openPremiumModal }) {
   const [micActive, setMicActive] = useState(true);
   const [videoActive, setVideoActive] = useState(true);
   const [partnerName, setPartnerName] = useState("");
-  const [volume, setVolume] = useState(1); // 0 to 1
+  const [volume, setVolume] = useState(1);
   const [socketError, setSocketError] = useState(false);
 
   const localVideoRef = useRef(null);
@@ -27,56 +27,15 @@ export default function FaceToFace({ progress, openPremiumModal }) {
       initMedia();
       try {
         socketRef.current = io(BACKEND_URL.replace("/api", ""), { transports: ['websocket'] });
-
-        socketRef.current.on("connect_error", (err) => {
-          console.error("Socket connect error", err);
-          setSocketError(true);
-          setConnecting(false);
-        });
-
-        socketRef.current.on("match_found", async ({ room, caller, partnerName }) => {
-          setConnecting(false);
-          setInCall(true);
-          setPartnerName(partnerName);
-          setupWebRTC(caller);
-        });
-
-        socketRef.current.on("offer", async (data) => {
-          if (!peerConnectionRef.current) setupWebRTC(false);
-          await peerConnectionRef.current.setRemoteDescription(new RTCSessionDescription(data));
-          const answer = await peerConnectionRef.current.createAnswer();
-          await peerConnectionRef.current.setLocalDescription(answer);
-          socketRef.current.emit("answer", answer);
-        });
-
-        socketRef.current.on("answer", async (data) => {
-          if (peerConnectionRef.current) {
-            await peerConnectionRef.current.setRemoteDescription(new RTCSessionDescription(data));
-          }
-        });
-
-        socketRef.current.on("ice-candidate", async (data) => {
-          if (peerConnectionRef.current) {
-            try { await peerConnectionRef.current.addIceCandidate(new RTCIceCandidate(data)); }
-            catch(e) { console.error("ICE error", e); }
-          }
-        });
-
-        socketRef.current.on("partner_disconnected", () => {
-          alert("Partner has left the conversation.");
-          endCall();
-        });
-      } catch (err) {
-        console.error("FaceToFace socket init failed", err);
-        setSocketError(true);
-      }
+        socketRef.current.on("connect_error", (err) => { setSocketError(true); setConnecting(false); });
+        socketRef.current.on("match_found", async ({ room, caller, partnerName }) => { setConnecting(false); setInCall(true); setPartnerName(partnerName); setupWebRTC(caller); });
+        socketRef.current.on("offer", async (data) => { if (!peerConnectionRef.current) setupWebRTC(false); await peerConnectionRef.current.setRemoteDescription(new RTCSessionDescription(data)); const answer = await peerConnectionRef.current.createAnswer(); await peerConnectionRef.current.setLocalDescription(answer); socketRef.current.emit("answer", answer); });
+        socketRef.current.on("answer", async (data) => { if (peerConnectionRef.current) await peerConnectionRef.current.setRemoteDescription(new RTCSessionDescription(data)); });
+        socketRef.current.on("ice-candidate", async (data) => { if (peerConnectionRef.current) try { await peerConnectionRef.current.addIceCandidate(new RTCIceCandidate(data)); } catch(e){} });
+        socketRef.current.on("partner_disconnected", () => { endCall(); });
+      } catch (err) { setSocketError(true); }
     }
-
-    return () => {
-      if (localStreamRef.current) localStreamRef.current.getTracks().forEach(t => t.stop());
-      if (peerConnectionRef.current) peerConnectionRef.current.close();
-      if (socketRef.current) socketRef.current.disconnect();
-    };
+    return () => { if (localStreamRef.current) localStreamRef.current.getTracks().forEach(t => t.stop()); if (peerConnectionRef.current) peerConnectionRef.current.close(); if (socketRef.current) socketRef.current.disconnect(); };
   }, [progress?.isPremium]);
 
   const initMedia = async () => {
@@ -84,311 +43,87 @@ export default function FaceToFace({ progress, openPremiumModal }) {
       const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
       localStreamRef.current = stream;
       if (localVideoRef.current) localVideoRef.current.srcObject = stream;
-    } catch (err) {
-      console.error("Camera access error:", err);
-    }
+    } catch (err) { console.error("Camera error:", err); }
   };
 
   const setupWebRTC = async (isCaller) => {
-    const pc = new RTCPeerConnection({
-      iceServers: [
-        { urls: "stun:stun.l.google.com:19302" },
-        { urls: "stun:stun1.l.google.com:19302" },
-        { urls: "stun:stun2.l.google.com:19302" },
-        { urls: "stun:stun3.l.google.com:19302" }
-      ]
-    });
+    const pc = new RTCPeerConnection({ iceServers: [{ urls: "stun:stun.l.google.com:19302" }] });
     peerConnectionRef.current = pc;
-
-    if (localStreamRef.current) {
-      localStreamRef.current.getTracks().forEach(track => pc.addTrack(track, localStreamRef.current));
-    }
-
-    pc.ontrack = (event) => {
-      if (remoteVideoRef.current && event.streams[0]) {
-        remoteVideoRef.current.srcObject = event.streams[0];
-      }
-    };
-
-    pc.onicecandidate = (event) => {
-      if (event.candidate && socketRef.current) {
-        socketRef.current.emit("ice-candidate", event.candidate);
-      }
-    };
-
-    if (isCaller) {
-      const offer = await pc.createOffer();
-      await pc.setLocalDescription(offer);
-      socketRef.current.emit("offer", offer);
-    }
+    if (localStreamRef.current) localStreamRef.current.getTracks().forEach(track => pc.addTrack(track, localStreamRef.current));
+    pc.ontrack = (event) => { if (remoteVideoRef.current && event.streams[0]) remoteVideoRef.current.srcObject = event.streams[0]; };
+    pc.onicecandidate = (event) => { if (event.candidate && socketRef.current) socketRef.current.emit("ice-candidate", event.candidate); };
+    if (isCaller) { const offer = await pc.createOffer(); await pc.setLocalDescription(offer); socketRef.current.emit("offer", offer); }
   };
 
-  const startSearch = () => {
-    setConnecting(true);
-    socketRef.current.emit("join_queue", { username: progress?.username || "Anonymous Learner" });
-  };
+  const startSearch = () => { setConnecting(true); socketRef.current.emit("join_queue", { username: progress?.username || "Learner" }); };
+  const cancelSearch = () => { setConnecting(false); socketRef.current.emit("leave_queue"); };
+  const endCall = () => { setInCall(false); setConnecting(false); setPartnerName(""); if (peerConnectionRef.current) { peerConnectionRef.current.close(); peerConnectionRef.current = null; } if (remoteVideoRef.current) remoteVideoRef.current.srcObject = null; socketRef.current.emit("leave_queue"); };
 
-  const cancelSearch = () => {
-    setConnecting(false);
-    socketRef.current.emit("leave_queue");
-  };
-
-  const endCall = () => {
-    setInCall(false);
-    setConnecting(false);
-    setPartnerName("");
-    if (peerConnectionRef.current) {
-      peerConnectionRef.current.close();
-      peerConnectionRef.current = null;
-    }
-    if (remoteVideoRef.current) {
-      remoteVideoRef.current.srcObject = null;
-    }
-    socketRef.current.emit("leave_queue");
-  };
-
-  const [aiAnalysis, setAiAnalysis] = useState(null);
-  const [isAiListening, setIsAiListening] = useState(false);
-  const [transcript, setTranscript] = useState("");
-  const recognitionRef = useRef(null);
-
-  // AI Evaluation Logic
-  const startAiListening = () => {
-    if (!('webkitSpeechRecognition' in window)) {
-      alert("Your browser does not support speech recognition. Please use Chrome.");
-      return;
-    }
-    const SpeechRecognition = window.webkitSpeechRecognition;
-    recognitionRef.current = new SpeechRecognition();
-    recognitionRef.current.continuous = true;
-    recognitionRef.current.interimResults = true;
-    recognitionRef.current.lang = "en-US";
-
-    recognitionRef.current.onresult = (event) => {
-      let final = "";
-      for (let i = event.resultIndex; i < event.results.length; ++i) {
-        if (event.results[i].isFinal) final += event.results[i][0].transcript;
-      }
-      setTranscript(prev => prev + " " + final);
-    };
-
-    recognitionRef.current.start();
-    setIsAiListening(true);
-    setAiAnalysis(null);
-  };
-
-  const stopAiListening = async () => {
-    if (recognitionRef.current) recognitionRef.current.stop();
-    setIsAiListening(false);
-    if (transcript.length < 10) return;
-
-    try {
-      const res = await fetch(`${BACKEND_URL}/api/ai/speaking`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ transcript, prompt: "Casual conversation practice" })
-      });
-      const data = await res.json();
-      setAiAnalysis(data);
-    } catch (err) { console.error("AI Evaluation failed", err); }
-  };
-
-  const toggleMic = () => {
-    if (localStreamRef.current) {
-      localStreamRef.current.getAudioTracks()[0].enabled = !micActive;
-      setMicActive(!micActive);
-    }
-  };
-
-  const toggleVideo = () => {
-    if (localStreamRef.current) {
-      localStreamRef.current.getVideoTracks()[0].enabled = !videoActive;
-      setVideoActive(!videoActive);
-    }
-  };
-
-  const handleVolume = (val) => {
-    setVolume(val);
-    if (remoteVideoRef.current) remoteVideoRef.current.volume = val;
-  };
+  const toggleMic = () => { if (localStreamRef.current) { localStreamRef.current.getAudioTracks()[0].enabled = !micActive; setMicActive(!micActive); } };
+  const toggleVideo = () => { if (localStreamRef.current) { localStreamRef.current.getVideoTracks()[0].enabled = !videoActive; setVideoActive(!videoActive); } };
 
   if (!progress?.isPremium) {
     return (
-      <div style={{ padding: 60, textAlign: "center", animation: "fUp .5s ease" }}>
-        <style>{`@keyframes fUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}`}</style>
-        <div style={{ width: 80, height: 80, borderRadius: "50%", background: "rgba(167,139,250,0.1)", border: "1px solid rgba(167,139,250,0.2)", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 24px" }}>
-          <Lock size={36} color="#a78bfa" />
+      <div style={{ padding: "60px 20px", textAlign: "center" }} className="animate-fade-up">
+        <div style={{ width: 80, height: 80, borderRadius: "50%", background: "var(--bg-secondary)", border: "1px solid var(--border)", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 24px" }}>
+          <Lock size={32} color="var(--text-primary)" />
         </div>
-        <h1 style={{ fontSize: 32, fontWeight: 900, color: "#fff", marginBottom: 16 }}>Premium Speaking Practice</h1>
-        <p style={{ color: "#8b9bbf", maxWidth: 500, margin: "0 auto 32px", fontSize: 16, lineHeight: 1.6 }}>
-          Experience the ultimate way to master English by speaking with real people across the globe. Unlock video conversations now.
-        </p>
-        <button onClick={openPremiumModal} style={{ padding: "16px 40px", borderRadius: 16, background: "linear-gradient(135deg,#7c3aed,#a78bfa)", color: "#fff", border: "none", fontWeight: 800, fontSize: 16, cursor: "pointer", boxShadow: "0 10px 30px rgba(124,58,237,0.4)" }}>
-          Upgrade to Premium
-        </button>
+        <h1 style={{ fontSize: 28, fontWeight: 800, marginBottom: 16 }}>Premium Speaking</h1>
+        <p style={{ color: "var(--text-muted)", maxWidth: 400, margin: "0 auto 32px", fontSize: 15, lineHeight: 1.6 }}>Unlock high-fidelity video conversations with learners across the globe.</p>
+        <button onClick={openPremiumModal} style={{ padding: "16px 40px", borderRadius: 16, background: "var(--text-primary)", color: "var(--bg-primary)", border: "none", fontWeight: 700, fontSize: 16, cursor: "pointer" }}>Upgrade to Premium</button>
       </div>
     );
   }
 
   return (
-    <div style={{ maxWidth: 1200, margin: "0 auto", animation: "fUp .5s ease" }}>
+    <div style={{ maxWidth: 1000, margin: "0 auto" }} className="animate-fade-up">
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 32 }}>
         <div>
-          <h1 style={{ fontSize: 28, fontWeight: 900, color: "#fff", letterSpacing: "-0.5px" }}>Face-to-Face</h1>
-          <div style={{ display: "flex", alignItems: "center", gap: 8, color: "#10b981", fontSize: 13, fontWeight: 700, marginTop: 4 }}>
-            <div style={{ width: 8, height: 8, borderRadius: "50%", background: "#10b981", boxShadow: "0 0 10px #10b981" }} />
-            REAL-TIME CONNECTION ACTIVE
+          <h1 style={{ fontSize: 24, fontWeight: 800 }}>Face-to-Face</h1>
+          <div style={{ display: "flex", alignItems: "center", gap: 6, color: "#30d158", fontSize: 12, fontWeight: 700, marginTop: 4 }}>
+            <div style={{ width: 6, height: 6, borderRadius: "50%", background: "#30d158" }} /> ONLINE
           </div>
         </div>
-        <div style={{ display: "flex", gap: 12 }}>
-          <button 
-             onClick={isAiListening ? stopAiListening : startAiListening}
-             style={{ 
-               padding: "10px 20px", borderRadius: 14, 
-               background: isAiListening ? "rgba(225,29,72,0.15)" : "rgba(74,158,255,0.1)", 
-               border: `1px solid ${isAiListening ? "#ef4444" : "#4a9eff"}`,
-               color: isAiListening ? "#ef4444" : "#4a9eff",
-               fontWeight: 800, fontSize: 13, cursor: "pointer",
-               display: "flex", alignItems: "center", gap: 8
-             }}
-          >
-            <Ic icon={isAiListening ? Volume2 : Zap} s={16} />
-            {isAiListening ? "Stop AI Analyst" : "Start AI Analyst"}
-          </button>
-          <div style={{ padding: "8px 16px", borderRadius: 12, background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.05)", display: "flex", alignItems: "center", gap: 10 }}>
-            <Crown size={18} color="#fbbf24" />
-            <span style={{ fontSize: 13, fontWeight: 800, color: "#fff" }}>PREMIUM</span>
-          </div>
+        <div style={{ padding: "8px 16px", borderRadius: 12, background: "var(--bg-secondary)", border: "1px solid var(--border)", fontSize: 13, fontWeight: 700 }}>
+          <Crown size={14} color="#FFD700" style={{ verticalAlign: "middle", marginRight: 6 }} /> PREMIUM
         </div>
       </div>
 
-      {socketError && (
-        <div style={{ marginBottom: 18, background: "rgba(225,29,72,0.06)", border: "1px solid rgba(225,29,72,0.12)", padding: 12, borderRadius: 10, color: "#f87171", display: "flex", alignItems: "center", gap: 8 }}>
-          <Ic icon={X} s={16} c="#f87171" />
-          <div style={{ fontSize: 13 }}>
-            Unable to connect to the Face-to-Face service. Please ensure the backend/socket server is running.
-          </div>
-        </div>
-      )}
-
-      <div className="face-grid" style={{ display: "grid", gridTemplateColumns: aiAnalysis ? "1fr 1fr 340px" : "1fr 1fr", gap: 24, marginBottom: 32, transition: "all 0.3s" }}>
-        {/* Local Stream */}
-        <div style={{ position: "relative", borderRadius: 28, overflow: "hidden", background: "#0b1120", border: "1px solid rgba(255,255,255,0.05)", aspectRatio: "16/9" }}>
-          <video ref={localVideoRef} autoPlay playsInline muted style={{ width: "100%", height: "100%", objectFit: "cover", opacity: videoActive ? 1 : 0 }} />
-          {!videoActive && <div style={{ position: "absolute", inset: 0, display: "flex", alignItems: "center", justifyContent: "center", color: "#64748b" }}><User size={64}/></div>}
-          <div style={{ position: "absolute", bottom: 20, left: 20, padding: "8px 16px", background: "rgba(0,0,0,0.5)", backdropFilter: "blur(10px)", borderRadius: 12, color: "#fff", fontSize: 13, fontWeight: 700, display: "flex", alignItems: "center", gap: 8 }}>
-            <User size={14} /> You {!micActive && <MicOff size={14} color="#ef4444"/>}
-          </div>
+      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 20, marginBottom: 32 }}>
+        <div style={{ position: "relative", borderRadius: 24, overflow: "hidden", background: "#000", aspectRatio: "4/3", border: "1px solid var(--border)" }}>
+           <video ref={localVideoRef} autoPlay playsInline muted style={{ width: "100%", height: "100%", objectFit: "cover", opacity: videoActive ? 1 : 0 }} />
+           {!videoActive && <div style={{ position: "absolute", inset: 0, display: "flex", alignItems: "center", justifyContent: "center" }}><User size={48} color="#8e8e93" /></div>}
+           <div style={{ position: "absolute", bottom: 16, left: 16, padding: "6px 12px", background: "rgba(0,0,0,0.5)", backdropFilter: "blur(10px)", borderRadius: 10, color: "#fff", fontSize: 12, fontWeight: 600 }}>You</div>
         </div>
 
-        {/* Remote Stream */}
-        <div style={{ position: "relative", borderRadius: 28, overflow: "hidden", background: "#0b1120", border: "1px solid rgba(255,255,255,0.05)", aspectRatio: "16/9", display: "flex", alignItems: "center", justifyContent: "center" }}>
-          <video ref={remoteVideoRef} autoPlay playsInline style={{ width: "100%", height: "100%", objectFit: "cover", display: inCall ? "block" : "none" }} />
-          
-          {!inCall && (
-            <div style={{ textAlign: "center" }}>
-              {connecting ? (
-                <div style={{ position: "relative", width: 100, height: 100 }}>
-                   <div style={{ position: "absolute", inset: 0, borderRadius: "50%", border: "2px solid #4a9eff", animation: "pulse 2s infinite" }} />
-                   <div style={{ position: "absolute", inset: 15, borderRadius: "50%", background: "rgba(74,158,255,0.1)", display: "flex", alignItems: "center", justifyContent: "center" }}>
-                      <Video size={32} color="#4a9eff" />
-                   </div>
-                </div>
-              ) : (
-                <div style={{ color: "#64748b", display: "flex", flexDirection: "column", alignItems: "center", gap: 12 }}>
-                  <User size={48} />
-                  <span style={{ fontSize: 14, fontWeight: 600 }}>Waiting for partner...</span>
-                </div>
-              )}
-            </div>
-          )}
-
-          <div style={{ position: "absolute", bottom: 20, left: 20, padding: "8px 16px", background: "rgba(0,0,0,0.5)", backdropFilter: "blur(10px)", borderRadius: 12, color: "#fff", fontSize: 13, fontWeight: 700, display: "flex", alignItems: "center", gap: 8 }}>
-            <User size={14} /> {inCall ? partnerName : (connecting ? "Finding partner..." : "Offline")}
-          </div>
-
-          {inCall && (
-            <div style={{ position: "absolute", bottom: 20, right: 20, display: "flex", alignItems: "center", gap: 12, background: "rgba(0,0,0,0.5)", padding: "10px", borderRadius: 12, backdropFilter: "blur(10px)" }}>
-              <button onClick={() => handleVolume(volume === 0 ? 1 : 0)} style={{ background: "none", border: "none", color: "#fff", cursor: "pointer" }}>
-                {volume === 0 ? <VolumeX size={18} /> : <Volume2 size={18} />}
-              </button>
-              <input type="range" min="0" max="1" step="0.1" value={volume} onChange={(e) => handleVolume(parseFloat(e.target.value))} style={{ width: 60, height: 4, accentColor: "#4a9eff" }} />
-            </div>
-          )}
+        <div style={{ position: "relative", borderRadius: 24, overflow: "hidden", background: "#000", aspectRatio: "4/3", border: "1px solid var(--border)", display: "flex", alignItems: "center", justifyContent: "center" }}>
+           <video ref={remoteVideoRef} autoPlay playsInline style={{ width: "100%", height: "100%", objectFit: "cover", display: inCall ? "block" : "none" }} />
+           {!inCall && (
+             <div style={{ textAlign: "center", color: "#8e8e93" }}>
+                {connecting ? <div className="loader-mini" /> : <User size={48} />}
+                <p style={{ fontSize: 13, fontWeight: 600, marginTop: 12 }}>{connecting ? "Searching..." : "Ready to connect"}</p>
+             </div>
+           )}
+           <div style={{ position: "absolute", bottom: 16, left: 16, padding: "6px 12px", background: "rgba(0,0,0,0.5)", backdropFilter: "blur(10px)", borderRadius: 10, color: "#fff", fontSize: 12, fontWeight: 600 }}>{inCall ? partnerName : "Partner"}</div>
         </div>
-
-        {/* AI ANALYSIS CARD */}
-        {aiAnalysis && (
-          <div style={{ background: "#131d2e", borderRadius: 28, border: "1px solid rgba(74, 158, 255, 0.2)", padding: 24, animation: "fUp .5s ease", display: "flex", flexDirection: "column", gap: 20 }}>
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-              <h3 style={{ fontSize: 18, fontWeight: 900, color: "#fff", margin: 0 }}>AI Feedback</h3>
-              <button onClick={() => setAiAnalysis(null)} style={{ background: "none", border: "none", color: "#64748b", cursor: "pointer" }}><Ic icon={X} s={16} /></button>
-            </div>
-
-            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
-              {Object.entries(aiAnalysis.scores).map(([k, v]) => (
-                <div key={k} style={{ background: "rgba(255,255,255,0.03)", padding: 12, borderRadius: 16, border: "1px solid rgba(255,255,255,0.05)" }}>
-                  <div style={{ fontSize: 10, color: "#8b9bbf", fontWeight: 800, textTransform: "uppercase", marginBottom: 4 }}>{k}</div>
-                  <div style={{ fontSize: 18, fontWeight: 900, color: "#4a9eff" }}>{v}</div>
-                </div>
-              ))}
-            </div>
-
-            <div style={{ flex: 1, minHeight: 0, overflowY: "auto", paddingRight: 8 }}>
-               <div style={{ fontSize: 13, color: "#f0f4ff", lineHeight: 1.6, background: "rgba(0,0,0,0.2)", padding: 16, borderRadius: 18, fontStyle: "italic", marginBottom: 16 }}>
-                 "{aiAnalysis.evaluation}"
-               </div>
-               <div style={{ fontSize: 12, color: "#8b9bbf", lineHeight: 1.6 }}>
-                 <strong>Tips:</strong> {aiAnalysis.feedback}
-               </div>
-            </div>
-          </div>
-        )}
       </div>
 
-      {isAiListening && (
-        <div style={{ background: "rgba(74,158,255,0.05)", border: "1px solid rgba(74,158,255,0.2)", borderRadius: 20, padding: "16px 24px", marginBottom: 24, display: "flex", alignItems: "center", gap: 16, animation: "pulse 2s infinite" }}>
-          <div style={{ width: 12, height: 12, borderRadius: "50%", background: "#ef4444" }} />
-          <div style={{ flex: 1, fontSize: 14, color: "#8b9bbf", fontStyle: "italic" }}>
-            AI Analysts is listening to your speech... "{transcript.slice(-60)}..."
-          </div>
-        </div>
-      )}
-
-      <div style={{ display: "flex", justifyContent: "center", gap: 16, flexWrap: "wrap" }}>
+      <div style={{ display: "flex", justifyContent: "center", gap: 16 }}>
         {inCall ? (
           <>
-            <button onClick={toggleMic} style={{ width: 60, height: 60, borderRadius: 20, border: "none", background: micActive ? "rgba(255,255,255,0.05)" : "rgba(239,68,68,0.2)", color: micActive ? "#fff" : "#ef4444", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}>
-              {micActive ? <Mic size={24}/> : <MicOff size={24}/>}
-            </button>
-            <button onClick={toggleVideo} style={{ width: 60, height: 60, borderRadius: 20, border: "none", background: videoActive ? "rgba(255,255,255,0.05)" : "rgba(239,68,68,0.2)", color: videoActive ? "#fff" : "#ef4444", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}>
-              <Video size={24}/>
-            </button>
-            <button onClick={endCall} style={{ padding: "0 40px", borderRadius: 20, border: "none", background: "#ef4444", color: "#fff", fontWeight: 800, fontSize: 16, cursor: "pointer", boxShadow: "0 10px 20px rgba(239,68,68,0.3)", minHeight: 60 }}>
-              End Practice
-            </button>
+            <button onClick={toggleMic} style={{ width: 56, height: 56, borderRadius: "50%", background: micActive ? "var(--bg-secondary)" : "#ff3b30", border: "none", color: micActive ? "var(--text-primary)" : "#fff", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}><Ic icon={micActive ? Mic : MicOff} s={22}/></button>
+            <button onClick={toggleVideo} style={{ width: 56, height: 56, borderRadius: "50%", background: videoActive ? "var(--bg-secondary)" : "#ff3b30", border: "none", color: videoActive ? "var(--text-primary)" : "#fff", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}><Ic icon={Video} s={22}/></button>
+            <button onClick={endCall} style={{ padding: "0 32px", borderRadius: 28, background: "#ff3b30", color: "#fff", border: "none", fontWeight: 700, cursor: "pointer" }}>End Call</button>
           </>
         ) : (
-          <button 
-            onClick={connecting ? cancelSearch : startSearch} 
-            style={{ padding: "18px 50px", borderRadius: 20, border: "none", background: connecting ? "#ef4444" : "#4a9eff", color: "#fff", fontWeight: 800, fontSize: 16, cursor: "pointer", boxShadow: connecting ? "0 10px 30px rgba(239,68,68,0.3)" : "0 10px 30px rgba(74,158,255,0.3)", transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)" }}
-          >
-            {connecting ? "Cancel Search" : "Connect with Partner"}
-          </button>
+          <button onClick={connecting ? cancelSearch : startSearch} style={{ padding: "16px 48px", borderRadius: 16, background: connecting ? "#ff3b30" : "var(--text-primary)", color: connecting ? "#fff" : "var(--bg-primary)", border: "none", fontWeight: 700, fontSize: 16, cursor: "pointer" }}>{connecting ? "Cancel" : "Connect with Partner"}</button>
         )}
       </div>
 
       <style>{`
-        @keyframes pulse { 0% { transform: scale(1); opacity: 1; } 100% { transform: scale(1.6); opacity: 0; } }
-        @media (max-width: 1024px) {
-          .face-grid { grid-template-columns: 1fr 1fr !important; }
-        }
-        @media (max-width: 768px) {
-          .face-grid { grid-template-columns: 1fr !important; }
-          .face-grid > div { aspect-ratio: 4/3 !important; }
-        }
+        .loader-mini { width: 30px; height: 30px; border: 3px solid rgba(255,255,255,0.1); border-top: 3px solid #fff; borderRadius: 50%; animation: spin 0.8s linear infinite; }
+        @keyframes spin { to { transform: rotate(360deg); } }
       `}</style>
     </div>
   );
 }
-

@@ -1,4 +1,3 @@
-// Spin.jsx — CEFR Center — Fortune Drum, STRICT 3 spins/day, XP Only
 import React, { useState, useRef, useEffect } from "react";
 
 function pickPrize(prizes) {
@@ -16,13 +15,13 @@ const Icons = {
 };
 
 const DEFAULT_PRIZES = [
-  { id: "x50",    label: "50 XP",      color: "#F59E0B", xp: 50,  probability: 2  },
-  { id: "x25",    label: "25 XP",      color: "#EF9F27", xp: 25,  probability: 8  },
-  { id: "x15",    label: "15 XP",      color: "#1D9E75", xp: 15,  probability: 15 },
-  { id: "x10",    label: "10 XP",      color: "#378ADD", xp: 10,  probability: 25 },
-  { id: "x5",     label: "5 XP",       color: "#7F77DD", xp: 5,   probability: 30 },
-  { id: "x2",     label: "2 XP",       color: "#4a9eff", xp: 2,   probability: 15 },
-  { id: "no",     label: "Try Again!", color: "#4a5568", xp: 0,   probability: 5  },
+  { id: "x50",    label: "50 XP",      color: "#1c1c1e", xp: 50,  probability: 2  },
+  { id: "x25",    label: "25 XP",      color: "#2c2c2e", xp: 25,  probability: 8  },
+  { id: "x15",    label: "15 XP",      color: "#3a3a3c", xp: 15,  probability: 15 },
+  { id: "x10",    label: "10 XP",      color: "#48484a", xp: 10,  probability: 25 },
+  { id: "x5",     label: "5 XP",       color: "#636366", xp: 5,   probability: 30 },
+  { id: "x2",     label: "2 XP",       color: "#8e8e93", xp: 2,   probability: 15 },
+  { id: "no",     label: "0 XP",       color: "#aeaeb2", xp: 0,   probability: 5  },
 ];
 
 function getToday() {
@@ -46,7 +45,7 @@ function addSpinCount() {
   return c;
 }
 
-export default function Spin({ progress, canSpin, recordSpin, prizes }) {
+export default function Spin({ progress, recordSpin, prizes }) {
   const activePrizes = prizes && prizes.length > 0 ? prizes : DEFAULT_PRIZES;
 
   const [spinning, setSpinning] = useState(false);
@@ -56,7 +55,6 @@ export default function Spin({ progress, canSpin, recordSpin, prizes }) {
   const [usedCount, setUsedCount] = useState(getSpinCount);
   const rafRef = useRef(null);
 
-  // Sync from progress too
   useEffect(() => {
     const t = getToday();
     const { date, count } = progress.spinUsed || {};
@@ -73,7 +71,6 @@ export default function Spin({ progress, canSpin, recordSpin, prizes }) {
   const doSpin = () => {
     if (!canDoSpin) return;
 
-    // Immediately block further spins
     const newCount = addSpinCount();
     setUsedCount(newCount);
     setSpinning(true);
@@ -93,12 +90,11 @@ export default function Spin({ progress, canSpin, recordSpin, prizes }) {
     const tick = (now) => {
       const elapsed = now - start;
       const t = Math.min(elapsed / duration, 1);
-      // Cubic ease-out for smooth deceleration
       const ease = 1 - Math.pow(1 - t, 3);
       const current = startAngle + (endAngle - startAngle) * ease;
       setAngle(current);
 
-      if (t < 1) {
+      if (elapsed < duration) {
         rafRef.current = requestAnimationFrame(tick);
       } else {
         setAngle(endAngle);
@@ -117,142 +113,91 @@ export default function Spin({ progress, canSpin, recordSpin, prizes }) {
   }, []);
 
   return (
-    <div style={{ animation: "fadeUp .4s ease" }}>
+    <div style={{ animation: "fadeUp .5s ease-out", color: "var(--text-primary)" }}>
       <style>{`
-        @keyframes fadeUp  { from{opacity:0;transform:translateY(12px)} to{opacity:1;transform:translateY(0)} }
-        @keyframes popIn   { 0%{transform:scale(0.5);opacity:0} 60%{transform:scale(1.1)} 100%{transform:scale(1);opacity:1} }
+        @keyframes fadeUp  { from{opacity:0;transform:translateY(20px)} to{opacity:1;transform:translateY(0)} }
+        @keyframes popIn   { 0%{transform:scale(0.8);opacity:0} 100%{transform:scale(1);opacity:1} }
         @keyframes spinIcon { to{transform:rotate(360deg)} }
       `}</style>
 
-      {/* Header */}
-      <div style={{ marginBottom: 24 }}>
-        <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 6 }}>
-          <div style={{ width: 36, height: 36, borderRadius: 10, background: "rgba(167,139,250,0.15)", display: "flex", alignItems: "center", justifyContent: "center", color: "#a78bfa" }}>{Icons.spin}</div>
-          <div>
-            <h2 style={{ fontSize: 20, fontWeight: 800, color: "#f0f6ff", margin: 0 }}>Fortune Drum</h2>
-            <p style={{ fontSize: 13, color: "#8b9bbf", margin: 0 }}>Win daily XP rewards to level up faster!</p>
-          </div>
-        </div>
-
-        <div style={{ display: "flex", gap: 10, flexWrap: "wrap", marginTop: 14 }}>
-          <div style={{ display: "flex", alignItems: "center", gap: 8, background: "rgba(167,139,250,0.07)", border: "1px solid rgba(167,139,250,0.2)", borderRadius: 10, padding: "8px 14px" }}>
-            <span style={{ color: "#a78bfa" }}>{Icons.spin}</span>
-            <span style={{ fontSize: 16, fontWeight: 800, color: "#a78bfa" }}>{spinsLeft}/3</span>
-            <span style={{ fontSize: 12, color: "#8b9bbf" }}>daily spins</span>
-          </div>
-          <div style={{ display: "flex", alignItems: "center", gap: 6, background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 10, padding: "8px 14px" }}>
-            {[0, 1, 2].map(i => (
-              <div key={i} style={{
-                width: 10, height: 10, borderRadius: "50%",
-                background: i < spinsLeft ? "#a78bfa" : "rgba(255,255,255,0.1)",
-                border: i < spinsLeft ? "none" : "1px solid rgba(255,255,255,0.2)",
-                transition: "all .3s",
-              }}/>
-            ))}
-          </div>
-        </div>
+      <div style={{ marginBottom: 40 }}>
+        <h1 style={{ fontSize: 32, fontWeight: 900, marginBottom: 8 }}>Fortune Drum</h1>
+        <p style={{ color: "var(--text-muted)", fontSize: 16 }}>Test your luck for extra XP</p>
       </div>
 
-      <div style={{ display: "flex", gap: 24, flexWrap: "wrap" }}>
-        <div style={{ flex: "1 1 300px", display: "flex", flexDirection: "column", alignItems: "center" }}>
-          {/* Arrow pointer */}
-          <div style={{ width: 0, height: 0, borderLeft: "10px solid transparent", borderRight: "10px solid transparent", borderTop: "24px solid #a78bfa", marginBottom: -8, zIndex: 10, position: "relative", filter: "drop-shadow(0 2px 4px rgba(167,139,250,0.5))" }} />
+      <div style={{ display: "flex", gap: 40, flexWrap: "wrap", justifyContent: "center" }}>
+        <div style={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
+          {/* Arrow */}
+          <div style={{ width: 0, height: 0, borderLeft: "12px solid transparent", borderRight: "12px solid transparent", borderTop: "24px solid var(--text-primary)", marginBottom: -10, zIndex: 10 }} />
 
           {/* Wheel */}
-          <div style={{ position: "relative", width: "min(320px, 90vw)", height: "min(320px, 90vw)" }}>
-            <svg viewBox="0 0 320 320" style={{ width: "100%", height: "100%", transform: `rotate(${angle}deg)`, filter: "drop-shadow(0 8px 32px rgba(0,0,0,0.5))" }}>
+          <div style={{ position: "relative", width: 340, height: 340 }}>
+            <svg viewBox="0 0 320 320" style={{ width: "100%", height: "100%", transform: `rotate(${angle}deg)`, boxShadow: "0 0 60px rgba(0,0,0,0.5)", borderRadius: "50%" }}>
               {activePrizes.map((prize, i) => {
                 const sa = i * segAngle - 90;
-                const r = 150, cx = 160, cy = 160;
+                const r = 155, cx = 160, cy = 160;
                 const rad = d => (d * Math.PI) / 180;
                 const x1 = cx + r * Math.cos(rad(sa));
                 const y1 = cy + r * Math.sin(rad(sa));
                 const x2 = cx + r * Math.cos(rad(sa + segAngle));
                 const y2 = cy + r * Math.sin(rad(sa + segAngle));
                 const ma = sa + segAngle / 2;
-                const tr = r * 0.65;
+                const tr = r * 0.7;
                 const tx = cx + tr * Math.cos(rad(ma));
                 const ty = cy + tr * Math.sin(rad(ma));
                 return (
                   <g key={prize.id}>
-                    <path d={`M${cx},${cy} L${x1},${y1} A${r},${r} 0 0,1 ${x2},${y2} Z`} fill={prize.color} stroke="rgba(0,0,0,0.25)" strokeWidth="1" />
+                    <path d={`M${cx},${cy} L${x1},${y1} A${r},${r} 0 0,1 ${x2},${y2} Z`} fill={prize.color} stroke="var(--bg-primary)" strokeWidth="1" />
                     <text x={tx} y={ty} textAnchor="middle" dominantBaseline="middle" transform={`rotate(${ma + 90}, ${tx}, ${ty})`}
-                      style={{ fontSize: "11px", fontWeight: 700, fill: "#fff" }}>
+                      style={{ fontSize: "12px", fontWeight: 800, fill: "#fff" }}>
                       {prize.label}
                     </text>
                   </g>
                 );
               })}
-              <circle cx="160" cy="160" r="30" fill="#0b1120" stroke="#a78bfa" strokeWidth="2" />
-              <text x="160" y="165" textAnchor="middle" dominantBaseline="middle" style={{ fontSize: "20px", fill: "#a78bfa", fontWeight: 800 }}>⚡</text>
+              <circle cx="160" cy="160" r="32" fill="var(--bg-secondary)" stroke="var(--border)" strokeWidth="2" />
+              <text x="160" y="165" textAnchor="middle" style={{ fontSize: "24px", fill: "var(--text-primary)" }}>✦</text>
             </svg>
           </div>
 
-          {/* Spin button */}
           <button onClick={doSpin} disabled={!canDoSpin}
             style={{
-              marginTop: 24, display: "flex", alignItems: "center", gap: 10,
-              padding: "14px 44px", borderRadius: 14, border: "none",
-              background: canDoSpin ? "linear-gradient(135deg, #7c3aed, #a78bfa)" : "rgba(255,255,255,0.05)",
-              color: canDoSpin ? "#fff" : "#4a5568",
-              fontSize: 16, fontWeight: 800,
-              cursor: canDoSpin ? "pointer" : "not-allowed",
-              transition: "background .2s, box-shadow .2s",
-              boxShadow: canDoSpin ? "0 4px 20px rgba(167,139,250,0.4)" : "none",
-              fontFamily: "inherit",
+              marginTop: 40, width: "100%", maxWidth: 280,
+              padding: "16px", borderRadius: 14, border: "none",
+              background: canDoSpin ? "var(--text-primary)" : "var(--bg-secondary)",
+              color: canDoSpin ? "var(--bg-primary)" : "var(--text-muted)",
+              fontSize: 16, fontWeight: 800, cursor: canDoSpin ? "pointer" : "not-allowed",
+              boxShadow: canDoSpin ? "0 10px 20px rgba(0,0,0,0.2)" : "none"
             }}>
-            <span style={{ display: "inline-flex", animation: spinning ? "spinIcon 0.5s linear infinite" : "none" }}>{Icons.spin}</span>
-            {spinning ? "Spinning..." : spinsLeft === 0 ? "Daily limit reached" : "Spin Now"}
+            {spinning ? "Spinning..." : spinsLeft === 0 ? "Come back tomorrow" : `Spin Now (${spinsLeft} left)`}
           </button>
-
-          {spinsLeft === 0 && !spinning && (
-            <div style={{ marginTop: 12, display: "flex", alignItems: "center", gap: 8, color: "#8b9bbf", fontSize: 13 }}>
-              {Icons.lock} <span>Resets at midnight</span>
-            </div>
-          )}
         </div>
 
-        {/* Right panel */}
-        <div style={{ flex: "1 1 260px", display: "flex", flexDirection: "column", gap: 14 }}>
+        <div style={{ flex: "1 1 300px", maxWidth: 400 }}>
           {showResult && result && (
-            <div style={{
-              background: "rgba(167,139,250,0.08)", border: "1px solid rgba(167,139,250,0.2)",
-              borderRadius: 20, padding: 24, textAlign: "center", animation: "popIn .4s ease",
-            }}>
-              <div style={{ fontSize: 40, marginBottom: 12 }}>{result.xp > 0 ? "⚡" : "😅"}</div>
-              <h3 style={{ fontSize: 18, fontWeight: 800, color: "#fff", marginBottom: 6 }}>
-                {result.xp > 0 ? `+${result.xp} XP Earned!` : "Try again tomorrow!"}
-              </h3>
-              <p style={{ fontSize: 13, color: "#8b9bbf" }}>{result.label}</p>
+            <div style={{ background: "var(--bg-secondary)", border: "1px solid var(--border)", borderRadius: 24, padding: 32, textAlign: "center", marginBottom: 24, animation: "popIn .3s ease-out" }}>
+              <div style={{ fontSize: 48, marginBottom: 12 }}>{result.xp > 0 ? "✧" : "✦"}</div>
+              <h3 style={{ fontSize: 24, fontWeight: 900, marginBottom: 8 }}>{result.xp > 0 ? `+${result.xp} XP` : "No Luck"}</h3>
+              <p style={{ color: "var(--text-muted)" }}>{result.label}</p>
             </div>
           )}
 
-          <div style={{ background: "#18243a", border: "1px solid rgba(255,255,255,0.06)", borderRadius: 16, padding: 20 }}>
-            <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 16 }}>
-              <div style={{ color: "#a78bfa" }}>{Icons.trophy}</div>
-              <span style={{ fontSize: 14, fontWeight: 700, color: "#fff" }}>Potential Rewards</span>
-            </div>
+          <div style={{ background: "var(--bg-secondary)", border: "1px solid var(--border)", borderRadius: 24, padding: 24 }}>
+            <h3 style={{ fontSize: 16, fontWeight: 800, marginBottom: 20, display: "flex", alignItems: "center", gap: 10 }}>
+              {Icons.trophy} Rewards
+            </h3>
             {activePrizes.filter(p => p.xp > 0).map(prize => (
-              <div key={prize.id} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "10px 0", borderBottom: "1px solid rgba(255,255,255,0.04)" }}>
-                <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-                  <div style={{ width: 8, height: 8, borderRadius: "50%", background: prize.color }} />
-                  <span style={{ fontSize: 13, color: "#cbd5e1" }}>{prize.label}</span>
+              <div key={prize.id} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "12px 0", borderBottom: "1px solid var(--border)" }}>
+                <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+                  <div style={{ width: 10, height: 10, borderRadius: "50%", background: prize.color }} />
+                  <span style={{ fontSize: 14, fontWeight: 600 }}>{prize.label}</span>
                 </div>
-                <span style={{ fontSize: 12, color: "#64748b", fontWeight: 600 }}>{prize.probability}%</span>
+                <span style={{ fontSize: 12, color: "var(--text-muted)", fontWeight: 700 }}>{prize.probability}%</span>
               </div>
             ))}
-          </div>
-
-          <div style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.06)", borderRadius: 16, padding: 16 }}>
-            <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 10, color: "#a78bfa" }}>
-              {Icons.info} <span style={{ fontSize: 13, fontWeight: 700 }}>Drum Info</span>
+            <div style={{ marginTop: 24, padding: 16, background: "var(--bg-primary)", borderRadius: 16, fontSize: 12, color: "var(--text-muted)", display: "flex", gap: 10 }}>
+              {Icons.info} <span>Limit: 3 spins per day. Resets at 00:00.</span>
             </div>
-            <ul style={{ margin: 0, padding: 0, listStyle: "none", fontSize: 12, color: "#8b9bbf", display: "grid", gap: 8 }}>
-              <li>• Everyone gets <strong style={{color:"#fff"}}>3 free spins</strong> every 24 hours</li>
-              <li>• Spin counts reset at midnight local time</li>
-              <li>• Rewards are added instantly to your XP total</li>
-              <li>• Consistent daily spins help you reach C1 faster</li>
-            </ul>
           </div>
         </div>
       </div>

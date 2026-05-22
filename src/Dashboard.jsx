@@ -85,10 +85,10 @@ function Ic({ n, s = 16, c = "currentColor" }) {
 // Redundant LISTENING_TESTS removed as it is now fetched from the backend via useEffect.
 
 const SECTIONS = [
-  { key: "listening", label: "Listening", color: "#1D9E75", ic: "ear",  max: LISTENING_MAX, isL: true  },
-  { key: "reading",   label: "Reading",   color: "#378ADD", ic: "book", max: MAX_SCORE,     isL: false },
-  { key: "writing",   label: "Writing",   color: "#EF9F27", ic: "pen",  max: MAX_SCORE,     isL: false },
-  { key: "speaking",  label: "Speaking (Maintenance)", color: "#D4537E", ic: "mic",  max: MAX_SCORE,     isL: false, disabled: true },
+  { key: "listening", label: "Listening", color: "var(--text-primary)", ic: "ear",  max: LISTENING_MAX, isL: true  },
+  { key: "reading",   label: "Reading",   color: "var(--text-primary)", ic: "book", max: MAX_SCORE,     isL: false },
+  { key: "writing",   label: "Writing",   color: "var(--text-primary)", ic: "pen",  max: MAX_SCORE,     isL: false },
+  { key: "speaking",  label: "Speaking", color: "var(--text-muted)", ic: "mic",  max: MAX_SCORE,     isL: false, disabled: true },
 ];
 
 const ICON_MAP = {
@@ -117,12 +117,12 @@ function SystemUptime() {
   }, [launchDate]);
 
   return (
-    <div style={{ marginTop: 12, padding: "8px 12px", background: "rgba(74, 158, 255, 0.05)", borderRadius: 10, border: "0.5px solid rgba(74, 158, 255, 0.1)" }}>
-      <div style={{ fontSize: 9, color: "#4a9eff", fontWeight: 700, textTransform: "uppercase", marginBottom: 2, display: "flex", alignItems: "center", gap: 5 }}>
-        <div style={{ width: 5, height: 5, borderRadius: "50%", background: "#4ade80", boxShadow: "0 0 5px #4ade80" }} />
-        System Uptime
+    <div style={{ marginTop: 12, padding: "10px 14px", background: "var(--bg-secondary)", borderRadius: 14, border: "1px solid var(--border)" }}>
+      <div style={{ fontSize: 10, color: "var(--text-muted)", fontWeight: 700, textTransform: "uppercase", marginBottom: 4, display: "flex", alignItems: "center", gap: 6 }}>
+        <div style={{ width: 6, height: 6, borderRadius: "50%", background: "#30d158" }} />
+        LIVE STATUS
       </div>
-      <div style={{ fontSize: 13, fontWeight: 700, color: "#f0f4ff", fontFamily: "monospace" }}>{uptime}</div>
+      <div style={{ fontSize: 13, fontWeight: 700, color: "var(--text-primary)", fontFamily: "monospace" }}>{uptime}</div>
     </div>
   );
 }
@@ -178,159 +178,140 @@ function DashHome({ user, progress, scores, lvlMeta, pct, nxp, cxp, setPage, cle
   const overallCEFR = overallBand ? bandToCEFR(overallBand) : null;
   return (
     <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}>
-      {/* PREMIUM LEVEL PROGRESS CARD (Matching Image 1) */}
+      {/* PREMIUM LEVEL PROGRESS CARD (Monochrome Apple Style) */}
       <div style={{
-        background: "linear-gradient(90deg, #2b3b75, #4f46e5)",
-        borderRadius: 16,
-        padding: "16px 24px",
-        marginBottom: 20,
-        boxShadow: "0 8px 24px rgba(79,70,229,0.3)",
-        color: "#fff",
-        display: "flex", flexDirection: "column", gap: 16
+        background: "var(--bg-secondary)",
+        borderRadius: 24,
+        padding: "24px",
+        marginBottom: 24,
+        border: "1px solid var(--border)",
+        boxShadow: "0 15px 35px -12px rgba(0,0,0,0.5)",
+        color: "var(--text-primary)",
+        display: "flex", flexDirection: "column", gap: 20
       }}>
         {/* Top Row: Circular gauge & Stats */}
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-          <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 20 }}>
             {/* Circular Gauge */}
-            <div style={{ position: "relative", width: 60, height: 60 }}>
-              <svg width="60" height="60" viewBox="0 0 60 60" style={{ transform: "rotate(-90deg)" }}>
-                <circle cx="30" cy="30" r="26" fill="none" stroke="rgba(255,255,255,0.1)" strokeWidth="6" />
+            <div style={{ position: "relative", width: 72, height: 72 }}>
+              <svg width="72" height="72" viewBox="0 0 72 72" style={{ transform: "rotate(-90deg)" }}>
+                <circle cx="36" cy="36" r="32" fill="none" stroke="var(--border)" strokeWidth="6" />
                 <motion.circle 
-                  initial={{ strokeDasharray: "0 163" }}
-                  animate={{ strokeDasharray: `${(pct / 100) * 163} 163` }}
+                  initial={{ strokeDasharray: "0 201" }}
+                  animate={{ strokeDasharray: `${(pct / 100) * 201} 201` }}
                   transition={{ duration: 1.5 }}
-                  cx="30" cy="30" r="26" fill="none" stroke="#a5b4fc" strokeWidth="6" strokeLinecap="round" 
+                  cx="36" cy="36" r="32" fill="none" stroke="var(--text-primary)" strokeWidth="6" strokeLinecap="round" 
                 />
               </svg>
               <div style={{ position: "absolute", inset: 0, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center" }}>
-                <span style={{ fontSize: 16, fontWeight: 900 }}>{progress.level}</span>
-                <span style={{ fontSize: 8, fontWeight: 700, color: "rgba(255,255,255,0.7)" }}>{pct}%</span>
+                <span style={{ fontSize: 20, fontWeight: 900 }}>{progress.level}</span>
+                <span style={{ fontSize: 9, fontWeight: 700, color: "var(--text-muted)" }}>{pct}%</span>
               </div>
             </div>
             
             {/* Title & Subtitle */}
             <div>
-              <div style={{ fontSize: 10, fontWeight: 700, color: "rgba(255,255,255,0.7)", letterSpacing: 1, textTransform: "uppercase" }}>CEFR LEVEL</div>
-              <div style={{ display: "flex", alignItems: "baseline", gap: 8 }}>
-                <h1 style={{ fontSize: 24, fontWeight: 900, margin: 0 }}>{progress.level}</h1>
-                <span style={{ fontSize: 12, color: "rgba(255,255,255,0.7)" }}>• {pct}%</span>
+              <div style={{ fontSize: 11, fontWeight: 700, color: "var(--text-muted)", letterSpacing: 1.2, textTransform: "uppercase" }}>Proficiency</div>
+              <div style={{ display: "flex", alignItems: "baseline", gap: 10 }}>
+                <h1 style={{ fontSize: 28, fontWeight: 900, margin: 0 }}>Road to Mastery</h1>
               </div>
-              <div style={{ marginTop: 4, background: "rgba(255,255,255,0.1)", padding: "4px 10px", borderRadius: 12, fontSize: 11, display: "inline-block" }}>
-                → Steady progress
+              <div style={{ marginTop: 6, background: "var(--bg-primary)", border: "1px solid var(--border)", padding: "4px 12px", borderRadius: 12, fontSize: 11, fontWeight: 600, display: "inline-block" }}>
+                {nxp ? `${Math.max(0, nxp - progress.xp)} XP to ${LEVEL_THRESHOLDS[LEVEL_THRESHOLDS.findIndex(t=>t.code===progress.level)+1]?.code || "Next"}` : "Master Level Reached"}
               </div>
             </div>
           </div>
           
-          <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
-             {/* Equilizer graphic (mock) */}
-             <div style={{ display: "flex", alignItems: "flex-end", gap: 2, height: 24, opacity: 0.6 }}>
-               {[4,8,12,16,10,14,6,12,8,4,10,6].map((h, i) => <div key={i} style={{ width: 3, height: h, background: "#fff", borderRadius: 2 }}/>)}
-             </div>
-             
-             {/* Book Icon Button */}
-             <div style={{ width: 40, height: 40, borderRadius: 12, background: "rgba(255,255,255,0.1)", display: "flex", alignItems: "center", justifyContent: "center", position: "relative" }}>
-                <Ic n="book" s={18} c="#fff" />
-                <div style={{ position: "absolute", top: -4, right: -4, background: "#ef4444", color: "#fff", fontSize: 10, fontWeight: 800, width: 16, height: 16, borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center" }}>7</div>
-             </div>
-             
-             {/* Close Button */}
-             <div style={{ width: 30, height: 30, borderRadius: "50%", background: "rgba(255,255,255,0.2)", display: "flex", alignItems: "center", justifyContent: "center" }}>
-               <span style={{ fontSize: 12, fontWeight: 800 }}>X</span>
+          <div className="audio-visualizer-decor" style={{ display: "flex", alignItems: "center", gap: 16 }}>
+             <div style={{ display: "flex", alignItems: "flex-end", gap: 3, height: 32, opacity: 0.3 }}>
+               {[12,18,24,32,20,28,14,24,18,12,20,14].map((h, i) => <div key={i} style={{ width: 4, height: h, background: "var(--text-primary)", borderRadius: 2 }}/>)}
              </div>
           </div>
         </div>
         
         {/* Bottom Progress Bar */}
-        <div style={{ position: "relative", marginTop: 8 }}>
-           <div style={{ display: "flex", justifyContent: "space-between", position: "absolute", width: "100%", top: 12, padding: "0 10%", color: "rgba(255,255,255,0.5)", fontSize: 10, fontWeight: 700 }}>
-             <span>B1</span>
-             <span>B2</span>
-             <span>C1</span>
+        <div style={{ position: "relative", marginTop: 4 }}>
+           <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 8, color: "var(--text-muted)", fontSize: 10, fontWeight: 700 }}>
+             <span>{progress.level}</span>
+             <span>{LEVEL_THRESHOLDS[LEVEL_THRESHOLDS.findIndex(t=>t.code===progress.level)+1]?.code || "MAX"}</span>
            </div>
            
-           <div style={{ height: 6, background: "rgba(255,255,255,0.1)", borderRadius: 3, width: "100%", overflow: "hidden" }}>
-             <motion.div initial={{ width: 0 }} animate={{ width: `${pct}%` }} transition={{ duration: 1 }} style={{ height: "100%", background: "#a5b4fc", borderRadius: 3 }} />
+           <div style={{ height: 8, background: "var(--bg-primary)", borderRadius: 4, width: "100%", overflow: "hidden", border: "1px solid var(--border)" }}>
+             <motion.div initial={{ width: 0 }} animate={{ width: `${pct}%` }} transition={{ duration: 1 }} style={{ height: "100%", background: "var(--text-primary)", borderRadius: 4 }} />
            </div>
         </div>
       </div>
 
-      {/* REFERRAL BANNER */}
+      {/* REFERRAL BANNER (Monochrome Apple Style) */}
       <div style={{
-        background: "linear-gradient(135deg, #0f1f3d 0%, #1a2e55 50%, #0f1f3d 100%)",
-        borderRadius: 20,
-        padding: "20px 24px",
-        marginBottom: 20,
-        border: "1px solid rgba(74,158,255,0.2)",
+        background: "var(--bg-secondary)",
+        borderRadius: 24,
+        padding: "24px",
+        marginBottom: 24,
+        border: "1px solid var(--border)",
         position: "relative",
         overflow: "hidden",
-        boxShadow: "0 8px 24px rgba(0,0,0,0.3)"
+        boxShadow: "0 10px 30px -10px rgba(0,0,0,0.3)"
       }}>
-        {/* Decorative glow circles */}
-        <div style={{ position: "absolute", top: "-30px", right: "-30px", width: 120, height: 120, borderRadius: "50%", background: "rgba(74,158,255,0.08)", pointerEvents: "none" }} />
-        <div style={{ position: "absolute", bottom: "-20px", left: "20%", width: 80, height: 80, borderRadius: "50%", background: "rgba(74,158,255,0.05)", pointerEvents: "none" }} />
-        
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 14, position: "relative" }}>
-          <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-            <div style={{ width: 44, height: 44, borderRadius: 14, background: "rgba(74,158,255,0.15)", border: "1px solid rgba(74,158,255,0.3)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
-              <span style={{ fontSize: 22 }}>🎁</span>
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 18, position: "relative" }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
+            <div style={{ width: 48, height: 48, borderRadius: 16, background: "var(--bg-primary)", border: "1px solid var(--border)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, fontSize: 24 }}>
+              🎁
             </div>
             <div>
-              <h3 style={{ fontSize: 15, fontWeight: 800, color: "#fff", margin: 0, marginBottom: 2 }}>Referral Bonus — 9 Days FREE Premium</h3>
-              <p style={{ fontSize: 12, color: "#8bb8ff", margin: 0 }}>Invite 5 friends who register and study — get 9 days Pro free!</p>
+              <h3 style={{ fontSize: 16, fontWeight: 800, color: "var(--text-primary)", margin: 0, marginBottom: 2 }}>Referral Program</h3>
+              <p style={{ fontSize: 12, color: "var(--text-muted)", margin: 0 }}>Invite 5 friends to unlock 9 days of Premium access.</p>
             </div>
           </div>
-          <div style={{ background: "rgba(74,158,255,0.15)", border: "1px solid rgba(74,158,255,0.3)", color: "#4a9eff", padding: "4px 12px", borderRadius: 20, fontSize: 12, fontWeight: 900, flexShrink: 0 }}>
+          <div style={{ background: "var(--text-primary)", color: "var(--bg-primary)", padding: "4px 14px", borderRadius: 20, fontSize: 12, fontWeight: 900, flexShrink: 0 }}>
             0 / 5
           </div>
         </div>
         
-        {/* Animated progress bar */}
-        <div style={{ height: 6, background: "rgba(255,255,255,0.07)", borderRadius: 3, marginBottom: 14, overflow: "hidden" }}>
+        <div style={{ height: 8, background: "var(--bg-primary)", borderRadius: 4, marginBottom: 20, overflow: "hidden", border: "1px solid var(--border)" }}>
           <motion.div
             initial={{ width: 0 }}
             animate={{ width: "0%" }}
-            transition={{ duration: 1, ease: "easeOut" }}
-            style={{ height: "100%", background: "linear-gradient(90deg, #4a9eff, #7dd3ff)", borderRadius: 3, boxShadow: "0 0 10px rgba(74,158,255,0.5)" }}
+            transition={{ duration: 1 }}
+            style={{ height: "100%", background: "var(--text-primary)", borderRadius: 4 }}
           />
         </div>
         
-        <div style={{ display: "flex", gap: 10, position: "relative" }}>
-          <div style={{ flex: 1, background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 10, padding: "10px 12px", display: "flex", alignItems: "center", gap: 8, fontSize: 12, color: "#8b9bbf", overflow: "hidden" }}>
-            <span style={{ flexShrink: 0 }}>🔗</span>
-            <span style={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>cefrcenter.vercel.app/?ref=invite</span>
+        <div style={{ display: "flex", gap: 12, position: "relative" }}>
+          <div style={{ flex: 1, background: "var(--bg-primary)", border: "1px solid var(--border)", borderRadius: 14, padding: "12px 16px", display: "flex", alignItems: "center", gap: 10, fontSize: 13, color: "var(--text-muted)", overflow: "hidden" }}>
+             🔗 <span style={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>cefrcenter.vercel.app/?ref=invite</span>
           </div>
           <button
             onClick={() => { navigator.clipboard.writeText("https://cefrcenter.vercel.app/?ref=invite"); }}
-            style={{ background: "linear-gradient(135deg, #2563eb, #4a9eff)", color: "#fff", border: "none", borderRadius: 10, padding: "0 18px", fontWeight: 800, cursor: "pointer", fontSize: 12, boxShadow: "0 4px 12px rgba(74,158,255,0.3)", flexShrink: 0 }}>
-            Share
+            style={{ background: "var(--text-primary)", color: "var(--bg-primary)", border: "none", borderRadius: 14, padding: "0 24px", fontWeight: 700, cursor: "pointer", fontSize: 13 }}>
+            Copy
           </button>
         </div>
       </div>
 
-      {/* STREAK & LEVEL CARD (Matching Image 2 & 3) */}
+      {/* STREAK & LEVEL CARD */}
       <div className="dash-sub-grid" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16, marginBottom: 20 }}>
-        <div style={{ background: "rgba(255, 255, 255, 0.03)", border: "1px solid rgba(255, 255, 255, 0.08)", borderRadius: 24, padding: "20px", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 10 }}>
+        <div style={{ background: "var(--bg-secondary)", border: "1px solid var(--border)", borderRadius: 24, padding: "20px", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 10, boxShadow: "0 10px 20px -10px rgba(0,0,0,0.3)" }}>
           <div style={{ position: "relative" }}>
-            <div style={{ width: 60, height: 60, borderRadius: "50%", background: "rgba(225, 29, 72, 0.1)", display: "flex", alignItems: "center", justifyContent: "center" }}>
-              <Ic n="bolt" s={32} c="#e11d48" />
+            <div style={{ width: 64, height: 64, borderRadius: 18, background: "rgba(255, 59, 48, 0.1)", display: "flex", alignItems: "center", justifyContent: "center" }}>
+              <Ic n="fire" s={36} c="#ff3b30" />
             </div>
-            <div style={{ position: "absolute", top: -5, right: -5, background: "#e11d48", color: "#fff", fontSize: 10, fontWeight: 900, width: 22, height: 22, borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", border: "2px solid #060c1a" }}>
+            <div style={{ position: "absolute", top: -8, right: -8, background: "#ff3b30", color: "#fff", fontSize: 11, fontWeight: 900, width: 24, height: 24, borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", border: "3px solid var(--bg-secondary)" }}>
               {user.consecutiveDays || 0}
             </div>
           </div>
           <div style={{ textAlign: "center" }}>
-            <h4 style={{ fontSize: 15, fontWeight: 800, color: "#fff", marginBottom: 2 }}>Day Streak</h4>
-            <p style={{ fontSize: 11, color: "#8b9bbf", fontWeight: 600 }}>Keep it up!</p>
+            <h4 style={{ fontSize: 15, fontWeight: 800, color: "var(--text-primary)", marginBottom: 2 }}>Streak</h4>
+            <p style={{ fontSize: 11, color: "var(--text-muted)", fontWeight: 700 }}>Days Active</p>
           </div>
         </div>
 
-        <div style={{ background: "rgba(255, 255, 255, 0.03)", border: `1px solid ${lvlMeta.color}33`, borderRadius: 24, padding: "20px", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 10 }}>
-           <div style={{ width: 60, height: 60, borderRadius: "50%", background: `${lvlMeta.color}15`, display: "flex", alignItems: "center", justifyContent: "center", border: `2px solid ${lvlMeta.color}44` }}>
-              <span style={{ fontSize: 20, fontWeight: 900, color: lvlMeta.color }}>{progress.level}</span>
+        <div style={{ background: "var(--bg-secondary)", border: "1px solid var(--border)", borderRadius: 24, padding: "20px", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 10, boxShadow: "0 10px 20px -10px rgba(0,0,0,0.3)" }}>
+           <div style={{ width: 64, height: 64, borderRadius: 18, background: "var(--bg-primary)", display: "flex", alignItems: "center", justifyContent: "center", border: "1px solid var(--border)" }}>
+              <span style={{ fontSize: 24, fontWeight: 900, color: "var(--text-primary)" }}>{progress.level}</span>
            </div>
            <div style={{ textAlign: "center" }}>
-             <h4 style={{ fontSize: 15, fontWeight: 800, color: "#fff", marginBottom: 2 }}>CEFR Level</h4>
-             <p style={{ fontSize: 11, color: "#8b9bbf", fontWeight: 600 }}>{nxp ? `${Math.max(0, nxp - progress.xp)} XP to next` : "Max Level! 🏆"}</p>
+             <h4 style={{ fontSize: 15, fontWeight: 800, color: "var(--text-primary)", marginBottom: 2 }}>Current</h4>
+             <p style={{ fontSize: 11, color: "var(--text-muted)", fontWeight: 700 }}>CEFR Level</p>
            </div>
         </div>
       </div>
@@ -831,7 +812,7 @@ export default function Dashboard() {
                 <div style={{marginTop:6,height:4,borderRadius:2,background:"rgba(255,255,255,0.08)"}}>
                   <div style={{height:"100%",borderRadius:2,width:`${pct}%`,background:lvlMeta.color}}/>
                 </div>
-                {nxp && <div style={{fontSize:9,color:"#4a5568",marginTop:4}}>{nxp-progress.xp} XP to next</div>}
+                {nxp && <div style={{fontSize:9,color:"var(--text-muted)",marginTop:4}}>{Math.max(0, nxp - progress.xp)} XP to next</div>}
               </div>
               <SystemUptime />
               

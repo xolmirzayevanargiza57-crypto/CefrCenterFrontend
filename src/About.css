@@ -6,8 +6,8 @@
 }
 
 ::selection {
-  background: rgba(225, 29, 72, 0.15);
-  color: #e11d48;
+  background: rgba(0, 0, 0, 0.1);
+  color: #000000;
 }
 
 body {
@@ -63,11 +63,12 @@ body {
 }
 
 .logo {
-  font-size: 22px;
+  font-size: 24px;
   font-weight: 900;
-  color: #e11d48;
+  color: var(--text-primary);
   cursor: pointer;
   user-select: none;
+  letter-spacing: -1px;
 }
 
 .nav-menu {
@@ -85,7 +86,7 @@ body {
 
 .nav-menu p:hover {
   opacity: 1;
-  color: #e11d48;
+  color: var(--text-primary);
 }
 
 .nav-right {
@@ -113,21 +114,21 @@ body {
 .start-btn {
   display: flex;
   align-items: center;
-  gap: 7px;
-  background: #e11d48;
-  color: white;
+  gap: 8px;
+  background: var(--text-primary);
+  color: var(--bg-primary);
   border: none;
-  padding: 11px 18px;
-  border-radius: 14px;
-  font-weight: 800;
+  padding: 10px 24px;
+  border-radius: 99px;
+  font-weight: 700;
   cursor: pointer;
-  transition: 0.25s;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
   white-space: nowrap;
 }
 
 .start-btn:hover {
-  background: #be123c;
-  transform: translateY(-2px);
+  transform: scale(1.05);
+  box-shadow: 0 10px 20px rgba(0,0,0,0.1);
 }
 
 .menu-btn {
@@ -196,13 +197,16 @@ body.dark .mobile-menu {
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  background: rgba(225, 29, 72, 0.1);
-  color: #e11d48;
-  padding: 7px 14px;
-  border-radius: 999px;
-  font-size: 13px;
+  background: var(--bg-secondary);
+  color: var(--text-primary);
+  padding: 8px 18px;
+  border-radius: 99px;
+  font-size: 12px;
   font-weight: 800;
-  margin-bottom: 16px;
+  margin-bottom: 20px;
+  border: 1px solid var(--border);
+  text-transform: uppercase;
+  letter-spacing: 1px;
 }
 
 .section-sub {
@@ -217,15 +221,14 @@ body.dark .mobile-menu {
 /* ─── HERO ─── */
 .about-hero {
   width: 100%;
-  min-height: 90vh;
-  padding: 90px 8%;
-  background: radial-gradient(circle at top, rgba(225, 29, 72, 0.18), transparent),
-    radial-gradient(circle at bottom, rgba(255, 255, 255, 0.04), transparent);
+  min-height: 100vh;
+  padding: 100px 8%;
   display: flex;
   justify-content: center;
   align-items: center;
   text-align: center;
   position: relative;
+  background: var(--bg-primary);
 }
 
 .hero-content {
@@ -235,14 +238,16 @@ body.dark .mobile-menu {
 .hero-badge {
   display: inline-flex;
   align-items: center;
-  gap: 7px;
-  background: rgba(225, 29, 72, 0.1);
-  color: #e11d48;
-  padding: 8px 16px;
-  border-radius: 999px;
-  font-size: 13px;
-  font-weight: 700;
-  margin-bottom: 22px;
+  gap: 8px;
+  background: var(--bg-secondary);
+  color: var(--text-primary);
+  padding: 10px 20px;
+  border-radius: 99px;
+  font-size: 12px;
+  font-weight: 800;
+  margin-bottom: 24px;
+  border: 1px solid var(--border);
+  text-transform: uppercase;
 }
 
 .hero-content h1 {
@@ -258,11 +263,7 @@ body.dark .hero-content h1 {
 }
 
 .hero-content h1 span {
-  background: #e11d48;
-  padding: 4px 16px;
-  border-radius: 12px;
-  color: white;
-  display: inline-block;
+  color: var(--text-muted);
 }
 
 .hero-content p {
@@ -288,21 +289,21 @@ body.dark .hero-content p {
 .btn-red {
   display: inline-flex;
   align-items: center;
-  gap: 8px;
-  padding: 14px 24px;
-  border-radius: 14px;
+  gap: 10px;
+  padding: 16px 32px;
+  border-radius: 99px;
   font-weight: 800;
   cursor: pointer;
-  transition: 0.25s;
+  transition: all 0.3s;
   border: none;
-  font-size: 15px;
-  background: #e11d48;
-  color: white;
+  font-size: 16px;
+  background: var(--text-primary);
+  color: var(--bg-primary);
 }
 
 .btn-red:hover {
-  background: #be123c;
-  transform: translateY(-2px);
+  transform: scale(1.05);
+  filter: brightness(0.9);
 }
 
 .btn-red:disabled {
@@ -360,8 +361,8 @@ body.dark .btn-outline {
 }
 
 .stat-box h3 {
-  font-size: 28px;
-  color: #e11d48;
+  font-size: 32px;
+  color: var(--text-primary);
   font-weight: 950;
   margin-bottom: 4px;
 }
@@ -426,15 +427,16 @@ body.dark .features-section h2 {
 }
 
 .feature-icon {
-  width: 54px;
-  height: 54px;
-  background: rgba(225, 29, 72, 0.1);
-  border-radius: 16px;
+  width: 60px;
+  height: 60px;
+  background: var(--bg-primary);
+  border: 1px solid var(--border);
+  border-radius: 18px;
   display: flex;
   align-items: center;
   justify-content: center;
-  margin-bottom: 16px;
-  color: #e11d48;
+  margin-bottom: 20px;
+  color: var(--text-primary);
 }
 
 .feature-card h3 {
@@ -498,12 +500,13 @@ body.dark .speaking-card {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 54px;
-  height: 54px;
-  background: rgba(225, 29, 72, 0.1);
-  border-radius: 16px;
+  width: 60px;
+  height: 60px;
+  background: var(--bg-primary);
+  border: 1px solid var(--border);
+  border-radius: 18px;
   margin-bottom: 16px;
-  color: #e11d48;
+  color: var(--text-primary);
 }
 
 .speaking-pulse {
@@ -538,12 +541,11 @@ body.dark .speaking-card {
 .stag {
   font-size: 11px;
   font-weight: 700;
-  letter-spacing: 0.3px;
-  padding: 4px 10px;
+  padding: 4px 12px;
   border-radius: 20px;
-  background: rgba(225, 29, 72, 0.1);
-  color: #e11d48;
-  border: 1px solid rgba(225, 29, 72, 0.2);
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  border: 1px solid var(--border);
   white-space: nowrap;
 }
 
@@ -621,8 +623,9 @@ body.dark .team-section h2 {
 }
 
 .instructor-badge {
-  background: rgba(225, 29, 72, 0.12);
-  color: #e11d48;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  border: 1px solid var(--border);
 }
 
 .developer-badge {
@@ -650,7 +653,7 @@ body.dark .dev-card h3 {
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  color: #e11d48;
+  color: var(--text-muted);
   font-weight: 700;
   font-size: 14px;
   margin-bottom: 14px;
@@ -746,13 +749,14 @@ body.dark .info-glass-card {
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  background: rgba(225, 29, 72, 0.12);
-  color: #e11d48;
-  padding: 7px 14px;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  padding: 7px 18px;
   border-radius: 999px;
   font-weight: 800;
-  font-size: 13px;
+  font-size: 12px;
   margin-bottom: 12px;
+  border: 1px solid var(--border);
 }
 
 .info-glass-card p {

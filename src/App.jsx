@@ -23,7 +23,7 @@ function Loader() {
   return (
     <div style={{
       minHeight:      "100vh",
-      background:     "#060d1a",
+      background:     "var(--bg-primary)",
       display:        "flex",
       flexDirection:  "column",
       alignItems:     "center",
@@ -33,18 +33,18 @@ function Loader() {
       <div style={{
         width:       40,
         height:      40,
-        border:      "3px solid rgba(59,130,246,0.15)",
-        borderTop:   "3px solid #3b82f6",
+        border:      "3px solid var(--border)",
+        borderTop:   "3px solid var(--text-primary)",
         borderRadius:"50%",
-        animation:   "spin 0.9s linear infinite",
+        animation:   "spin 0.8s linear infinite",
       }} />
       <p style={{
-        color:       "#475569",
+        color:       "var(--text-muted)",
         fontSize:    13,
         fontWeight:  600,
-        letterSpacing: 0.4,
+        letterSpacing: 0.5,
       }}>
-        Loading...
+        Initializing...
       </p>
       <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
     </div>
