@@ -80,7 +80,11 @@ export default function US({ onSelect }) {
     }
 
     const finalVia = hearAbout === "Other" ? (otherText || "Other") : hearAbout;
-    onSelect(username, finalVia);
+    if (typeof onSelect === "function") {
+      onSelect(username, finalVia);
+    } else {
+      console.warn("US: onSelect not provided — finishing locally", { username, finalVia });
+    }
   };
 
   useEffect(() => {

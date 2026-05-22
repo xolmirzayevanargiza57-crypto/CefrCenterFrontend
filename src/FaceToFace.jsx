@@ -14,6 +14,7 @@ export default function FaceToFace({ progress, openPremiumModal }) {
   const [videoActive, setVideoActive] = useState(true);
   const [partnerName, setPartnerName] = useState("");
   const [volume, setVolume] = useState(1); // 0 to 1
+  const [socketError, setSocketError] = useState(false);
 
   const localVideoRef = useRef(null);
   const remoteVideoRef = useRef(null);
@@ -24,40 +25,51 @@ export default function FaceToFace({ progress, openPremiumModal }) {
   useEffect(() => {
     if (progress?.isPremium) {
       initMedia();
-      socketRef.current = io(BACKEND_URL.replace("/api", ""), { transports: ['websocket'] });
+      try {
+        socketRef.current = io(BACKEND_URL.replace("/api", ""), { transports: ['websocket'] });
 
-      socketRef.current.on("match_found", async ({ room, caller, partnerName }) => {
-        setConnecting(false);
-        setInCall(true);
-        setPartnerName(partnerName);
-        setupWebRTC(caller);
-      });
+        socketRef.current.on("connect_error", (err) => {
+          console.error("Socket connect error", err);
+          setSocketError(true);
+          setConnecting(false);
+        });
 
-      socketRef.current.on("offer", async (data) => {
-        if (!peerConnectionRef.current) setupWebRTC(false);
-        await peerConnectionRef.current.setRemoteDescription(new RTCSessionDescription(data));
-        const answer = await peerConnectionRef.current.createAnswer();
-        await peerConnectionRef.current.setLocalDescription(answer);
-        socketRef.current.emit("answer", answer);
-      });
+        socketRef.current.on("match_found", async ({ room, caller, partnerName }) => {
+          setConnecting(false);
+          setInCall(true);
+          setPartnerName(partnerName);
+          setupWebRTC(caller);
+        });
 
-      socketRef.current.on("answer", async (data) => {
-        if (peerConnectionRef.current) {
+        socketRef.current.on("offer", async (data) => {
+          if (!peerConnectionRef.current) setupWebRTC(false);
           await peerConnectionRef.current.setRemoteDescription(new RTCSessionDescription(data));
-        }
-      });
+          const answer = await peerConnectionRef.current.createAnswer();
+          await peerConnectionRef.current.setLocalDescription(answer);
+          socketRef.current.emit("answer", answer);
+        });
 
-      socketRef.current.on("ice-candidate", async (data) => {
-        if (peerConnectionRef.current) {
-          try { await peerConnectionRef.current.addIceCandidate(new RTCIceCandidate(data)); }
-          catch(e) { console.error("ICE error", e); }
-        }
-      });
+        socketRef.current.on("answer", async (data) => {
+          if (peerConnectionRef.current) {
+            await peerConnectionRef.current.setRemoteDescription(new RTCSessionDescription(data));
+          }
+        });
 
-      socketRef.current.on("partner_disconnected", () => {
-        alert("Partner has left the conversation.");
-        endCall();
-      });
+        socketRef.current.on("ice-candidate", async (data) => {
+          if (peerConnectionRef.current) {
+            try { await peerConnectionRef.current.addIceCandidate(new RTCIceCandidate(data)); }
+            catch(e) { console.error("ICE error", e); }
+          }
+        });
+
+        socketRef.current.on("partner_disconnected", () => {
+          alert("Partner has left the conversation.");
+          endCall();
+        });
+      } catch (err) {
+        console.error("FaceToFace socket init failed", err);
+        setSocketError(true);
+      }
     }
 
     return () => {
@@ -249,6 +261,15 @@ export default function FaceToFace({ progress, openPremiumModal }) {
           </div>
         </div>
       </div>
+
+      {socketError && (
+        <div style={{ marginBottom: 18, background: "rgba(225,29,72,0.06)", border: "1px solid rgba(225,29,72,0.12)", padding: 12, borderRadius: 10, color: "#f87171", display: "flex", alignItems: "center", gap: 8 }}>
+          <Ic icon={X} s={16} c="#f87171" />
+          <div style={{ fontSize: 13 }}>
+            Unable to connect to the Face-to-Face service. Please ensure the backend/socket server is running.
+          </div>
+        </div>
+      )}
 
       <div className="face-grid" style={{ display: "grid", gridTemplateColumns: aiAnalysis ? "1fr 1fr 340px" : "1fr 1fr", gap: 24, marginBottom: 32, transition: "all 0.3s" }}>
         {/* Local Stream */}

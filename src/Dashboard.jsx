@@ -628,7 +628,14 @@ export default function Dashboard() {
     </div>
   );
 
-  if (!progress.onboarded) return <US onSelect={setInitialLevel} />;
+  if (!progress.onboarded) return (
+    <US onSelect={(name, how) => {
+      updateUsername(name);
+      // We don't have level selection in US.jsx, so we might need to show LevelSelect
+      // or just set a default level. Since App.jsx handles this better, 
+      // let's just make sure this one doesn't break things.
+    }} />
+  );
 
   const initials = (user?.displayName || progress.username || "ST").split(" ").map(n=>n[0]).join("").slice(0,2).toUpperCase();
   const lvlMeta  = CEFR_META[progress.level] ?? CEFR_META.A1;

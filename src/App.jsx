@@ -57,6 +57,7 @@ function Root() {
   const [authReady, setAuthReady]     = useState(false);
   const [user, setUser]               = useState(null);
   const [usStepDone, setUsStepDone]   = useState(false);
+  const [passedUsername, setPassedUsername] = useState("");
   const navigate                      = useNavigate();
 
   // If user is logged in, sync from cloud
@@ -81,6 +82,7 @@ function Root() {
         <Us
           onSelect={(username, hearAbout) => {
             updateUsername(username);
+            setPassedUsername(username);
             setUsStepDone(true);
           }}
         />
@@ -89,7 +91,7 @@ function Root() {
       return (
         <LevelSelect 
           onSelect={(levelCode) => {
-            setInitialLevel(levelCode, progress.username);
+            setInitialLevel(levelCode, passedUsername || progress.username);
             navigate("/dashboard", { replace: true });
           }}
         />

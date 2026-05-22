@@ -20,7 +20,7 @@
   --bg-primary:    #060d1a;
   --bg-secondary:  #0d1b2e;
   --bg-card:       #111827;
-  --accent-blue:   #3b82f6;
+  --accent-blue:   #4a9eff;
   --accent-cyan:   #38bdf8;
   --text-primary:  #f1f5f9;
   --text-muted:    #64748b;
@@ -94,25 +94,21 @@ a, button, input, select, textarea {
   .glass, [class*='card'], [class*='modal'] {
     backdrop-filter: none !important;
     -webkit-backdrop-filter: none !important;
-    background-color: rgba(15, 23, 42, 0.98) !important;
+    /* more readable mobile card background (blue tint) */
+    background-color: rgba(8, 28, 54, 0.98) !important;
     will-change: transform;
     backface-visibility: hidden;
     -webkit-backface-visibility: hidden;
   }
   
-  /* Global responsive spacing */
-  .main-content { padding: 12px 10px !important; }
-  h1 { font-size: 24px !important; }
-  h2 { font-size: 20px !important; }
-  
-  /* Grid layouts */
-  [style*="grid-template-columns"] {
+  /* Grid layouts - Relaxed for better flexibility */
+  .grid-2, .grid-3 {
     grid-template-columns: 1fr !important;
   }
 }
 
 @media (max-width: 480px) {
-  .hero-h1 { font-size: 24px !important; }
+  .hero-h1 { font-size: 22px !important; }
   .btn-primary, .btn-secondary, button {
     padding: 10px 14px !important;
     font-size: 13px !important;
@@ -120,11 +116,18 @@ a, button, input, select, textarea {
   input, select, textarea {
     font-size: 14px !important;
   }
+  /* Better spacing for mobile cards */
+  [style*="padding"] {
+    padding: 16px 14px !important;
+  }
+  /* Slightly lighter app background on very small screens for better contrast */
+  html, body, #root { background: linear-gradient(180deg, #08162f 0%, var(--bg-primary) 100%); }
 }
 
 /* Fix for small phones (iPhone SE, etc.) */
 @media (max-width: 380px) {
   .top-bar-stats { display: none !important; }
-  .sidebar-container { width: 180px !important; }
-  .logo { font-size: 14px !important; }
+  .sidebar-container { width: 160px !important; }
+  .logo { font-size: 12px !important; }
+  h1 { font-size: 20px !important; }
 }

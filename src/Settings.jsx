@@ -441,7 +441,7 @@ export default function Settings({ user, progress, resetProgress, updateUsername
       </Section>
 
 
-      <Section title="Subscription" icon={<ShieldCheck size={18} color="#fbbf24" strokeWidth={2.5} />}>
+      <Section title="Subscription" icon={<Shield size={18} color="#fbbf24" strokeWidth={2.5} />}>
         <Row 
           icon={<Crown size={16} color={progress.isPremium && progress.premiumExpire && new Date(progress.premiumExpire) > new Date() ? "#fbbf24" : "#64748b"} />} 
           label="Current Plan" 
