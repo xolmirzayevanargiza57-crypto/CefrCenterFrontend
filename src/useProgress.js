@@ -431,9 +431,10 @@ export function useProgress() {
     });
   }, []);
 
-  const setInitialLevel = useCallback((code, username) => {
-    // XP always starts at 0 as requested by USER
-    const next = { ...P, level: code, xp: 0, username: username || P.username || "", onboarded: true };
+  const setInitialLevel = useCallback((code, username, initialXP = 0) => {
+    // Set initial level and grant optional starter XP (default 0)
+    const xpValue = typeof initialXP === 'number' ? initialXP : 0;
+    const next = { ...P, level: code, xp: xpValue, username: username || P.username || "", onboarded: true };
     sp(next);
   }, [P, sp]);
 
