@@ -3,12 +3,12 @@ import { Trophy, Medal, Crown, Star, User, Zap, ChevronRight, TrendingUp, Award,
 import BACKEND_URL from "../config/api.js";
 
 const COLORS = {
-  gold: "#fbbf24",
-  silver: "#e2e8f0",
-  bronze: "#d97706",
+  gold: "#1D9E75",
+  silver: "#10b981",
+  bronze: "#059669",
   premium: "#4a9eff",
   bg: "#0f172a",
-  accent: "#6d28d9"
+  accent: "#1D9E75"
 };
 
 export default function Leaderboard({ currentUser }) {

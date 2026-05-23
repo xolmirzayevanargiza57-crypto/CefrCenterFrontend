@@ -1,5 +1,7 @@
 // Notifications.jsx — CEFR Center — Public Announcements
 import React, { useState, useEffect } from "react";
+import { io } from "socket.io-client";
+import BACKEND_URL from "./config/api.js";
 
 const STORAGE_KEY = "cefr_notifications_v1";
 const READ_KEY = "cefr_notif_read_v1";
@@ -83,8 +85,6 @@ function NotifIcon({ name, color, size = 18 }) {
   return icons[name] || icons.bell;
 }
 
-import BACKEND_URL from "./config/api.js";
-
 export default function Notifications() {
   const [readIds, setReadIds] = useState(() => {
     try { return JSON.parse(localStorage.getItem(READ_KEY) || "[]"); } catch { return []; }
@@ -105,6 +105,18 @@ export default function Notifications() {
         console.error(e);
         setLoading(false);
       });
+
+    // Listen for new notifications via socket
+    try {
+      const base = BACKEND_URL.replace('/api', '');
+      const sock = io(base, { transports: ['websocket'] });
+      sock.on('notification_created', (newNotif) => {
+        setNotifications(prev => [newNotif, ...prev]);
+      });
+      return () => { sock.disconnect(); };
+    } catch (e) {
+      console.warn('Socket init failed', e);
+    }
   }, []);
 
   const saveRead = (ids) => {

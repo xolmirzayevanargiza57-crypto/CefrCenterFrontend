@@ -83,6 +83,12 @@ export default function FaceToFace({ progress, openPremiumModal }) {
         });
 
         sock.on("partner_disconnected", () => { if (mounted) endCall(); });
+        sock.on('not_premium', (data) => {
+          if (!mounted) return;
+          setConnecting(false);
+          setSocketError(true);
+          alert(data?.reason === 'Premium required' ? 'Premium talab qilinadi. Iltimos, Premium sotib oling.' : 'Queue join failed: ' + (data?.reason || 'Unknown'));
+        });
       } catch (err) {
         console.error("Socket init error:", err);
         setSocketError(true);
@@ -163,6 +169,7 @@ export default function FaceToFace({ progress, openPremiumModal }) {
     setConnecting(true);
     socketRef.current.emit("join_queue", {
       username: progress?.username || "Learner",
+      email: progress?.email
     });
   };
 

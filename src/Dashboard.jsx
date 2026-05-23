@@ -724,15 +724,15 @@ export default function Dashboard() {
                 <div style={{ display: "flex", alignItems: "center", gap: 10, background: "var(--bg-secondary)", padding: "8px 10px", borderRadius: 8, border: "1px solid var(--border)" }}>
                   <div style={{ flex: 1, minWidth: 0 }}>
                     <div style={{ fontSize: 10, color: "var(--text-muted)" }}>Phone</div>
-                    <div style={{ fontSize: 13, fontWeight: 700, color: "var(--text-primary)", whiteSpace: "nowrap" }}>+998 94 146 44 42</div>
+                    <div style={{ fontSize: 13, fontWeight: 700, color: "var(--text-primary)", whiteSpace: "nowrap" }}>+998 94 022 44 92</div>
                   </div>
                   <button
-                    onClick={() => { navigator.clipboard.writeText("+998 94 146 44 42"); alert("Copied!"); }}
+                    onClick={() => { navigator.clipboard.writeText("+998 94 022 44 92"); alert("Copied!"); }}
                     style={{ background: "var(--bg-secondary)", border: "1px solid var(--border)", borderRadius: 6, padding: "6px", cursor: "pointer", color: "var(--accent)" }}>
                     <Ic n="copy" s={14} c="var(--accent)" />
                   </button>
                 </div>
-                <a href="tel:+998941464442" style={{ textDecoration: "none", display: "flex", alignItems: "center", justifyContent: "center", gap: 8, marginTop: 8, width: "100%", padding: "10px", borderRadius: 8, background: "#1D9E75", color: "#fff", border: "none", fontWeight: 700, fontSize: 12, cursor: "pointer" }}>
+                <a href="tel:+998940224492" style={{ textDecoration: "none", display: "flex", alignItems: "center", justifyContent: "center", gap: 8, marginTop: 8, width: "100%", padding: "10px", borderRadius: 8, background: "#1D9E75", color: "#fff", border: "none", fontWeight: 700, fontSize: 12, cursor: "pointer" }}>
                   <Ic n="phone" s={14} c="#fff" /> Call Admin
                 </a>
               </div>

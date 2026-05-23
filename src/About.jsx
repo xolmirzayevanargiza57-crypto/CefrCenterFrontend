@@ -43,8 +43,18 @@ export default function About() {
   const [error, setError] = useState("");
 
   useEffect(() => {
-    document.body.classList.add("dark");
-    localStorage.setItem("theme", "dark");
+    // Preserve previous theme and avoid forcing dark mode here
+    const hadDark = document.body.classList.contains("dark");
+    const prevTheme = localStorage.getItem("theme");
+    // Remove dark class so About page shows default (light) styles
+    document.body.classList.remove("dark");
+    localStorage.setItem("theme", "light");
+    return () => {
+      // Restore previous state when leaving the page
+      if (hadDark) document.body.classList.add("dark");
+      if (prevTheme) localStorage.setItem("theme", prevTheme);
+      else localStorage.removeItem("theme");
+    };
   }, []);
 
   useEffect(() => {

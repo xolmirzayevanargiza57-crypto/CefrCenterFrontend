@@ -1,14 +1,37 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Mail, CheckCircle, XCircle, Info, Trash2, ArrowLeft } from "lucide-react";
 import BACKEND_URL from "./config/api.js";
+import { io } from "socket.io-client";
 
 export default function Messages({ user, onBack }) {
   const [messages, setMessages] = useState([]);
   const [loading, setLoading] = useState(true);
+  const socketRef = useRef(null);
 
   useEffect(() => {
     fetchMessages();
+    // init socket for realtime messages
+    try {
+      const base = BACKEND_URL.replace('/api', '');
+      const sock = io(base, { transports: ['websocket'] });
+      socketRef.current = sock;
+      sock.on('connect', () => {});
+      sock.on('new_message', ({ email, message }) => {
+        if (email && user?.email && email === user.email) {
+          setMessages(prev => [message, ...prev]);
+          try {
+            if (Notification && Notification.permission === 'granted') {
+              new Notification(message.title || 'New message', { body: message.body?.slice(0, 120) });
+            } else if (Notification && Notification.permission !== 'denied') {
+              Notification.requestPermission().then(p => { if (p === 'granted') new Notification(message.title || 'New message', { body: message.body?.slice(0, 120) }); });
+            }
+          } catch (e) { /* ignore */ }
+        }
+      });
+    } catch (e) { console.warn('Socket init failed', e); }
+
+    return () => { socketRef.current?.disconnect(); };
   }, []);
 
   const fetchMessages = async () => {
