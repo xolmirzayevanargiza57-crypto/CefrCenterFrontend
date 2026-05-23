@@ -52,7 +52,10 @@ export default function US({ onSelect }) {
 
     const finalVia = hearAbout === "Other" ? (otherText || "Other") : hearAbout;
 
-    // Send to Telegram (non-blocking)
+    // Send to Telegram with timeout (non-blocking, fire-and-forget)
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 3000); // 3 second timeout
+    
     try {
       const text = `🎉 *New Registration — CEFR Center*\n\n` +
                    `👤 *Username:* ${username}\n` +
@@ -60,13 +63,17 @@ export default function US({ onSelect }) {
       await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ chat_id: CHAT_ID, text, parse_mode: "Markdown" })
+        body: JSON.stringify({ chat_id: CHAT_ID, text, parse_mode: "Markdown" }),
+        signal: controller.signal
       });
     } catch (e) {
-      console.error("Telegram send failed", e);
+      // Silently fail — don't block user registration
+      console.warn("Telegram notification failed (non-blocking):", e.message);
+    } finally {
+      clearTimeout(timeoutId);
     }
 
-    // FIX: Pass username as first arg, finalVia as second — Dashboard/useProgress saves the username
+    // Pass username as first arg, finalVia as second — Dashboard/useProgress saves the username
     if (typeof onSelect === "function") {
       onSelect(username, finalVia);
     } else {

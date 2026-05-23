@@ -499,7 +499,7 @@ export default function Dashboard() {
   if (!isPremActive) {
     NAV.splice(NAV.length - 1, 0, { pg: "premium_upgrade", label: "Get Premium", ic: "crown", badge: "HOT" });
   }
-  if (isAdmin) NAV.push({ pg: "admin", label: "Admin Panel", ic: "lock", badge: "PRO" });
+  // Admin Panel removed from navigation — use admin login to access directly
 
   // Fetch Notifications Count
   useEffect(() => {
@@ -590,8 +590,8 @@ export default function Dashboard() {
   );
 
   if (!progress.onboarded) return (
-    <US onSelect={(name) => {
-      updateUsername(name);
+    <US onSelect={(name, via) => {
+      updateProfileData({ username: name, onboarded: true });
     }} />
   );
 

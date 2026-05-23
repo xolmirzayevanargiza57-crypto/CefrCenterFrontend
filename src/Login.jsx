@@ -138,11 +138,18 @@ export default function Login() {
     setError("");
     try {
       const result = await signInWithPopup(auth, provider);
-      // After Google sign-in, navigate to dashboard.
-      // US.jsx (onboarding) will show if the user hasn't completed setup.
-      navigate("/dashboard");
+      // Successfully signed in with Google
+      // Navigate to dashboard where US.jsx will prompt for username if needed
+      navigate("/dashboard", { replace: true });
     } catch (err) {
-      setError("Google sign-in failed.");
+      if (err.code === "auth/popup-closed-by-user") {
+        setError("Google sign-in was cancelled.");
+      } else if (err.code === "auth/network-request-failed") {
+        setError("Network error. Please check your connection.");
+      } else {
+        setError("Google sign-in failed. Please try again.");
+      }
+      console.error("Google sign-in error:", err);
     } finally {
       setLoading(false);
     }
