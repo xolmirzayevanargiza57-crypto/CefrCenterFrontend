@@ -218,63 +218,7 @@ function DashHome({ user, progress, scores, lvlMeta, pct, nxp, cxp, setPage, cle
         </div>
       </div>
 
-      {/* REFERRAL BANNER */}
-      <div style={{
-        background: "var(--bg-secondary)",
-        borderRadius: 24,
-        padding: "24px",
-        marginBottom: 24,
-        border: "1px solid var(--border)",
-        boxShadow: "0 4px 20px rgba(0,0,0,0.05)"
-      }}>
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 18 }}>
-          <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
-            <div style={{ width: 48, height: 48, borderRadius: 16, background: "var(--bg-primary)", border: "1px solid var(--border)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, fontSize: 24 }}>
-              🎁
-            </div>
-            <div>
-              <h3 style={{ fontSize: 16, fontWeight: 800, color: "var(--text-primary)", margin: 0, marginBottom: 2 }}>Referral Program</h3>
-              <p style={{ fontSize: 12, color: "var(--text-muted)", margin: 0 }}>Invite 5 friends → 9 days Premium free</p>
-            </div>
-          </div>
-          <div style={{ background: "var(--text-primary)", color: "var(--bg-primary)", padding: "4px 14px", borderRadius: 20, fontSize: 12, fontWeight: 900, flexShrink: 0 }}>
-            0 / 5
-          </div>
-        </div>
-        <div style={{ height: 8, background: "var(--bg-primary)", borderRadius: 4, marginBottom: 20, overflow: "hidden", border: "1px solid var(--border)" }}>
-          <div style={{ height: "100%", width: "0%", background: "var(--text-primary)", borderRadius: 4 }} />
-        </div>
-        <div style={{ display: "flex", gap: 12 }}>
-          <div style={{ flex: 1, background: "var(--bg-primary)", border: "1px solid var(--border)", borderRadius: 14, padding: "12px 16px", display: "flex", alignItems: "center", gap: 10, fontSize: 13, color: "var(--text-muted)", overflow: "hidden" }}>
-            🔗 <span style={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>https://xn--cefrcenter-b046i.vercel.app/?ref=invite</span>
-          </div>
-          <button
-            onClick={async () => {
-              const url = "https://xn--cefrcenter-b046i.vercel.app/?ref=invite";
-              try {
-                await navigator.clipboard.writeText(url);
-                setCopiedInvite(true);
-                setTimeout(() => setCopiedInvite(false), 1800);
-              } catch (e) {
-                try {
-                  const ta = document.createElement('textarea');
-                  ta.value = url;
-                  document.body.appendChild(ta);
-                  ta.select();
-                  document.execCommand('copy');
-                  document.body.removeChild(ta);
-                  setCopiedInvite(true);
-                  setTimeout(() => setCopiedInvite(false), 1800);
-                } catch (err) {
-                  console.warn('Copy failed', err);
-                }
-              }
-            }}
-            style={{ background: copiedInvite ? "#4ade80" : "var(--text-primary)", color: "var(--bg-primary)", border: "none", borderRadius: 14, padding: "0 24px", fontWeight: 700, cursor: "pointer", fontSize: 13 }}>
-            {copiedInvite ? 'Copied' : 'Copy'}
-          </button>
-        </div>
-      </div>
+      {/* Referral Program removed */}
 
       {/* STREAK & LEVEL CARD */}
       <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16, marginBottom: 20 }}>
