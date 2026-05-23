@@ -7,11 +7,11 @@ import {
 } from "firebase/auth";
 import { auth } from "./firebase";
 import { 
-  User, Mail, Lock, Shield, Settings as Gear, 
+  User, Mail, Lock, Shield, ShieldCheck, Settings as Gear, 
   CheckCircle, AlertCircle, Camera, LogOut, 
   ChevronRight, Save, Trash2, Download, History,
   Activity, Zap, Database, RefreshCw, Award, Target,
-  TrendingUp, BarChart3, Clock, Shield, Crown
+  TrendingUp, BarChart3, Clock, Crown
 } from "lucide-react";
 
 const STORAGE_KEY = "cefr_center_progress_v1";
@@ -440,8 +440,8 @@ export default function Settings({ user, progress, resetProgress, updateUsername
         />
       </Section>
 
-
-      <Section title="Subscription" icon={<Shield size={18} color="#fbbf24" strokeWidth={2.5} />}>
+      {/* ── SUBSCRIPTION ─────────────────────────────────────────────────── */}
+      <Section title="Subscription" icon={<ShieldCheck size={18} color="#fbbf24" strokeWidth={2.5} />}>
         <Row 
           icon={<Crown size={16} color={progress.isPremium && progress.premiumExpire && new Date(progress.premiumExpire) > new Date() ? "#fbbf24" : "#64748b"} />} 
           label="Current Plan" 
@@ -508,7 +508,6 @@ export default function Settings({ user, progress, resetProgress, updateUsername
            </div>
            <p style={{ fontSize: 11, color: "#94a3b8", textAlign: "center", marginTop: 12, fontWeight: 600 }}>XP Points Gained (Last 7 Days)</p>
         </div>
-        
 
         <Row 
           icon={<Clock size={16} />} 
@@ -655,7 +654,7 @@ export default function Settings({ user, progress, resetProgress, updateUsername
         </div>
       )}
 
-      {/* Goal Modal */}
+      {/* ── GOAL MODAL ───────────────────────────────────────────────────── */}
       {showGoalModal && (
         <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.8)", zIndex: 10000, display: "flex", alignItems: "center", justifyContent: "center", padding: "40px 20px", overflowY: "auto" }}>
           <div style={{ background: "#131d2e", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 20, padding: 24, maxWidth: 350, width: "100%", boxShadow: "0 24px 64px rgba(0,0,0,0.6)" }}>
