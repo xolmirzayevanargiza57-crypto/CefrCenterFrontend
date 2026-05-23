@@ -91,8 +91,8 @@ function Root() {
       return (
         <LevelSelect 
           onSelect={(levelCode) => {
-            // Grant a small starter XP when selecting level (e.g., 50 XP)
-            setInitialLevel(levelCode, passedUsername || progress.username, 50);
+            // Do not grant starter XP here; level is set and persisted
+            setInitialLevel(levelCode, passedUsername || progress.username);
             navigate("/dashboard", { replace: true });
           }}
         />
