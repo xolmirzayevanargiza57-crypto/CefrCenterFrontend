@@ -246,12 +246,32 @@ function DashHome({ user, progress, scores, lvlMeta, pct, nxp, cxp, setPage, cle
         </div>
         <div style={{ display: "flex", gap: 12 }}>
           <div style={{ flex: 1, background: "var(--bg-primary)", border: "1px solid var(--border)", borderRadius: 14, padding: "12px 16px", display: "flex", alignItems: "center", gap: 10, fontSize: 13, color: "var(--text-muted)", overflow: "hidden" }}>
-            🔗 <span style={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>cefrcenter.vercel.app/?ref=invite</span>
+            🔗 <span style={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>https://xn--cefrcenter-b046i.vercel.app/?ref=invite</span>
           </div>
           <button
-            onClick={() => { navigator.clipboard.writeText("https://cefrcenter.vercel.app/?ref=invite"); }}
-            style={{ background: "var(--text-primary)", color: "var(--bg-primary)", border: "none", borderRadius: 14, padding: "0 24px", fontWeight: 700, cursor: "pointer", fontSize: 13 }}>
-            Copy
+            onClick={async () => {
+              const url = "https://xn--cefrcenter-b046i.vercel.app/?ref=invite";
+              try {
+                await navigator.clipboard.writeText(url);
+                setCopiedInvite(true);
+                setTimeout(() => setCopiedInvite(false), 1800);
+              } catch (e) {
+                try {
+                  const ta = document.createElement('textarea');
+                  ta.value = url;
+                  document.body.appendChild(ta);
+                  ta.select();
+                  document.execCommand('copy');
+                  document.body.removeChild(ta);
+                  setCopiedInvite(true);
+                  setTimeout(() => setCopiedInvite(false), 1800);
+                } catch (err) {
+                  console.warn('Copy failed', err);
+                }
+              }
+            }}
+            style={{ background: copiedInvite ? "#4ade80" : "var(--text-primary)", color: "var(--bg-primary)", border: "none", borderRadius: 14, padding: "0 24px", fontWeight: 700, cursor: "pointer", fontSize: 13 }}>
+            {copiedInvite ? 'Copied' : 'Copy'}
           </button>
         </div>
       </div>
@@ -452,6 +472,7 @@ export default function Dashboard() {
   const [timeBonusClaimed, setTimeBonusClaimed] = useState(false);
   const [lessons, setLessons] = useState(null);
   const [unreadNotifs, setUnreadNotifs] = useState(0);
+  const [copiedInvite, setCopiedInvite] = useState(false);
   const userAddedRef = useRef(false);
   const timerRef = useRef(null);
   const syncTimerRef = useRef(null);
