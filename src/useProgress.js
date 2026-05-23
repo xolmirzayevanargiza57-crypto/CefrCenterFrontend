@@ -435,11 +435,23 @@ export function useProgress() {
     // XP always starts at 0 (do not grant starter XP here)
     const next = { ...P, level: code, xp: 0, username: username || P.username || "", onboarded: true };
     sp(next);
+    // If user is authenticated and cloud sync ready, persist immediately
+    try {
+      const email = emailRef.current || auth?.currentUser?.email;
+      if (email && isReady.current) {
+        // Fire-and-forget
+        syncToMongoDB(next, rd(SCK, {}), email).catch(e => console.warn('Immediate sync failed:', e.message));
+      }
+    } catch (e) {}
   }, [P, sp]);
 
   const updateUsername = useCallback((name) => {
     const next = { ...P, username: name };
     sp(next);
+    try {
+      const email = emailRef.current || auth?.currentUser?.email;
+      if (email && isReady.current) syncToMongoDB(next, rd(SCK, {}), email).catch(() => {});
+    } catch (e) {}
   }, [P, sp]);
 
   const resetProgress = useCallback(() => { sp(DEF); ss({}); spr({}); }, [sp, ss]);
