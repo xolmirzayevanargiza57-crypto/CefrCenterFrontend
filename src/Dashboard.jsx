@@ -556,7 +556,7 @@ export default function Dashboard() {
 
   if (!progress.onboarded) return (
     <US onSelect={(name, via) => {
-      updateProfileData({ username: name, onboarded: true });
+      updateProfileData({ username: name, onboarded: true, hearAbout: via });
     }} />
   );
 

@@ -483,6 +483,10 @@ export function useProgress() {
         const next = { ...prev, ...fields };
         wr(SK, next);
         scheduleSync(next, rd(SCK, {}));
+        try {
+          const email = emailRef.current || auth?.currentUser?.email;
+          if (email && isReady.current) syncToMongoDB(next, rd(SCK, {}), email).catch(() => {});
+        } catch (e) {}
         return next;
       });
     },
