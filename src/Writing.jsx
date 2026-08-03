@@ -34,18 +34,14 @@ function isGibberish(text) {
   const words = text.trim().split(/\s+/);
   if (words.length < 8) return true;
 
-  // Pattern checks for random strings
   if ((text.match(/[bcdfghjklmnpqrstvwxyz]{5,}/gi) || []).length > 2) return true; 
   
-  // Vowel density check
   const noVowel = words.filter(w => w.length > 2 && !/[aeiouy]/i.test(w)).length;
   if (noVowel > words.length * 0.2) return true;
 
-  // Unique word ratio (repetition)
   const unique = new Set(words.map(w => w.toLowerCase()));
   if (unique.size < words.length * 0.4 && words.length > 10) return true;
 
-  // Gibberish word detection (common words check)
   const common = ["the", "and", "i", "to", "a", "of", "in", "is", "it", "you", "that", "this"];
   const commonCount = words.filter(w => common.includes(w.toLowerCase())).length;
   if (commonCount < 1 && words.length > 5) return true;
@@ -152,7 +148,7 @@ function CriterionBar({ crit, score, maxPerCrit }) {
 }
 
 // ─── Main Component ───────────────────────────────────────────────────────────
-export default function Writing({ progress, scores, saveScore, addXP, addCoins, tests: propTests = [] }) {
+export default function Writing({ progress, scores, saveScore, addXP, addCoins, tests: propTests = [], writingTopics = null }) {
   const [tests,      setTests]      = useState(propTests);
   const [loading,    setLoading]    = useState(propTests.length === 0);
   const [view,       setView]       = useState("list");
@@ -163,6 +159,7 @@ export default function Writing({ progress, scores, saveScore, addXP, addCoins, 
   const [submitting, setSubmitting] = useState(false);
   const [validErr,   setValidErr]   = useState("");
   const [activeErr,  setActiveErr]  = useState(null);
+  const [showTopics, setShowTopics] = useState(false);
 
   // Use tests from props
   useEffect(() => {
@@ -174,8 +171,6 @@ export default function Writing({ progress, scores, saveScore, addXP, addCoins, 
 
   const part  = sel?.parts?.[pIdx];
   const pN    = part?.partNum || (part?.id?.includes("P1.1") ? 1.1 : (part?.id?.includes("P1.2") ? 1.2 : 2));
-  // In CEFR writing, Part 2 is often the 3rd task (1.1, 1.2, 2). 
-  // User refers to the essay task as "Part 3".
   const isPart3 = part?.id?.includes("P2") || pIdx === 2;
 
   const text  = texts[part?.id] || "";
@@ -212,7 +207,6 @@ export default function Writing({ progress, scores, saveScore, addXP, addCoins, 
       if (!resp.ok) throw new Error(`Server error ${resp.status}`);
       const data = await resp.json();
 
-      // Clamp + validate scores
       const pN = part.partNum || (part.id.includes("P1") ? 1 : 3);
       const maxForThisPart = pN === 1 ? 15 : (pN === 2 ? 20 : 40);
       const maxPerCrit = maxForThisPart / 4;
@@ -227,7 +221,6 @@ export default function Writing({ progress, scores, saveScore, addXP, addCoins, 
       const totalScore = Math.round(sc.task + sc.cohesion + sc.lexical + sc.grammar);
       const bandInfo   = scoreToWritingBand(totalScore, maxForThisPart);
 
-      // Only keep errors that are actually in the text
       const errors = (data.errors || []).filter(e =>
         e.original && typeof e.original === "string" && text.includes(e.original)
       );
@@ -245,7 +238,6 @@ export default function Writing({ progress, scores, saveScore, addXP, addCoins, 
 
       setResults(prev => ({ ...prev, [part.id]: result }));
 
-      // ── Dashboard sync ──────────────────────────────────────────────────────
       const scoreKey = `${sel.id}_${part.id}`;
       const xpKey    = `writing_${scoreKey}`;
       saveScore?.("writing", scoreKey, totalScore);
@@ -286,40 +278,105 @@ export default function Writing({ progress, scores, saveScore, addXP, addCoins, 
           <div style={{ width: 36, height: 36, border: "3px solid rgba(239,159,39,0.2)", borderTopColor: "#EF9F27", borderRadius: "50%", animation: "spin 1s linear infinite", margin: "0 auto 16px" }} />
           Loading tests...
         </div>
-      ) : tests.length === 0 ? (
-        <div style={{ textAlign: "center", padding: 40, background: "#18243a", borderRadius: 14, color: "#8b9bbf" }}>
-          No writing tests found. Check backend connection.
-        </div>
       ) : (
-        <div style={{ display: "grid", gap: 10 }}>
-          {tests.map(t => {
-            const partScores = (t.parts || []).map(p => scores?.[`writing_${t.id}_${p.id}`]).filter(s => s != null);
-            const totalSc = partScores.reduce((a, b) => a + b, 0);
-            const allDone = partScores.length === (t.parts || []).length && partScores.length > 0;
-            const bi      = (partScores.length > 0) ? scoreToWritingBand(totalSc, 75) : null;
-            return (
-              <div key={t.id}
-                onClick={() => { setSel(t); setPIdx(0); setView("test"); setActiveErr(null); }}
-                style={{ background: allDone ? "rgba(239,159,39,0.04)" : "#18243a", border: `1px solid ${allDone ? "rgba(239,159,39,0.3)" : "rgba(255,255,255,0.07)"}`, borderRadius: 12, padding: "14px 18px", cursor: "pointer", transition: "all .15s", display: "flex", justifyContent: "space-between", alignItems: "center", gap: 10 }}
-                onMouseEnter={e => { e.currentTarget.style.borderColor = "#EF9F2777"; e.currentTarget.style.background = allDone ? "rgba(239,159,39,0.08)" : "#1e2d48"; }}
-                onMouseLeave={e => { e.currentTarget.style.borderColor = allDone ? "rgba(239,159,39,0.3)" : "rgba(255,255,255,0.07)"; e.currentTarget.style.background = allDone ? "rgba(239,159,39,0.04)" : "#18243a"; }}>
-                <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
-                  <div style={{ width: 38, height: 38, borderRadius: "50%", background: allDone ? "#EF9F27" : "rgba(255,255,255,0.05)", border: allDone ? "none" : "1px solid rgba(255,255,255,0.1)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
-                    {allDone ? <Ic n="check" s={18} c="#fff" /> : <span style={{ fontSize: 13, fontWeight: 800, color: "#8b9bbf" }}>{tests.indexOf(t) + 1}</span>}
+        <>
+          {/* Tests Section */}
+          <div style={{ marginBottom: 20 }}>
+            <h3 style={{ fontSize: 15, fontWeight: 700, color: "#f0f4ff", marginBottom: 12, display: "flex", alignItems: "center", gap: 8 }}>
+              <Ic n="star" s={14} c="#EF9F27" /> Official Tests
+            </h3>
+            <div style={{ display: "grid", gap: 10 }}>
+              {tests.map(t => {
+                const partScores = (t.parts || []).map(p => scores?.[`writing_${t.id}_${p.id}`]).filter(s => s != null);
+                const totalSc = partScores.reduce((a, b) => a + b, 0);
+                const allDone = partScores.length === (t.parts || []).length && partScores.length > 0;
+                const bi      = (partScores.length > 0) ? scoreToWritingBand(totalSc, 75) : null;
+                return (
+                  <div key={t.id}
+                    onClick={() => { setSel(t); setPIdx(0); setView("test"); setActiveErr(null); }}
+                    style={{ background: allDone ? "rgba(239,159,39,0.04)" : "#18243a", border: `1px solid ${allDone ? "rgba(239,159,39,0.3)" : "rgba(255,255,255,0.07)"}`, borderRadius: 12, padding: "14px 18px", cursor: "pointer", transition: "all .15s", display: "flex", justifyContent: "space-between", alignItems: "center", gap: 10 }}
+                    onMouseEnter={e => { e.currentTarget.style.borderColor = "#EF9F2777"; e.currentTarget.style.background = allDone ? "rgba(239,159,39,0.08)" : "#1e2d48"; }}
+                    onMouseLeave={e => { e.currentTarget.style.borderColor = allDone ? "rgba(239,159,39,0.3)" : "rgba(255,255,255,0.07)"; e.currentTarget.style.background = allDone ? "rgba(239,159,39,0.04)" : "#18243a"; }}>
+                    <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
+                      <div style={{ width: 38, height: 38, borderRadius: "50%", background: allDone ? "#EF9F27" : "rgba(255,255,255,0.05)", border: allDone ? "none" : "1px solid rgba(255,255,255,0.1)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+                        {allDone ? <Ic n="check" s={18} c="#fff" /> : <span style={{ fontSize: 13, fontWeight: 800, color: "#8b9bbf" }}>{tests.indexOf(t) + 1}</span>}
+                      </div>
+                      <div>
+                        <h3 style={{ fontSize: 14, fontWeight: 700, color: "#f0f4ff", marginBottom: 3 }}>{t.title}</h3>
+                        <p style={{ fontSize: 12, color: "#8b9bbf" }}>{t.level} · {(t.parts || []).length} tasks{partScores.length > 0 ? ` · ${partScores.length}/${(t.parts||[]).length} done` : ""}</p>
+                      </div>
+                    </div>
+                    <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                      {partScores.length > 0 && <div style={{ textAlign: "right" }}><div style={{ fontSize: 16, fontWeight: 800, color: bi?.color || "#EF9F27" }}>{totalSc}/75</div><div style={{ fontSize: 10, color: bi?.color || "#8b9bbf", fontWeight: 600 }}>Band {bi?.band || "?"}</div></div>}
+                      <Ic n="next" s={14} c="#8b9bbf" />
+                    </div>
                   </div>
-                  <div>
-                    <h3 style={{ fontSize: 14, fontWeight: 700, color: "#f0f4ff", marginBottom: 3 }}>{t.title}</h3>
-                    <p style={{ fontSize: 12, color: "#8b9bbf" }}>{t.level} · {(t.parts || []).length} tasks{partScores.length > 0 ? ` · ${partScores.length}/${(t.parts||[]).length} done` : ""}</p>
-                  </div>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* Topics Section */}
+          {writingTopics && (writingTopics.part_1?.length > 0 || writingTopics.part_2?.length > 0) && (
+            <div>
+              <button 
+                onClick={() => setShowTopics(!showTopics)}
+                style={{ background: "none", border: "none", color: "#EF9F27", fontSize: 14, fontWeight: 700, cursor: "pointer", display: "flex", alignItems: "center", gap: 8, padding: "8px 0", fontFamily: "inherit" }}
+              >
+                <Ic n={showTopics ? "back" : "next"} s={12} c="#EF9F27" />
+                {showTopics ? "Hide" : "Show"} All Topics ({writingTopics.part_1?.length + writingTopics.part_2?.length} topics)
+              </button>
+              
+              {showTopics && (
+                <div style={{ marginTop: 12 }}>
+                  {/* Part 1 Topics */}
+                  {writingTopics.part_1?.length > 0 && (
+                    <div style={{ marginBottom: 20 }}>
+                      <h4 style={{ fontSize: 13, fontWeight: 700, color: "#8b9bbf", marginBottom: 10, display: "flex", alignItems: "center", gap: 8 }}>
+                        <span style={{ background: "rgba(55,138,221,0.15)", color: "#378ADD", padding: "2px 12px", borderRadius: 20, fontSize: 10 }}>Part 1</span>
+                        Informal Emails ({writingTopics.part_1.length})
+                      </h4>
+                      <div style={{ display: "grid", gap: 8 }}>
+                        {writingTopics.part_1.map((topic, i) => (
+                          <div key={i} style={{ background: "#18243a", borderRadius: 10, padding: "12px 16px", border: "1px solid rgba(255,255,255,0.05)" }}>
+                            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: 6 }}>
+                              <span style={{ fontSize: 13, color: "#f0f4ff", fontWeight: 500 }}>{topic.title}</span>
+                              <span style={{ fontSize: 10, background: "rgba(55,138,221,0.15)", color: "#378ADD", padding: "2px 10px", borderRadius: 10 }}>{topic.level}</span>
+                            </div>
+                            <p style={{ fontSize: 12, color: "#8b9bbf", marginTop: 4 }}>{topic.prompt}</p>
+                            <span style={{ fontSize: 11, color: "#4a5568" }}>{topic.minWords}-{topic.maxWords} words</span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Part 2 Topics */}
+                  {writingTopics.part_2?.length > 0 && (
+                    <div>
+                      <h4 style={{ fontSize: 13, fontWeight: 700, color: "#8b9bbf", marginBottom: 10, display: "flex", alignItems: "center", gap: 8 }}>
+                        <span style={{ background: "rgba(239,159,39,0.15)", color: "#EF9F27", padding: "2px 12px", borderRadius: 20, fontSize: 10 }}>Part 2</span>
+                        Discussion Essays ({writingTopics.part_2.length})
+                      </h4>
+                      <div style={{ display: "grid", gap: 8 }}>
+                        {writingTopics.part_2.map((topic, i) => (
+                          <div key={i} style={{ background: "#18243a", borderRadius: 10, padding: "12px 16px", border: "1px solid rgba(239,159,39,0.1)" }}>
+                            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: 6 }}>
+                              <span style={{ fontSize: 13, color: "#f0f4ff", fontWeight: 500 }}>{topic.title}</span>
+                              <span style={{ fontSize: 10, background: "rgba(239,159,39,0.15)", color: "#EF9F27", padding: "2px 10px", borderRadius: 10 }}>{topic.level}</span>
+                            </div>
+                            <p style={{ fontSize: 12, color: "#8b9bbf", marginTop: 4 }}>{topic.prompt}</p>
+                            <span style={{ fontSize: 11, color: "#4a5568" }}>{topic.minWords}-{topic.maxWords} words</span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
                 </div>
-                <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-                  {partScores.length > 0 && <div style={{ textAlign: "right" }}><div style={{ fontSize: 16, fontWeight: 800, color: bi?.color || "#EF9F27" }}>{totalSc}/75</div><div style={{ fontSize: 10, color: bi?.color || "#8b9bbf", fontWeight: 600 }}>Band {bi?.band || "?"}</div></div>}
-                  <Ic n="next" s={14} c="#8b9bbf" />
-                </div>
-              </div>
-            );
-          })}
-        </div>
+              )}
+            </div>
+          )}
+        </>
       )}
     </div>
   );
@@ -374,7 +431,6 @@ export default function Writing({ progress, scores, saveScore, addXP, addCoins, 
           </div>
         )}
         
-        {/* Images for Task Description - Hidden for Part 3 as requested */}
         {part.images?.length > 0 && !isPart3 && (
           <div style={{ display: "flex", gap: 10, marginTop: 16, flexWrap: "wrap", justifyContent: "center" }}>
             {part.images.map((img, i) => (
